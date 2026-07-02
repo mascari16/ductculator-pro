@@ -331,21 +331,45 @@ SIDEBAR
 
 }
 
-/*======================
-COLLAPSED SIDEBAR
-======================*/
+.icon{
 
-.sidebar.collapsed h2{
+    display:inline-block;
+
+    width:28px;
+
+    text-align:center;
+
+    font-size:18px;
+
+}
+
+/* ======================
+   COLLAPSED BUTTONS
+====================== */
+
+.sidebar.collapsed .text{
 
     display:none;
 
 }
 
-.sidebar.collapsed button:not(.toggle-btn){
+.sidebar.collapsed button{
 
-    text-align:center;
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
 
     padding:14px 0;
+
+}
+
+.sidebar.collapsed .icon{
+
+    width:auto;
+
+    margin:0;
 
     font-size:22px;
 
