@@ -634,10 +634,13 @@ MOBILE
     }
 
     .sidebar{
+    width:230px;
+    transition:width .25s ease;
+}
 
-        width:100%;
-
-    }
+.sidebar.collapsed{
+    width:75px;
+}
 
     .calculator{
 

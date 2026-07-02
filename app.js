@@ -24,6 +24,16 @@ document.getElementById("goHome").addEventListener("click", () => {
 
 });
 
+// Sidebar Toggle
+const sidebar = document.querySelector(".sidebar");
+const toggleSidebar = document.getElementById("toggleSidebar");
+
+toggleSidebar.addEventListener("click", () => {
+
+    sidebar.classList.toggle("collapsed");
+
+});
+
 // ----------------------------
 // Calculator Controls
 // ----------------------------
