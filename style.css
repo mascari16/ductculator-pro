@@ -237,6 +237,8 @@ SIDEBAR
 
     width:75px;
 
+    padding:25px 10px;
+
 }
 
 .sidebar-top{
@@ -359,6 +361,12 @@ SIDEBAR
 
 }
 
+.sidebar.collapsed .sidebar-top{
+
+    justify-content:center;
+
+}
+
 /* ======================
    COLLAPSED BUTTONS
 ====================== */
@@ -369,14 +377,11 @@ SIDEBAR
 
 }
 
-.sidebar.collapsed button{
+.sidebar.collapsed button:not(.toggle-btn){
 
     display:flex;
-
     justify-content:center;
-
     align-items:center;
-
     padding:14px 0;
 
 }
