@@ -1,46 +1,49 @@
-// ==========================================
+// =====================================================
 // DUCTCULATOR PRO
 // app.js
-// ==========================================
+// =====================================================
 
-// ---------- Navigation ----------
+// ----------------------------
+// Dashboard Navigation
+// ----------------------------
 
 const dashboard = document.getElementById("dashboard");
 const airflowWorkspace = document.getElementById("airflowWorkspace");
 
-const openAirflow = document.getElementById("openAirflow");
-const goHome = document.getElementById("goHome");
-
-openAirflow.addEventListener("click", () => {
+document.getElementById("openAirflow").addEventListener("click", () => {
 
     dashboard.classList.remove("active");
     airflowWorkspace.classList.add("active");
 
 });
 
-goHome.addEventListener("click", () => {
+document.getElementById("goHome").addEventListener("click", () => {
 
     airflowWorkspace.classList.remove("active");
     dashboard.classList.add("active");
 
 });
 
-// ---------- Inputs ----------
+// ----------------------------
+// Calculator Controls
+// ----------------------------
 
 const methodSelect = document.getElementById("methodSelect");
 
 const velocityGroup = document.getElementById("velocityGroup");
 const frictionGroup = document.getElementById("frictionGroup");
 
-const calculateBtn = document.getElementById("calculateBtn");
-
 const cfmInput = document.getElementById("cfmInput");
 const velocityInput = document.getElementById("velocityInput");
 const frictionInput = document.getElementById("frictionInput");
 
+const calculateBtn = document.getElementById("calculateBtn");
+
 const results = document.getElementById("results");
 
-// ---------- Method Changed ----------
+// ----------------------------
+// Switch Calculation Method
+// ----------------------------
 
 methodSelect.addEventListener("change", () => {
 
@@ -58,7 +61,9 @@ methodSelect.addEventListener("change", () => {
 
 });
 
-// ---------- Calculate ----------
+// ----------------------------
+// Calculate Button
+// ----------------------------
 
 calculateBtn.addEventListener("click", () => {
 
@@ -66,14 +71,15 @@ calculateBtn.addEventListener("click", () => {
 
     if (cfm <= 0) {
 
-        results.innerHTML = "<strong>Please enter a valid CFM.</strong>";
+        results.innerHTML = "<h2>Please enter a valid CFM.</h2>";
+
         return;
 
     }
 
-    // -----------------------
+    // ------------------------
     // CONSTANT VELOCITY
-    // -----------------------
+    // ------------------------
 
     if (methodSelect.value === "constantVelocity") {
 
@@ -83,61 +89,52 @@ calculateBtn.addEventListener("click", () => {
 
         if (!data) {
 
-            results.innerHTML = "<strong>Invalid values.</strong>";
+            results.innerHTML = "<h2>Invalid Values</h2>";
+
             return;
 
         }
 
-        results.innerHTML = `
+        results.innerHTML = buildResults(data);
 
-            <h2>${data.round}" Round</h2>
-
-            <hr>
-
-            <p>
-                <strong>Recommended Size</strong><br>
-                ${data.round}"
-            </p>
-
-            <p>
-                <strong>Exact Diameter</strong><br>
-                ${data.exactDiameter.toFixed(2)}"
-            </p>
-
-            <p>
-                <strong>Actual Velocity</strong><br>
-                ${Math.round(data.actualVelocity)} FPM
-            </p>
-
-            <p>
-                <strong>Duct Area</strong><br>
-                ${data.area.toFixed(3)} sq ft
-            </p>
-
-        `;
+        return;
 
     }
 
-    // -----------------------
+    // ------------------------
     // EQUAL FRICTION
-    // -----------------------
+    // ------------------------
 
-    else {
+    results.innerHTML = `
 
-        results.innerHTML = `
+        <div class="result-card">
 
-            <h2>Coming Soon</h2>
+            <div class="result-header">
 
-            <p>
+                <h2>Equal Friction</h2>
 
-                The Equal Friction engine
-                will use ASHRAE equations.
+                <p>
 
-            </p>
+                    Coming in Version 0.3
 
-        `;
+                </p>
 
-    }
+            </div>
+
+            <div style="padding:30px;">
+
+                <p>
+
+                    This calculator will use industry-standard
+                    ASHRAE duct sizing equations.
+
+                </p>
+
+            </div>
+
+        </div>
+
+    `;
 
 });
 
