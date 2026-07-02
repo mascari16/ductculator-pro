@@ -1,125 +1,157 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ductculator Pro</title>
 
-    <link rel="stylesheet" href="style.css">
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Ductculator Pro</title>
+
+<link rel="stylesheet" href="style.css">
+
 </head>
+
 <body>
 
-<header class="hero">
+<div class="app">
 
-    <h1>Ductculator Pro</h1>
+    <aside class="sidebar">
 
-    <p>
-        Professional HVAC Design Toolkit
-    </p>
+        <div class="logo">
 
-</header>
+            <h1>DUCTCULATOR</h1>
 
-<main>
-
-    <section>
-
-        <h2>Design Tools</h2>
-
-        <div class="card-grid">
-
-            <div class="tool-card">
-                <div class="icon">💨</div>
-                <h3>Airflow Calculator</h3>
-                <p>
-                    Size ducts using Equal Friction,
-                    Static Regain and Constant Velocity.
-                </p>
-            </div>
-
-            <div class="tool-card">
-                <div class="icon">📏</div>
-                <h3>Pressure Loss</h3>
-                <p>
-                    Calculate duct pressure losses
-                    including fittings.
-                </p>
-            </div>
-
-            <div class="tool-card">
-                <div class="icon">⭕</div>
-                <h3>Equivalent Sizes</h3>
-                <p>
-                    Compare round, oval and rectangular ducts.
-                </p>
-            </div>
-
-            <div class="tool-card">
-                <div class="icon">🔄</div>
-                <h3>Reverse Calculator</h3>
-                <p>
-                    Enter an existing duct and estimate airflow.
-                </p>
-            </div>
+            <span>PRO</span>
 
         </div>
 
-    </section>
-
-    <section>
-
-        <h2>Fabrication</h2>
-
-        <div class="card-grid">
-
-            <div class="tool-card">
-                <div class="icon">📦</div>
-                <h3>Material Estimator</h3>
-                <p>
-                    Estimate metal usage and weight.
-                </p>
-            </div>
-
-            <div class="tool-card">
-                <div class="icon">📐</div>
-                <h3>Developments</h3>
-                <p>
-                    Layout and fabrication calculations.
-                </p>
-            </div>
-
+        <div class="menu-title">
+            Design
         </div>
 
-    </section>
+        <button class="nav active">
+            💨 Airflow
+        </button>
 
-    <section>
+        <button class="nav">
+            ⭕ Equivalent
+        </button>
 
-        <h2>Utilities</h2>
+        <button class="nav">
+            🔄 Reverse
+        </button>
 
-        <div class="card-grid">
+        <button class="nav">
+            📏 Pressure
+        </button>
 
-            <div class="tool-card">
-                <div class="icon">⚡</div>
-                <h3>Conversions</h3>
-                <p>
-                    HVAC unit conversions.
-                </p>
-            </div>
-
-            <div class="tool-card">
-                <div class="icon">⚙</div>
-                <h3>Settings</h3>
-                <p>
-                    Preferences and app options.
-                </p>
-            </div>
-
+        <div class="menu-title">
+            Fabrication
         </div>
 
-    </section>
+        <button class="nav">
+            📦 Material
+        </button>
 
-</main>
+        <button class="nav">
+            📐 Developments
+        </button>
+
+        <div class="menu-title">
+            Utilities
+        </div>
+
+        <button class="nav">
+            ⚙ Settings
+        </button>
+
+    </aside>
+
+    <main>
+
+        <header>
+
+            <div>
+
+                <h2>Dashboard</h2>
+
+                <p>Professional HVAC Design Toolkit</p>
+
+            </div>
+
+            <input
+            class="search"
+            placeholder="Search tools...">
+
+        </header>
+
+        <section>
+
+            <h3>Design Tools</h3>
+
+            <div class="cards">
+
+                <div class="card">
+
+                    <div class="icon">💨</div>
+
+                    <h4>Airflow Calculator</h4>
+
+                    <p>
+                        Size ducts using Equal Friction,
+                        Constant Velocity and Static Regain.
+                    </p>
+
+                </div>
+
+                <div class="card">
+
+                    <div class="icon">⭕</div>
+
+                    <h4>Equivalent Sizes</h4>
+
+                    <p>
+                        Round, Flat Oval and Rectangle.
+                    </p>
+
+                </div>
+
+                <div class="card">
+
+                    <div class="icon">📏</div>
+
+                    <h4>Pressure Loss</h4>
+
+                    <p>
+                        Straight duct and fitting loss.
+                    </p>
+
+                </div>
+
+                <div class="card">
+
+                    <div class="icon">🔄</div>
+
+                    <h4>Reverse Calculator</h4>
+
+                    <p>
+                        Determine airflow from an existing duct.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
 
 <script src="app.js"></script>
 
 </body>
+
 </html>
