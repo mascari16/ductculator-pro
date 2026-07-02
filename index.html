@@ -3,13 +3,12 @@
 
 <head>
 
-<meta charset="UTF-8">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ductculator Pro</title>
 
-<title>Ductculator Pro</title>
-
-<link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css">
 
 </head>
 
@@ -17,134 +16,277 @@
 
 <div class="app">
 
+    <!-- ==========================
+         SIDEBAR
+    =========================== -->
+
     <aside class="sidebar">
 
         <div class="logo">
 
             <h1>DUCTCULATOR</h1>
 
-            <span>PRO</span>
+            <p>Professional Edition</p>
 
         </div>
 
-        <div class="menu-title">
-            Design
+        <nav>
+
+            <div class="nav-section">
+
+                <div class="nav-title">
+                    MAIN
+                </div>
+
+                <button class="nav-btn active" data-page="dashboard">
+                    🏠 Dashboard
+                </button>
+
+            </div>
+
+            <div class="nav-section">
+
+                <div class="nav-title">
+                    DESIGN
+                </div>
+
+                <button class="nav-btn" data-page="airflow">
+                    💨 Airflow Calculator
+                </button>
+
+                <button class="nav-btn" disabled>
+                    📏 Pressure Loss
+                </button>
+
+                <button class="nav-btn" disabled>
+                    ⭕ Equivalent Sizes
+                </button>
+
+                <button class="nav-btn" disabled>
+                    🔄 Reverse Calculator
+                </button>
+
+            </div>
+
+            <div class="nav-section">
+
+                <div class="nav-title">
+                    FABRICATION
+                </div>
+
+                <button class="nav-btn" disabled>
+                    📦 Material Estimator
+                </button>
+
+                <button class="nav-btn" disabled>
+                    📐 Developments
+                </button>
+
+            </div>
+
+            <div class="nav-section">
+
+                <div class="nav-title">
+                    UTILITIES
+                </div>
+
+                <button class="nav-btn" disabled>
+                    ⚙ Settings
+                </button>
+
+            </div>
+
+        </nav>
+
+        <div class="version">
+
+            <strong>Version</strong>
+
+            <span>0.1.0</span>
+
+            <small>Currently Building</small>
+
         </div>
-
-        <button class="nav active">
-            💨 Airflow
-        </button>
-
-        <button class="nav">
-            ⭕ Equivalent
-        </button>
-
-        <button class="nav">
-            🔄 Reverse
-        </button>
-
-        <button class="nav">
-            📏 Pressure
-        </button>
-
-        <div class="menu-title">
-            Fabrication
-        </div>
-
-        <button class="nav">
-            📦 Material
-        </button>
-
-        <button class="nav">
-            📐 Developments
-        </button>
-
-        <div class="menu-title">
-            Utilities
-        </div>
-
-        <button class="nav">
-            ⚙ Settings
-        </button>
 
     </aside>
 
-    <main>
+    <!-- ==========================
+         MAIN CONTENT
+    =========================== -->
 
-        <header>
+    <main class="content">
+
+        <header class="topbar">
 
             <div>
 
-                <h2>Dashboard</h2>
+                <h2 id="pageTitle">
+                    Dashboard
+                </h2>
 
-                <p>Professional HVAC Design Toolkit</p>
+                <p id="pageSubtitle">
+                    Professional HVAC Design Toolkit
+                </p>
 
             </div>
 
             <input
-            class="search"
-            placeholder="Search tools...">
+                type="text"
+                class="search"
+                placeholder="Search tools (coming soon)"
+            >
 
         </header>
 
-        <section>
+        <!-- Everything gets loaded here -->
 
-            <h3>Design Tools</h3>
+        <div id="workspace">
 
-            <div class="cards">
+            <!-- DASHBOARD -->
 
-                <div class="card">
+            <div id="dashboardPage">
 
-                    <div class="icon">💨</div>
+                <section>
 
-                    <h4>Airflow Calculator</h4>
+                    <h3>Design Tools</h3>
 
-                    <p>
-                        Size ducts using Equal Friction,
-                        Constant Velocity and Static Regain.
-                    </p>
+                    <div class="cards">
 
-                </div>
+                        <div class="card open-airflow">
 
-                <div class="card">
+                            <div class="card-icon">💨</div>
 
-                    <div class="icon">⭕</div>
+                            <h4>Airflow Calculator</h4>
 
-                    <h4>Equivalent Sizes</h4>
+                            <p>
+                                Equal Friction<br>
+                                Constant Velocity<br>
+                                Static Regain (Coming Soon)
+                            </p>
 
-                    <p>
-                        Round, Flat Oval and Rectangle.
-                    </p>
+                            <span class="card-link">
+                                Open →
+                            </span>
 
-                </div>
+                        </div>
 
-                <div class="card">
+                        <div class="card">
 
-                    <div class="icon">📏</div>
+                            <div class="card-icon">📏</div>
 
-                    <h4>Pressure Loss</h4>
+                            <h4>Pressure Loss</h4>
 
-                    <p>
-                        Straight duct and fitting loss.
-                    </p>
+                            <p>
+                                Straight duct<br>
+                                Fittings<br>
+                                Total Pressure
+                            </p>
 
-                </div>
+                            <span class="coming">
+                                Coming Soon
+                            </span>
 
-                <div class="card">
+                        </div>
 
-                    <div class="icon">🔄</div>
+                        <div class="card">
 
-                    <h4>Reverse Calculator</h4>
+                            <div class="card-icon">⭕</div>
 
-                    <p>
-                        Determine airflow from an existing duct.
-                    </p>
+                            <h4>Equivalent Sizes</h4>
+
+                            <p>
+                                Round<br>
+                                Rectangle<br>
+                                Flat Oval
+                            </p>
+
+                            <span class="coming">
+                                Coming Soon
+                            </span>
+
+                        </div>
+
+                        <div class="card">
+
+                            <div class="card-icon">🔄</div>
+
+                            <h4>Reverse Calculator</h4>
+
+                            <p>
+                                Existing Duct<br>
+                                Airflow<br>
+                                Velocity
+                            </p>
+
+                            <span class="coming">
+                                Coming Soon
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+            </div>
+
+            <!-- AIRFLOW PAGE -->
+
+            <div id="airflowPage" style="display:none;">
+
+                <div class="calculator">
+
+                    <div class="panel">
+
+                        <h3>Inputs</h3>
+
+                        <label>Airflow (CFM)</label>
+                        <input type="number" placeholder="2000">
+
+                        <label>Method</label>
+
+                        <select>
+
+                            <option>Equal Friction</option>
+
+                            <option>Constant Velocity</option>
+
+                            <option disabled>Static Regain (Soon)</option>
+
+                        </select>
+
+                        <label>Friction Rate</label>
+
+                        <input
+                            type="number"
+                            placeholder="0.08"
+                        >
+
+                        <button class="calculate">
+
+                            Calculate
+
+                        </button>
+
+                    </div>
+
+                    <div class="panel">
+
+                        <h3>Results</h3>
+
+                        <div class="placeholder">
+
+                            Airflow calculations will appear here.
+
+                        </div>
+
+                    </div>
 
                 </div>
 
             </div>
 
-        </section>
+        </div>
 
     </main>
 
