@@ -217,19 +217,76 @@ SIDEBAR
     border-right:1px solid var(--border);
     padding:25px;
 
+    transition:width .25s ease;
+
+    overflow:hidden;
+
+}
+
+.sidebar.collapsed{
+
+    width:75px;
+
+}
+
+.sidebar-top{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+    margin-bottom:30px;
+
+}
+
+.toggle-btn{
+
+    width:38px;
+
+    height:38px;
+
+    border:none;
+
+    border-radius:10px;
+
+    background:var(--card);
+
+    color:white;
+
+    cursor:pointer;
+
+    font-size:20px;
+
+    transition:.2s;
+
+    flex-shrink:0;
+
+}
+
+.toggle-btn:hover{
+
+    background:var(--blue);
+
 }
 
 .sidebar h2{
 
     color:var(--blue);
-    margin-bottom:30px;
+
+    white-space:nowrap;
+
+    transition:opacity .2s;
 
 }
 
 .sidebar hr{
 
     border:none;
+
     border-top:1px solid var(--border);
+
     margin:22px 0;
 
 }
@@ -237,16 +294,28 @@ SIDEBAR
 .sidebar button{
 
     width:100%;
+
     border:none;
+
     background:none;
+
     color:white;
+
     text-align:left;
+
     padding:14px;
+
     border-radius:10px;
+
     margin-bottom:8px;
+
     cursor:pointer;
+
     transition:.2s;
+
     font-size:15px;
+
+    white-space:nowrap;
 
 }
 
@@ -259,6 +328,26 @@ SIDEBAR
 .sidebar button.active{
 
     background:var(--blue);
+
+}
+
+/*======================
+COLLAPSED SIDEBAR
+======================*/
+
+.sidebar.collapsed h2{
+
+    display:none;
+
+}
+
+.sidebar.collapsed button:not(.toggle-btn){
+
+    text-align:center;
+
+    padding:14px 0;
+
+    font-size:22px;
 
 }
 
@@ -633,14 +722,6 @@ MOBILE
 
     }
 
-    .sidebar{
-    width:230px;
-    transition:width .25s ease;
-}
-
-.sidebar.collapsed{
-    width:75px;
-}
 
     .calculator{
 
