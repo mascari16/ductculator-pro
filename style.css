@@ -343,6 +343,12 @@ SIDEBAR
 
 }
 
+.sidebar.collapsed h2{
+
+    display:none;
+
+}
+
 /* ======================
    COLLAPSED BUTTONS
 ====================== */
