@@ -14,9 +14,9 @@
 
 <body>
 
-<!-- =========================
+<!-- ===================================================
      DASHBOARD
-========================== -->
+=================================================== -->
 
 <div id="dashboard" class="page active">
 
@@ -24,9 +24,7 @@
 
         <h1>DUCTCULATOR PRO</h1>
 
-        <p>
-            Professional HVAC Design Toolkit
-        </p>
+        <p>Professional HVAC Design Toolkit</p>
 
     </header>
 
@@ -118,11 +116,13 @@
 
 </div>
 
-<!-- =========================
+<!-- ===================================================
      AIRFLOW WORKSPACE
-========================== -->
+=================================================== -->
 
 <div id="airflowWorkspace" class="workspace">
+
+    <!-- Sidebar -->
 
     <aside class="sidebar">
 
@@ -142,27 +142,27 @@
 
         </button>
 
-        <button>
+        <button disabled>
 
             📏 Pressure Loss
 
         </button>
 
-        <button>
+        <button disabled>
 
-            ⭕ Equivalent
+            ⭕ Equivalent Sizes
 
         </button>
 
-        <button>
+        <button disabled>
 
-            🔄 Reverse
+            🔄 Reverse Calculator
 
         </button>
 
         <hr>
 
-        <button>
+        <button disabled>
 
             ⚙ Settings
 
@@ -170,19 +170,17 @@
 
     </aside>
 
+    <!-- Main Content -->
+
     <section class="content">
 
         <header>
 
-            <h1>
-
-                Airflow Calculator
-
-            </h1>
+            <h1>Airflow Calculator</h1>
 
             <p>
 
-                Equal Friction • Constant Velocity
+                Industry Standard HVAC Duct Sizing
 
             </p>
 
@@ -190,41 +188,86 @@
 
         <div class="calculator">
 
+            <!-- =======================
+                 INPUTS
+            ======================== -->
+
             <div class="panel">
 
                 <h3>Inputs</h3>
 
-                <label>Airflow (CFM)</label>
+                <label for="cfmInput">
+
+                    Airflow (CFM)
+
+                </label>
 
                 <input
+                    id="cfmInput"
                     type="number"
-                    placeholder="2000">
+                    placeholder="2000"
+                    value="2000">
 
-                <label>Calculation Method</label>
+                <label for="methodSelect">
 
-                <select>
+                    Calculation Method
 
-                    <option>
+                </label>
 
-                        Equal Friction
+                <select id="methodSelect">
 
-                    </option>
-
-                    <option>
+                    <option value="constantVelocity" selected>
 
                         Constant Velocity
 
                     </option>
 
+                    <option value="equalFriction">
+
+                        Equal Friction
+
+                    </option>
+
                 </select>
 
-                <label>Friction Rate</label>
+                <!-- Constant Velocity -->
 
-                <input
-                    type="number"
-                    placeholder=".08">
+                <div id="velocityGroup">
 
-                <button class="calculate">
+                    <label for="velocityInput">
+
+                        Velocity (FPM)
+
+                    </label>
+
+                    <input
+                        id="velocityInput"
+                        type="number"
+                        value="1200">
+
+                </div>
+
+                <!-- Equal Friction -->
+
+                <div id="frictionGroup" style="display:none;">
+
+                    <label for="frictionInput">
+
+                        Friction Rate (in.w.g./100')
+
+                    </label>
+
+                    <input
+                        id="frictionInput"
+                        type="number"
+                        step="0.01"
+                        value="0.08">
+
+                </div>
+
+                <button
+                    id="calculateBtn"
+                    class="calculate">
 
                     Calculate
 
@@ -232,13 +275,17 @@
 
             </div>
 
+            <!-- =======================
+                 RESULTS
+            ======================== -->
+
             <div class="panel">
 
                 <h3>Results</h3>
 
-                <div class="results">
+                <div id="results" class="results">
 
-                    Results will appear here.
+                    Enter values and press Calculate.
 
                 </div>
 
@@ -250,6 +297,12 @@
 
 </div>
 
+<!-- ===================================================
+     JAVASCRIPT
+=================================================== -->
+
+<script src="js/formulas.js"></script>
+<script src="js/airflow.js"></script>
 <script src="app.js"></script>
 
 </body>
