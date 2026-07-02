@@ -171,7 +171,10 @@ function buildResults(data) {
 
             <tr>
 
-                <td>⭕ Round</td>
+                <td>
+                    <span class="shape-icon">⭕</span>
+                    Round
+                </td>
 
                 <td>${data.round}"</td>
 
@@ -181,7 +184,10 @@ function buildResults(data) {
 
             <tr>
 
-                <td>▭ Rectangle</td>
+                <td>
+                    <span class="shape-icon">▭</span>
+                    Rectangle
+                </td>
 
                 <td>Coming Soon</td>
 
@@ -191,7 +197,10 @@ function buildResults(data) {
 
             <tr>
 
-                <td>⬭ Flat Oval</td>
+                <td>
+                    <span class="shape-icon">⬭</span>
+                    Flat Oval
+                </td>
 
                 <td>Coming Soon</td>
 

@@ -483,26 +483,26 @@ SECTION TITLES
     display:flex;
     align-items:center;
 
-    padding:18px 30px;
+    padding:18px 32px;
+
+    padding-left:40px;   /* increase this */
 
     background:linear-gradient(
         90deg,
         #32486d,
-        #253754
+        #2b3f61
     );
 
-    border-top:1px solid #4f8cff;
+    border-top:1px solid #5b8cff;
     border-bottom:1px solid var(--border);
 
-    color:white;
-
-    font-size:18px;
+    font-size:22px;
 
     font-weight:700;
 
-    letter-spacing:.5px;
-
     text-transform:uppercase;
+
+    letter-spacing:1px;
 
 }
 
@@ -513,29 +513,64 @@ TABLES
 .equivalent-table{
 
     width:100%;
+
     border-collapse:collapse;
 
-}
-
-.equivalent-table th{
-
-    background:#31476d;
-    color:white;
-    font-weight:600;
-    padding:16px;
+    table-layout:fixed;
 
 }
 
-.equivalent-table td{
+.equivalent-table thead th{
 
-    padding:14px;
-    border-top:1px solid var(--border);
+    background:#40557c;
+
+    color:#ffffff;
+
+    font-size:17px;
+
+    font-weight:700;
+
+    padding:18px;
+
+    text-align:center;
+
+    letter-spacing:.5px;
+
+}
+
+.equivalent-table tbody td{
+
+    padding:18px;
+
+    text-align:center;
+
+    border-bottom:1px solid rgba(255,255,255,.08);
+
+    font-size:17px;
+
+}
+
+.equivalent-table tbody tr{
+
+    transition:.18s;
 
 }
 
 .equivalent-table tbody tr:hover{
 
-    background:#22324a;
+    background:rgba(70,110,180,.12);
+
+}
+
+.equivalent-table tbody td:first-child{
+
+    text-align:center;
+
+}
+
+.equivalent-table tbody td:last-child{
+
+    font-weight:600;
 
 }
 
