@@ -1,8 +1,12 @@
-// ==========================================
+// =====================================================
 // DUCTCULATOR PRO
-// Airflow Engine
+// airflow.js
 // Version 0.2
-// ==========================================
+// =====================================================
+
+// ------------------------------------
+// Constant Velocity Calculator
+// ------------------------------------
 
 function calculateConstantVelocity(cfm, targetVelocity) {
 
@@ -10,22 +14,29 @@ function calculateConstantVelocity(cfm, targetVelocity) {
     targetVelocity = Number(targetVelocity);
 
     if (cfm <= 0 || targetVelocity <= 0) {
+
         return null;
+
     }
 
     // Required Area (sq ft)
-    const required = requiredArea(cfm, targetVelocity);
+
+    const requiredAreaValue = requiredArea(cfm, targetVelocity);
 
     // Exact Diameter
-    const exactDiameter = diameterFromArea(required);
 
-    // Standard Round
+    const exactDiameter = diameterFromArea(requiredAreaValue);
+
+    // Nearest Standard Round
+
     const round = nearestRound(exactDiameter);
 
     // Actual Area
+
     const actualArea = roundArea(round);
 
     // Actual Velocity
+
     const actualVelocity = calculateVelocity(cfm, actualArea);
 
     return {
@@ -34,7 +45,7 @@ function calculateConstantVelocity(cfm, targetVelocity) {
 
         targetVelocity,
 
-        requiredArea: required,
+        requiredArea: requiredAreaValue,
 
         exactDiameter,
 
@@ -48,9 +59,9 @@ function calculateConstantVelocity(cfm, targetVelocity) {
 
 }
 
-// ==========================================
-// HTML Results
-// ==========================================
+// ------------------------------------
+// Build Results HTML
+// ------------------------------------
 
 function buildResults(data) {
 
@@ -60,7 +71,7 @@ function buildResults(data) {
 
     <div class="result-header">
 
-        <h2>${data.round}" Round</h2>
+        <h2>${data.round}" ROUND</h2>
 
         <p>Recommended Standard Round Duct</p>
 
@@ -72,11 +83,11 @@ function buildResults(data) {
 
             <div class="box-label">
 
-                Exact Diameter
+                📐 Exact Diameter
 
             </div>
 
-            <div class="box-value">
+            <div class="box-value diameter">
 
                 ${data.exactDiameter.toFixed(2)}"
 
@@ -88,11 +99,11 @@ function buildResults(data) {
 
             <div class="box-label">
 
-                Actual Velocity
+                💨 Actual Velocity
 
             </div>
 
-            <div class="box-value">
+            <div class="box-value velocity">
 
                 ${Math.round(data.actualVelocity)} FPM
 
@@ -104,11 +115,11 @@ function buildResults(data) {
 
             <div class="box-label">
 
-                Required Area
+                📦 Required Area
 
             </div>
 
-            <div class="box-value">
+            <div class="box-value area">
 
                 ${data.requiredArea.toFixed(3)} ft²
 
@@ -120,11 +131,11 @@ function buildResults(data) {
 
             <div class="box-label">
 
-                Actual Area
+                📊 Actual Area
 
             </div>
 
-            <div class="box-value">
+            <div class="box-value area">
 
                 ${data.actualArea.toFixed(3)} ft²
 
@@ -164,7 +175,7 @@ function buildResults(data) {
 
                 <td>${data.round}"</td>
 
-                <td>Recommended</td>
+                <td style="color:#22c55e;">Recommended</td>
 
             </tr>
 
@@ -174,7 +185,7 @@ function buildResults(data) {
 
                 <td>Coming Soon</td>
 
-                <td>-</td>
+                <td style="color:#f59e0b;">Pending</td>
 
             </tr>
 
@@ -184,7 +195,7 @@ function buildResults(data) {
 
                 <td>Coming Soon</td>
 
-                <td>-</td>
+                <td style="color:#f59e0b;">Pending</td>
 
             </tr>
 
@@ -204,7 +215,11 @@ function buildResults(data) {
 
             <span>Target Velocity</span>
 
-            <strong>${data.targetVelocity} FPM</strong>
+            <strong class="velocity">
+
+                ${data.targetVelocity} FPM
+
+            </strong>
 
         </div>
 
@@ -212,7 +227,11 @@ function buildResults(data) {
 
             <span>Required Area</span>
 
-            <strong>${data.requiredArea.toFixed(3)} ft²</strong>
+            <strong class="area">
+
+                ${data.requiredArea.toFixed(3)} ft²
+
+            </strong>
 
         </div>
 
@@ -220,7 +239,11 @@ function buildResults(data) {
 
             <span>Actual Area</span>
 
-            <strong>${data.actualArea.toFixed(3)} ft²</strong>
+            <strong class="area">
+
+                ${data.actualArea.toFixed(3)} ft²
+
+            </strong>
 
         </div>
 
@@ -228,7 +251,35 @@ function buildResults(data) {
 
             <span>Exact Diameter</span>
 
-            <strong>${data.exactDiameter.toFixed(2)}"</strong>
+            <strong class="diameter">
+
+                ${data.exactDiameter.toFixed(2)}"
+
+            </strong>
+
+        </div>
+
+        <div class="engineering-row">
+
+            <span>Recommended Round</span>
+
+            <strong style="color:#4f8cff;">
+
+                ${data.round}"
+
+            </strong>
+
+        </div>
+
+        <div class="engineering-row">
+
+            <span>Actual Velocity</span>
+
+            <strong class="velocity">
+
+                ${Math.round(data.actualVelocity)} FPM
+
+            </strong>
 
         </div>
 
