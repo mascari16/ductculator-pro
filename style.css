@@ -480,10 +480,29 @@ SECTION TITLES
 
 .section-title{
 
+    display:flex;
+    align-items:center;
+
     padding:18px 30px;
-    background:#1d2b43;
-    font-weight:600;
-    border-top:1px solid var(--border);
+
+    background:linear-gradient(
+        90deg,
+        #32486d,
+        #253754
+    );
+
+    border-top:1px solid #4f8cff;
+    border-bottom:1px solid var(--border);
+
+    color:white;
+
+    font-size:18px;
+
+    font-weight:700;
+
+    letter-spacing:.5px;
+
+    text-transform:uppercase;
 
 }
 
@@ -500,9 +519,10 @@ TABLES
 
 .equivalent-table th{
 
-    background:#24344d;
-    text-align:left;
-    padding:14px;
+    background:#31476d;
+    color:white;
+    font-weight:600;
+    padding:16px;
 
 }
 

@@ -147,7 +147,7 @@ function buildResults(data) {
 
     <div class="section-title">
 
-        Equivalent Sizes
+        📐 Equivalent Sizes
 
     </div>
 
@@ -205,7 +205,7 @@ function buildResults(data) {
 
     <div class="section-title">
 
-        Engineering Details
+        ⚙ Engineering Details
 
     </div>
 
