@@ -254,7 +254,7 @@ ${rectangles
         "bad"
     }">
 
-        ${JSON.stringify(rect)}
+        ${rect.areaDifference.toFixed(2)}%
 
     </td>
 
