@@ -82,21 +82,14 @@ if (percentOff > 0.25) {
 
         options.push({
 
-            width: rect.width,
+    width: rect.width,
+    height: rect.height,
+    area: rect.area,
+    velocity,
+    areaDifference: ((rect.area - requiredArea) / requiredArea) * 100,
+    score
 
-            height: rect.height,
-
-            area: rect.area,
-
-            velocity,
-
-            areaDifference,
-
-            aspectRatio,
-
-            score
-
-        });
+});
 
     }
 
