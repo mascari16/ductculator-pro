@@ -44,6 +44,13 @@ if(round !== null){
 
 }
 
+console.log({
+    exactDiameter,
+    round,
+    actualArea,
+    actualVelocity
+});
+
     return {
 
         cfm,
