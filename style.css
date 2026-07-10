@@ -538,6 +538,34 @@ RESULTS
 
 }
 
+.warning-banner{
+
+    display:inline-block;
+
+    margin-bottom:16px;
+
+    padding:8px 16px;
+
+    background:#5b1f1f;
+
+    border:1px solid #ef4444;
+
+    color:#fecaca;
+
+    border-radius:8px;
+
+    font-size:13px;
+
+    font-weight:700;
+
+    letter-spacing:1px;
+
+    text-transform:uppercase;
+
+    box-shadow:0 0 10px rgba(239,68,68,.25);
+
+}
+
 .result-header h2{
 
     color:var(--blue);

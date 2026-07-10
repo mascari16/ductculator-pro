@@ -33,23 +33,17 @@ function calculateConstantVelocity(cfm, targetVelocity) {
 
     // Actual Area and Velocity
 
-    let actualArea = null;
-let actualVelocity = null;
+   // Always calculate using the exact diameter first
+let actualArea = roundArea(exactDiameter);
+let actualVelocity = calculateVelocity(cfm, actualArea);
 
-if(round !== null){
+// If a standard round exists, use that instead
+if (round !== null) {
 
     actualArea = roundArea(round);
-
     actualVelocity = calculateVelocity(cfm, actualArea);
 
 }
-
-console.log({
-    exactDiameter,
-    round,
-    actualArea,
-    actualVelocity
-});
 
     return {
 
@@ -95,21 +89,41 @@ function buildResults(data) {
 
     <div class="result-header">
 
-    <h2>
+    ${data.round === null ? `
 
-        ${data.round === null
-            ? `${data.exactDiameter.toFixed(2)}" REQUIRED`
-            : `${data.round}" ROUND`}
+        <div class="warning-banner">
 
-    </h2>
+            ⚠ CUSTOM DUCT REQUIRED
 
-    <p>
+        </div>
 
-        ${data.round === null
-            ? "No standard round size available"
-            : "Recommended Standard Round Duct"}
+        <h2>
 
-    </p>
+            ${data.exactDiameter.toFixed(2)}"
+
+        </h2>
+
+        <p>
+
+            Required diameter exceeds the largest standard round duct (96"). Use a custom round, rectangular, or flat oval duct.
+
+        </p>
+
+    ` : `
+
+        <h2>
+
+            ${data.round}" ROUND
+
+        </h2>
+
+        <p>
+
+            Recommended Standard Round Duct
+
+        </p>
+
+    `}
 
 </div>
 
@@ -177,9 +191,7 @@ function buildResults(data) {
 
             <div class="box-value area">
 
-            ${data.actualArea === null
-    ? "Custom"
-    : `${data.actualArea.toFixed(3)} ft²`}
+            ${data.requiredArea.toFixed(3)} ft²
 
             </div>
 
@@ -383,7 +395,9 @@ function buildResults(data) {
 
         <strong class="diameter">
 
-            ${data.round}"
+            ${data.round === null
+    ? `${data.exactDiameter.toFixed(2)}" (Custom)`
+    : `${data.round}"`}
 
         </strong>
 
