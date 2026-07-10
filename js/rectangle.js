@@ -80,10 +80,14 @@ if (percentOff > 0.25) {
             (velocityDifference / 10) +
             (aspectRatio * 2);
 
-        options.push({
+        // Always store largest dimension first
+const width = Math.max(rect.width, rect.height);
+const height = Math.min(rect.width, rect.height);
 
-    width: rect.width,
-    height: rect.height,
+options.push({
+
+    width,
+    height,
     area: rect.area,
     velocity,
     areaDifference: ((rect.area - requiredArea) / requiredArea) * 100,
@@ -101,6 +105,20 @@ if (percentOff > 0.25) {
 
 console.log(options.slice(0, 5));
 
-return options.slice(0, 5);
+const unique = [];
+const seen = new Set();
+
+for (const option of options) {
+
+    const key = `${option.width}x${option.height}`;
+
+    if (seen.has(key)) continue;
+
+    seen.add(key);
+    unique.push(option);
+
+}
+
+return unique.slice(0, 5);
 
 }
