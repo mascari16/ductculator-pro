@@ -65,6 +65,18 @@ function calculateConstantVelocity(cfm, targetVelocity) {
 
 function buildResults(data) {
 
+    const rectangles = getRectangleOptions(
+        data.requiredArea,
+        data.targetVelocity,
+        data.cfm
+    );
+
+    const ovals = getFlatOvalOptions(
+        data.requiredArea,
+        data.targetVelocity,
+        data.cfm
+    );
+
     return `
 
 <div class="result-card">
@@ -327,19 +339,19 @@ function buildResults(data) {
 
 </div>
 
-    <div class="section-title">
+<div class="section-title">
 
-        ⚙ Engineering Details
+    📊 Duct Analysis
 
-    </div>
+</div>
 
-    <div class="engineering">
+<div class="analysis-grid">
 
-    <div class="engineering-row">
+    <div class="analysis-item">
 
-        <span>Recommended Round</span>
+        <span>Round Duct</span>
 
-        <strong>
+        <strong class="diameter">
 
             ${data.round}"
 
@@ -347,66 +359,51 @@ function buildResults(data) {
 
     </div>
 
-        <div class="engineering-row">
+    <div class="analysis-item">
 
-            <span>Target Velocity</span>
+        <span>Target Velocity</span>
 
-            <strong class="velocity">
+        <strong class="velocity">
 
-                ${data.targetVelocity} FPM
+            ${data.targetVelocity} FPM
 
-            </strong>
+        </strong>
 
-        </div>
+    </div>
 
-        <div class="engineering-row">
+    <div class="analysis-item">
 
-            <span>Required Area</span>
+        <span>Actual Velocity</span>
 
-            <strong class="area">
+        <strong class="velocity">
 
-                ${data.requiredArea.toFixed(3)} ft²
+            ${Math.round(data.actualVelocity)} FPM
 
-            </strong>
+        </strong>
 
-        </div>
+    </div>
 
-        <div class="engineering-row">
+    <div class="analysis-item">
 
-            <span>Actual Area</span>
+        <span>Velocity Error</span>
 
-            <strong class="area">
+        <strong>
 
-                ${data.actualArea.toFixed(3)} ft²
+            ${(data.actualVelocity - data.targetVelocity).toFixed(0)} FPM
 
-            </strong>
+        </strong>
 
-        </div>
+    </div>
 
-        <div class="engineering-row">
+    <div class="analysis-item">
 
-            <span>Exact Diameter</span>
+        <span>Area Difference</span>
 
-            <strong class="diameter">
+        <strong>
 
-                ${data.exactDiameter.toFixed(2)}"
+            ${(((data.actualArea-data.requiredArea)/data.requiredArea)*100).toFixed(2)}%
 
-            </strong>
-
-        </div>
-
-
-        <div class="engineering-row">
-
-            <span>Actual Velocity</span>
-
-            <strong class="velocity">
-
-                ${Math.round(data.actualVelocity)} FPM
-
-            </strong>
-
-        </div>
+        </strong>
 
     </div>
 

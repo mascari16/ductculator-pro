@@ -755,6 +755,58 @@ ENGINEERING
 }
 
 /*======================
+DUCT ANALYSIS
+======================*/
+
+.analysis-grid{
+
+    display:grid;
+
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+
+    gap:18px;
+
+    padding:30px;
+
+}
+
+.analysis-item{
+
+    background:#10192d;
+
+    border:1px solid var(--border);
+
+    border-radius:14px;
+
+    padding:20px;
+
+}
+
+.analysis-item span{
+
+    display:block;
+
+    color:var(--gray);
+
+    font-size:13px;
+
+    margin-bottom:10px;
+
+    text-transform:uppercase;
+
+    letter-spacing:1px;
+
+}
+
+.analysis-item strong{
+
+    font-size:28px;
+
+    color:white;
+
+}
+
+/*======================
 MOBILE
 ======================*/
 
