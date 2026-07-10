@@ -727,8 +727,9 @@ ENGINEERING
 
 .engineering-row{
 
-    display:flex;
-    justify-content:space-between;
+    display:grid;
+    grid-template-columns:220px 1fr;
+    align-items:center;
     padding:12px 0;
     border-bottom:1px solid rgba(255,255,255,.05);
 
@@ -749,6 +750,7 @@ ENGINEERING
 .engineering-row strong{
 
     color:white;
+    justify-self:end;
 
 }
 
