@@ -147,70 +147,185 @@ function buildResults(data) {
 
     <div class="section-title">
 
-        📐 Equivalent Sizes
+    📐 Duct Options
+
+</div>
+
+<div class="options-grid">
+
+    <!-- =========================
+         RECTANGLE OPTIONS
+    ========================== -->
+
+    <div class="options-card">
+
+        <h3>
+
+            ▭ Rectangle
+
+        </h3>
+
+        <table class="options-table">
+
+            <thead>
+
+                <tr>
+
+                    <th>Size</th>
+
+                    <th>Area Δ</th>
+
+                    <th>Velocity</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                <tr>
+
+                    <td>48 × 24</td>
+
+                    <td class="good">+0.18%</td>
+
+                    <td>1198</td>
+
+                </tr>
+
+                <tr>
+
+                    <td>50 × 22</td>
+
+                    <td class="good">+0.42%</td>
+
+                    <td>1205</td>
+
+                </tr>
+
+                <tr>
+
+                    <td>54 × 20</td>
+
+                    <td class="okay">+0.83%</td>
+
+                    <td>1187</td>
+
+                </tr>
+
+                <tr>
+
+                    <td>42 × 28</td>
+
+                    <td class="warn">+1.38%</td>
+
+                    <td>1212</td>
+
+                </tr>
+
+                <tr>
+
+                    <td>60 × 18</td>
+
+                    <td class="bad">+2.17%</td>
+
+                    <td>1174</td>
+
+                </tr>
+
+            </tbody>
+
+        </table>
 
     </div>
 
-    <table class="equivalent-table">
+    <!-- =========================
+         FLAT OVAL OPTIONS
+    ========================== -->
 
-        <thead>
+    <div class="options-card">
 
-            <tr>
+        <h3>
 
-                <th>Shape</th>
+            ⬭ Flat Oval
 
-                <th>Size</th>
+        </h3>
 
-                <th>Status</th>
+        <table class="options-table">
 
-            </tr>
+            <thead>
 
-        </thead>
+                <tr>
 
-        <tbody>
+                    <th>Size</th>
 
-            <tr>
+                    <th>Area Δ</th>
 
-                <td>
-                    <span class="shape-icon">⭕</span>
-                    Round
-                </td>
+                    <th>Velocity</th>
 
-                <td>${data.round}"</td>
+                </tr>
 
-                <td style="color:#22c55e;">Recommended</td>
+            </thead>
 
-            </tr>
+            <tbody>
 
-            <tr>
+                <tr>
 
-                <td>
-                    <span class="shape-icon">▭</span>
-                    Rectangle
-                </td>
+                    <td>52 × 20</td>
 
-                <td>Coming Soon</td>
+                    <td class="good">+0.14%</td>
 
-                <td style="color:#f59e0b;">Pending</td>
+                    <td>1199</td>
 
-            </tr>
+                </tr>
 
-            <tr>
+                <tr>
 
-                <td>
-                    <span class="shape-icon">⬭</span>
-                    Flat Oval
-                </td>
+                    <td>54 × 18</td>
 
-                <td>Coming Soon</td>
+                    <td class="good">+0.39%</td>
 
-                <td style="color:#f59e0b;">Pending</td>
+                    <td>1204</td>
 
-            </tr>
+                </tr>
 
-        </tbody>
+                <tr>
 
-    </table>
+                    <td>48 × 22</td>
+
+                    <td class="okay">+0.71%</td>
+
+                    <td>1188</td>
+
+                </tr>
+
+                <tr>
+
+                    <td>56 × 18</td>
+
+                    <td class="warn">+1.44%</td>
+
+                    <td>1210</td>
+
+                </tr>
+
+                <tr>
+
+                    <td>60 × 16</td>
+
+                    <td class="bad">+2.09%</td>
+
+                    <td>1176</td>
+
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
 
     <div class="section-title">
 
