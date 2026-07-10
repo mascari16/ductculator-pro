@@ -77,7 +77,7 @@ function buildResults(data) {
         data.cfm
     );
 
-    console.log("Rectangle options:", rectangles);
+    console.log("Rectangles:", rectangles);
 
     const ovals = getFlatOvalOptions(
         data.requiredArea,
@@ -254,7 +254,7 @@ ${rectangles
         "bad"
     }">
 
-        ${rect.areaDifference.toFixed(2)}%
+        ${JSON.stringify(rect)}
 
     </td>
 
