@@ -448,73 +448,320 @@ ${rectangles
 
     <div class="breakdown-content">
 
-        <p><strong>Calculation Method</strong><br>
-        Constant Velocity</p>
+    <div class="breakdown-method">
 
-        <hr>
+        <span>Calculation Method</span>
 
-        <p><strong>1. Required Area</strong></p>
+        <strong>Constant Velocity</strong>
 
-        <p>
-            ${data.cfm.toFixed(0)} CFM ÷
+    </div>
+
+    <div class="breakdown-step">
+
+        <h4>1. Required Cross-Sectional Area</h4>
+
+        <p class="formula-label">Formula</p>
+
+        <code>
+            Area = CFM ÷ Velocity
+        </code>
+
+        <p class="formula-label">Substitute Values</p>
+
+        <code>
+            Area = ${data.cfm.toFixed(0)} CFM ÷
             ${data.targetVelocity.toFixed(0)} FPM
-            =
-            ${data.requiredArea.toFixed(3)} ft²
-        </p>
+        </code>
 
-        <p><strong>2. Exact Diameter</strong></p>
+        <p class="formula-label">Result</p>
 
-        <p>
+        <code>
+            Area = ${data.requiredArea.toFixed(3)} ft²
+        </code>
 
-            ${data.exactDiameter.toFixed(2)}"
-
-        </p>
-
-        <p><strong>3. Selected Round</strong></p>
-
-        <p>
-
-            ${
-                data.round === null
-                ? `${data.exactDiameter.toFixed(2)}" Custom`
-                : `${data.round}"`
-            }
-
-        </p>
-
-        <p><strong>4. Actual Area</strong></p>
-
-        <p>
-
-            ${data.actualArea.toFixed(3)} ft²
-
-        </p>
-
-        <p><strong>5. Actual Velocity</strong></p>
-
-        <p>
-
-            ${Math.round(data.actualVelocity)} FPM
-
-        </p>
-
-        <hr>
-
-        <p>
-
-            Velocity Error:
-            ${(data.actualVelocity-data.targetVelocity).toFixed(0)} FPM
-
-        </p>
-
-        <p>
-
-            Area Difference:
-            ${(((data.actualArea-data.requiredArea)/data.requiredArea)*100).toFixed(2)}%
-
+        <p class="formula-note">
+            Required area in square inches:
+            ${(data.requiredArea * 144).toFixed(2)} in²
         </p>
 
     </div>
+
+    <div class="breakdown-step">
+
+        <h4>2. Exact Round Diameter</h4>
+
+        <p class="formula-label">Circle Area Formula</p>
+
+        <code>
+            A = π × r²
+        </code>
+
+        <p class="formula-label">Solve for Diameter</p>
+
+        <code>
+            D = 2 × √(A ÷ π)
+        </code>
+
+        <p class="formula-label">Convert Feet to Inches</p>
+
+        <code>
+            D = 2 × √(${data.requiredArea.toFixed(3)} ÷ π) × 12
+        </code>
+
+        <p class="formula-label">Result</p>
+
+        <code>
+            D = ${data.exactDiameter.toFixed(2)}"
+        </code>
+
+    </div>
+
+    <div class="breakdown-step">
+
+        <h4>3. Standard Round Selection</h4>
+
+        <div class="breakdown-row">
+
+            <span>Exact Calculated Diameter</span>
+
+            <strong>${data.exactDiameter.toFixed(2)}"</strong>
+
+        </div>
+
+        <div class="breakdown-row">
+
+            <span>Selected Standard Diameter</span>
+
+            <strong>
+                ${data.round === null
+                    ? `${data.exactDiameter.toFixed(2)}" Custom`
+                    : `${data.round}"`}
+            </strong>
+
+        </div>
+
+        <div class="breakdown-row">
+
+            <span>Diameter Difference</span>
+
+            <strong>
+                ${data.round === null
+                    ? "0.00\""
+                    : `${(data.round - data.exactDiameter >= 0 ? "+" : "")}${(data.round - data.exactDiameter).toFixed(2)}"`}
+            </strong>
+
+        </div>
+
+    </div>
+
+    <div class="breakdown-step">
+
+        <h4>4. Actual Area of Selected Round Duct</h4>
+
+        <p class="formula-label">Formula</p>
+
+        <code>
+            Area = π × r²
+        </code>
+
+        <p class="formula-label">Radius in Feet</p>
+
+        <code>
+            Radius =
+            ${
+                data.round === null
+                    ? `${data.exactDiameter.toFixed(2)} ÷ 24`
+                    : `${data.round} ÷ 24`
+            }
+        </code>
+
+        <p class="formula-label">Substitute Values</p>
+
+        <code>
+            Area = π ×
+            (${
+                data.round === null
+                    ? `${(data.exactDiameter / 24).toFixed(4)}`
+                    : `${(data.round / 24).toFixed(4)}`
+            })²
+        </code>
+
+        <p class="formula-label">Result</p>
+
+        <code>
+            Area = ${data.actualArea.toFixed(3)} ft²
+        </code>
+
+        <p class="formula-note">
+            Actual area in square inches:
+            ${(data.actualArea * 144).toFixed(2)} in²
+        </p>
+
+    </div>
+
+    <div class="breakdown-step">
+
+        <h4>5. Actual Air Velocity</h4>
+
+        <p class="formula-label">Formula</p>
+
+        <code>
+            Velocity = CFM ÷ Area
+        </code>
+
+        <p class="formula-label">Substitute Values</p>
+
+        <code>
+            Velocity =
+            ${data.cfm.toFixed(0)} CFM ÷
+            ${data.actualArea.toFixed(3)} ft²
+        </code>
+
+        <p class="formula-label">Result</p>
+
+        <code>
+            Velocity = ${Math.round(data.actualVelocity)} FPM
+        </code>
+
+    </div>
+
+    <div class="breakdown-step">
+
+        <h4>6. Velocity Difference</h4>
+
+        <p class="formula-label">Formula</p>
+
+        <code>
+            Velocity Difference =
+            Actual Velocity − Target Velocity
+        </code>
+
+        <p class="formula-label">Substitute Values</p>
+
+        <code>
+            Velocity Difference =
+            ${Math.round(data.actualVelocity)} −
+            ${data.targetVelocity.toFixed(0)}
+        </code>
+
+        <p class="formula-label">Result</p>
+
+        <code>
+            Velocity Difference =
+            ${data.actualVelocity - data.targetVelocity >= 0 ? "+" : ""}
+            ${(data.actualVelocity - data.targetVelocity).toFixed(0)} FPM
+        </code>
+
+        <p class="formula-note">
+            Percent difference:
+            ${(
+                ((data.actualVelocity - data.targetVelocity) /
+                data.targetVelocity) * 100
+            ).toFixed(2)}%
+        </p>
+
+    </div>
+
+    <div class="breakdown-step">
+
+        <h4>7. Area Difference</h4>
+
+        <p class="formula-label">Formula</p>
+
+        <code>
+            Area Difference % =
+            ((Actual Area − Required Area) ÷ Required Area) × 100
+        </code>
+
+        <p class="formula-label">Substitute Values</p>
+
+        <code>
+            Area Difference % =
+            ((${data.actualArea.toFixed(3)} −
+            ${data.requiredArea.toFixed(3)}) ÷
+            ${data.requiredArea.toFixed(3)}) × 100
+        </code>
+
+        <p class="formula-label">Result</p>
+
+        <code>
+            Area Difference =
+            ${data.actualArea - data.requiredArea >= 0 ? "+" : ""}
+            ${(
+                ((data.actualArea - data.requiredArea) /
+                data.requiredArea) * 100
+            ).toFixed(2)}%
+        </code>
+
+    </div>
+
+    <div class="breakdown-step">
+
+        <h4>8. Final Result Summary</h4>
+
+        <div class="breakdown-row">
+
+            <span>Airflow</span>
+
+            <strong>${data.cfm.toFixed(0)} CFM</strong>
+
+        </div>
+
+        <div class="breakdown-row">
+
+            <span>Target Velocity</span>
+
+            <strong>${data.targetVelocity.toFixed(0)} FPM</strong>
+
+        </div>
+
+        <div class="breakdown-row">
+
+            <span>Required Area</span>
+
+            <strong>${data.requiredArea.toFixed(3)} ft²</strong>
+
+        </div>
+
+        <div class="breakdown-row">
+
+            <span>Exact Diameter</span>
+
+            <strong>${data.exactDiameter.toFixed(2)}"</strong>
+
+        </div>
+
+        <div class="breakdown-row">
+
+            <span>Selected Round</span>
+
+            <strong>
+                ${data.round === null
+                    ? `${data.exactDiameter.toFixed(2)}" Custom`
+                    : `${data.round}"`}
+            </strong>
+
+        </div>
+
+        <div class="breakdown-row">
+
+            <span>Actual Area</span>
+
+            <strong>${data.actualArea.toFixed(3)} ft²</strong>
+
+        </div>
+
+        <div class="breakdown-row">
+
+            <span>Actual Velocity</span>
+
+            <strong>${Math.round(data.actualVelocity)} FPM</strong>
+
+        </div>
+
+    </div>
+
+</div>
 
 </details>
 

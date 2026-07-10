@@ -950,6 +950,35 @@ ENGINEERING BREAKDOWN
 
     font-family:Consolas,monospace;
 
+.formula-label{
+
+    margin-top:14px;
+    margin-bottom:6px;
+
+    color:var(--gray);
+
+    font-size:12px;
+    font-weight:700;
+
+    text-transform:uppercase;
+    letter-spacing:1px;
+
+}
+
+.formula-note{
+
+    margin-top:10px;
+
+    color:var(--gray);
+
+    font-size:14px;
+
+}
+
+.breakdown-step code{
+
+    margin-bottom:10px;
+
 }
 
 /*======================
