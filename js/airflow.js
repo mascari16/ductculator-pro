@@ -201,6 +201,78 @@ function buildResults(data) {
 
     </div>
 
+<div class="section-title">
+
+    📊 Duct Analysis
+
+</div>
+
+<div class="analysis-grid">
+
+    <div class="analysis-item">
+
+        <span>Round Duct</span>
+
+        <strong class="diameter">
+
+            ${data.round === null
+    ? `${data.exactDiameter.toFixed(2)}" (Custom)`
+    : `${data.round}"`}
+
+        </strong>
+
+    </div>
+
+    <div class="analysis-item">
+
+        <span>Target Velocity</span>
+
+        <strong class="velocity">
+
+            ${data.targetVelocity} FPM
+
+        </strong>
+
+    </div>
+
+    <div class="analysis-item">
+
+        <span>Actual Velocity</span>
+
+        <strong class="velocity">
+
+            ${Math.round(data.actualVelocity)} FPM
+
+        </strong>
+
+    </div>
+
+    <div class="analysis-item">
+
+        <span>Velocity Error</span>
+
+        <strong>
+
+            ${(data.actualVelocity - data.targetVelocity).toFixed(0)} FPM
+
+        </strong>
+
+    </div>
+
+    <div class="analysis-item">
+
+        <span>Area Difference</span>
+
+        <strong>
+
+            ${(((data.actualArea-data.requiredArea)/data.requiredArea)*100).toFixed(2)}%
+
+        </strong>
+
+    </div>
+
+</div>
+
     <div class="section-title">
 
     📐 Duct Options
@@ -357,78 +429,6 @@ ${rectangles
             </tbody>
 
         </table>
-
-    </div>
-
-</div>
-
-<div class="section-title">
-
-    📊 Duct Analysis
-
-</div>
-
-<div class="analysis-grid">
-
-    <div class="analysis-item">
-
-        <span>Round Duct</span>
-
-        <strong class="diameter">
-
-            ${data.round === null
-    ? `${data.exactDiameter.toFixed(2)}" (Custom)`
-    : `${data.round}"`}
-
-        </strong>
-
-    </div>
-
-    <div class="analysis-item">
-
-        <span>Target Velocity</span>
-
-        <strong class="velocity">
-
-            ${data.targetVelocity} FPM
-
-        </strong>
-
-    </div>
-
-    <div class="analysis-item">
-
-        <span>Actual Velocity</span>
-
-        <strong class="velocity">
-
-            ${Math.round(data.actualVelocity)} FPM
-
-        </strong>
-
-    </div>
-
-    <div class="analysis-item">
-
-        <span>Velocity Error</span>
-
-        <strong>
-
-            ${(data.actualVelocity - data.targetVelocity).toFixed(0)} FPM
-
-        </strong>
-
-    </div>
-
-    <div class="analysis-item">
-
-        <span>Area Difference</span>
-
-        <strong>
-
-            ${(((data.actualArea-data.requiredArea)/data.requiredArea)*100).toFixed(2)}%
-
-        </strong>
 
     </div>
 
