@@ -239,7 +239,9 @@ function buildResults(data) {
 
             <tbody>
 
-${rectangles.map(rect => `
+${rectangles
+    .filter(rect => rect)
+    .map(rect => `      
 
 <tr>
 
