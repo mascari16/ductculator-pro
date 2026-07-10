@@ -241,20 +241,20 @@ function buildResults(data) {
 
 ${rectangles
     .filter(rect => rect)
-    .map(rect => `      
+    .map(rect => `
 
 <tr>
 
     <td>${rect.width}" × ${rect.height}"</td>
 
-   <td class="${
-    Math.abs(rect.areaDifference) < 0.5 ? "good" :
-    Math.abs(rect.areaDifference) < 1.0 ? "okay" :
-    Math.abs(rect.areaDifference) < 2.0 ? "warn" :
-    "bad"
-}">
+    <td class="${
+        Math.abs(rect.areaDifference) <= 2 ? "good" :
+        Math.abs(rect.areaDifference) <= 5 ? "okay" :
+        Math.abs(rect.areaDifference) <= 10 ? "warn" :
+        "bad"
+    }">
 
-        ${rect.areaDifference.toFixed(2)}%
+        ${rect.areaDifference > 0 ? "+" : ""}${rect.areaDifference.toFixed(2)}%
 
     </td>
 
