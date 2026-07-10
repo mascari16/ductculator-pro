@@ -51,6 +51,30 @@ const calculateBtn = document.getElementById("calculateBtn");
 
 const results = document.getElementById("results");
 
+cfmInput.addEventListener("input", updateCalculator);
+
+velocityInput.addEventListener("input", updateCalculator);
+
+frictionInput.addEventListener("input", updateCalculator);
+
+methodSelect.addEventListener("change", () => {
+
+    if (methodSelect.value === "constantVelocity") {
+
+        velocityGroup.style.display = "block";
+        frictionGroup.style.display = "none";
+
+    } else {
+
+        velocityGroup.style.display = "none";
+        frictionGroup.style.display = "block";
+
+    }
+
+    updateCalculator();
+
+});
+
 // ----------------------------
 // Switch Calculation Method
 // ----------------------------
@@ -71,25 +95,16 @@ methodSelect.addEventListener("change", () => {
 
 });
 
-// ----------------------------
-// Calculate Button
-// ----------------------------
-
-calculateBtn.addEventListener("click", () => {
+function updateCalculator() {
 
     const cfm = Number(cfmInput.value);
 
     if (cfm <= 0) {
 
         results.innerHTML = "<h2>Please enter a valid CFM.</h2>";
-
         return;
 
     }
-
-    // ------------------------
-    // CONSTANT VELOCITY
-    // ------------------------
 
     if (methodSelect.value === "constantVelocity") {
 
@@ -100,20 +115,14 @@ calculateBtn.addEventListener("click", () => {
         if (!data) {
 
             results.innerHTML = "<h2>Invalid Values</h2>";
-
             return;
 
         }
 
         results.innerHTML = buildResults(data);
-
         return;
 
     }
-
-    // ------------------------
-    // EQUAL FRICTION
-    // ------------------------
 
     results.innerHTML = `
 
@@ -123,22 +132,7 @@ calculateBtn.addEventListener("click", () => {
 
                 <h2>Equal Friction</h2>
 
-                <p>
-
-                    Coming in Version 0.3
-
-                </p>
-
-            </div>
-
-            <div style="padding:30px;">
-
-                <p>
-
-                    This calculator will use industry-standard
-                    ASHRAE duct sizing equations.
-
-                </p>
+                <p>Coming Soon</p>
 
             </div>
 
@@ -146,6 +140,8 @@ calculateBtn.addEventListener("click", () => {
 
     `;
 
-});
+}
+
+updateCalculator();
 
 console.log("Ductculator Pro Loaded");
