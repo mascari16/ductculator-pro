@@ -31,13 +31,18 @@ function calculateConstantVelocity(cfm, targetVelocity) {
 
     const round = nearestRound(exactDiameter);
 
-    // Actual Area
+    // Actual Area and Velocity
 
-    const actualArea = roundArea(round);
+    let actualArea = null;
+let actualVelocity = null;
 
-    // Actual Velocity
+if(round !== null){
 
-    const actualVelocity = calculateVelocity(cfm, actualArea);
+    actualArea = roundArea(round);
+
+    actualVelocity = calculateVelocity(cfm, actualArea);
+
+}
 
     return {
 
