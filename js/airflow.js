@@ -247,12 +247,12 @@ ${rectangles
 
     <td>${rect.width}" × ${rect.height}"</td>
 
-    <td class="${
-        rect.areaDifference < 0.5 ? "good" :
-        rect.areaDifference < 1.0 ? "okay" :
-        rect.areaDifference < 2.0 ? "warn" :
-        "bad"
-    }">
+   <td class="${
+    Math.abs(rect.areaDifference) < 0.5 ? "good" :
+    Math.abs(rect.areaDifference) < 1.0 ? "okay" :
+    Math.abs(rect.areaDifference) < 2.0 ? "warn" :
+    "bad"
+}">
 
         ${rect.areaDifference.toFixed(2)}%
 
