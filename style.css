@@ -835,6 +835,124 @@ DUCT ANALYSIS
 }
 
 /*======================
+ENGINEERING BREAKDOWN
+======================*/
+
+.engineering-breakdown{
+
+    margin:30px;
+
+    background:#10192d;
+
+    border:1px solid var(--border);
+
+    border-radius:14px;
+
+    overflow:hidden;
+
+}
+
+.engineering-breakdown summary{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    padding:18px 22px;
+
+    background:#253754;
+
+    color:var(--white);
+
+    cursor:pointer;
+
+    font-size:17px;
+
+    font-weight:700;
+
+    list-style:none;
+
+    user-select:none;
+
+}
+
+.engineering-breakdown summary::-webkit-details-marker{
+
+    display:none;
+
+}
+
+.engineering-breakdown summary::after{
+
+    content:"▼";
+
+    color:var(--gray);
+
+    font-size:13px;
+
+    transition:transform .2s ease;
+
+}
+
+.engineering-breakdown[open] summary::after{
+
+    transform:rotate(180deg);
+
+}
+
+.breakdown-content{
+
+    padding:24px;
+
+}
+
+.breakdown-content hr{
+
+    border:none;
+
+    border-top:1px solid rgba(255,255,255,.08);
+
+    margin:20px 0;
+
+}
+
+.breakdown-content p{
+
+    margin-bottom:14px;
+
+    line-height:1.6;
+
+    color:var(--gray);
+
+}
+
+.breakdown-content p strong{
+
+    color:var(--white);
+
+    font-size:16px;
+
+}
+
+.breakdown-content p:nth-of-type(even){
+
+    padding:12px 14px;
+
+    background:#0b1220;
+
+    border:1px solid var(--border);
+
+    border-radius:8px;
+
+    color:var(--white);
+
+    font-family:Consolas,monospace;
+
+}
+
+/*======================
 MOBILE
 ======================*/
 
