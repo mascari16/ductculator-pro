@@ -76,9 +76,9 @@ if (percentOff > 0.25) {
 
         // Weighted engineering score
         const score =
-    (areaDifference * 5) +
+    (Math.abs(areaDifference) * 5) +
     (velocityDifference / 10) +
-    Math.pow(aspectRatio, 2);
+    (Math.pow(aspectRatio - 1, 2) * 10);
 
         // Always store largest dimension first
 const width = Math.max(rect.width, rect.height);
