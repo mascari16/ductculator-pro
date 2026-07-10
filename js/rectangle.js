@@ -102,6 +102,11 @@ if (percentOff > 0.25) {
 
     options.sort((a, b) => a.score - b.score);
 
-    return options.slice(0, 5);
+    console.log(options.slice(0, 5));
 
-}
+    return options.slice(0, 5).map(rect => ({
+    width: rect.width,
+    height: rect.height,
+    velocity: rect.velocity,
+    areaDifference: rect.areaDifference
+}));
