@@ -434,6 +434,90 @@ ${rectangles
 
 </div>
 
+<!-- =========================
+     ENGINEERING BREAKDOWN
+========================= -->
+
+<details class="engineering-breakdown">
+
+    <summary>
+
+        🧮 Engineering Breakdown
+
+    </summary>
+
+    <div class="breakdown-content">
+
+        <p><strong>Calculation Method</strong><br>
+        Constant Velocity</p>
+
+        <hr>
+
+        <p><strong>1. Required Area</strong></p>
+
+        <p>
+            ${data.cfm.toFixed(0)} CFM ÷
+            ${data.targetVelocity.toFixed(0)} FPM
+            =
+            ${data.requiredArea.toFixed(3)} ft²
+        </p>
+
+        <p><strong>2. Exact Diameter</strong></p>
+
+        <p>
+
+            ${data.exactDiameter.toFixed(2)}"
+
+        </p>
+
+        <p><strong>3. Selected Round</strong></p>
+
+        <p>
+
+            ${
+                data.round === null
+                ? `${data.exactDiameter.toFixed(2)}" Custom`
+                : `${data.round}"`
+            }
+
+        </p>
+
+        <p><strong>4. Actual Area</strong></p>
+
+        <p>
+
+            ${data.actualArea.toFixed(3)} ft²
+
+        </p>
+
+        <p><strong>5. Actual Velocity</strong></p>
+
+        <p>
+
+            ${Math.round(data.actualVelocity)} FPM
+
+        </p>
+
+        <hr>
+
+        <p>
+
+            Velocity Error:
+            ${(data.actualVelocity-data.targetVelocity).toFixed(0)} FPM
+
+        </p>
+
+        <p>
+
+            Area Difference:
+            ${(((data.actualArea-data.requiredArea)/data.requiredArea)*100).toFixed(2)}%
+
+        </p>
+
+    </div>
+
+</details>
+
 `;
 
 }
