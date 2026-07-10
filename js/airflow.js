@@ -387,11 +387,11 @@ function buildResults(data) {
 
             <span>Recommended Round</span>
 
-            <strong style="color:#4f8cff;">
+            <strong>
 
-                ${data.round}"
+    ${data.round}"
 
-            </strong>
+</strong>
 
         </div>
 
