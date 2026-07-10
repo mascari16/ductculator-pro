@@ -95,11 +95,23 @@ function buildResults(data) {
 
     <div class="result-header">
 
-        <h2>${data.round}" ROUND</h2>
+    <h2>
 
-        <p>Recommended Standard Round Duct</p>
+        ${data.round === null
+            ? `${data.exactDiameter.toFixed(2)}" REQUIRED`
+            : `${data.round}" ROUND`}
 
-    </div>
+    </h2>
+
+    <p>
+
+        ${data.round === null
+            ? "No standard round size available"
+            : "Recommended Standard Round Duct"}
+
+    </p>
+
+</div>
 
     <div class="result-grid">
 
@@ -129,7 +141,9 @@ function buildResults(data) {
 
             <div class="box-value velocity">
 
-                ${Math.round(data.actualVelocity)} FPM
+                ${data.actualVelocity === null
+    ? "Custom"
+    : `${Math.round(data.actualVelocity)} FPM`}
 
             </div>
 
@@ -145,7 +159,9 @@ function buildResults(data) {
 
             <div class="box-value area">
 
-                ${data.requiredArea.toFixed(3)} ft²
+                ${data.actualArea === null
+    ? "Custom"
+    : `${data.actualArea.toFixed(3)} ft²`}
 
             </div>
 
@@ -161,7 +177,9 @@ function buildResults(data) {
 
             <div class="box-value area">
 
-                ${data.actualArea.toFixed(3)} ft²
+            ${data.actualArea === null
+    ? "Custom"
+    : `${data.actualArea.toFixed(3)} ft²`}
 
             </div>
 
