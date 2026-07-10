@@ -86,36 +86,57 @@ const height = Math.min(rect.width, rect.height);
 
 options.push({
 
-    width,
-    height,
+    width: rect.width,
+    height: rect.height,
     area: rect.area,
     velocity,
-    areaDifference: ((rect.area - requiredArea) / requiredArea) * 100,
+    areaDifference:
+        ((rect.area - requiredArea) / requiredArea) * 100,
+    aspectRatio,
     score
 
 });
 
     }
 
-    options.sort((a, b) => a.score - b.score);
+    // Sort by absolute area difference first.
+// If two options are equally close, prefer the lower aspect ratio.
+options.sort((a, b) => {
 
-    console.log(options.slice(0, 5));
+    const areaCompare =
+        Math.abs(a.areaDifference) -
+        Math.abs(b.areaDifference);
 
-    options.sort((a, b) => a.score - b.score);
+    if (Math.abs(areaCompare) > 0.000001) {
+        return areaCompare;
+    }
 
-console.log(options.slice(0, 5));
+    return a.aspectRatio - b.aspectRatio;
 
+});
+
+// Remove rotated duplicates such as 24 × 30 and 30 × 24.
 const unique = [];
 const seen = new Set();
 
 for (const option of options) {
 
-    const key = `${option.width}x${option.height}`;
+    const width = Math.max(option.width, option.height);
+    const height = Math.min(option.width, option.height);
 
-    if (seen.has(key)) continue;
+    const key = `${width}x${height}`;
+
+    if (seen.has(key)) {
+        continue;
+    }
 
     seen.add(key);
-    unique.push(option);
+
+    unique.push({
+        ...option,
+        width,
+        height
+    });
 
 }
 
