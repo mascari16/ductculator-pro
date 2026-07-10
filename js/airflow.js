@@ -237,57 +237,34 @@ function buildResults(data) {
 
             <tbody>
 
-                <tr>
+${rectangles.map(rect => `
 
-                    <td>48 × 24</td>
+<tr>
 
-                    <td class="good">+0.18%</td>
+    <td>${rect.width}" × ${rect.height}"</td>
 
-                    <td>1198</td>
+    <td class="${
+        rect.areaDifference < 0.5 ? "good" :
+        rect.areaDifference < 1.0 ? "okay" :
+        rect.areaDifference < 2.0 ? "warn" :
+        "bad"
+    }">
 
-                </tr>
+        ${rect.areaDifference.toFixed(2)}%
 
-                <tr>
+    </td>
 
-                    <td>50 × 22</td>
+    <td>
 
-                    <td class="good">+0.42%</td>
+        ${Math.round(rect.velocity)} FPM
 
-                    <td>1205</td>
+    </td>
 
-                </tr>
+</tr>
 
-                <tr>
+`).join("")}
 
-                    <td>54 × 20</td>
-
-                    <td class="okay">+0.83%</td>
-
-                    <td>1187</td>
-
-                </tr>
-
-                <tr>
-
-                    <td>42 × 28</td>
-
-                    <td class="warn">+1.38%</td>
-
-                    <td>1212</td>
-
-                </tr>
-
-                <tr>
-
-                    <td>60 × 18</td>
-
-                    <td class="bad">+2.17%</td>
-
-                    <td>1174</td>
-
-                </tr>
-
-            </tbody>
+</tbody>
 
         </table>
 
