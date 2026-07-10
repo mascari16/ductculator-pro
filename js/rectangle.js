@@ -52,6 +52,14 @@ function getRectangleOptions(requiredArea, targetVelocity, cfm) {
 
         const velocity = cfm / rect.area;
 
+        // Skip anything that isn't close to the required area
+const percentOff =
+    Math.abs((rect.area - requiredArea) / requiredArea);
+
+if (percentOff > 0.25) {
+    continue;
+}
+
         const areaDifference =
             Math.abs(((rect.area - requiredArea) / requiredArea) * 100);
 

@@ -77,6 +77,8 @@ function buildResults(data) {
         data.cfm
     );
 
+    console.log("Rectangle options:", rectangles);
+
     const ovals = getFlatOvalOptions(
         data.requiredArea,
         data.targetVelocity,
