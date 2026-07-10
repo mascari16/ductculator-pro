@@ -335,6 +335,18 @@ function buildResults(data) {
 
     <div class="engineering">
 
+    <div class="engineering-row">
+
+        <span>Recommended Round</span>
+
+        <strong>
+
+            ${data.round}"
+
+        </strong>
+
+    </div>
+
         <div class="engineering-row">
 
             <span>Target Velocity</span>
@@ -383,17 +395,6 @@ function buildResults(data) {
 
         </div>
 
-        <div class="engineering-row">
-
-            <span>Recommended Round</span>
-
-            <strong>
-
-    ${data.round}"
-
-</strong>
-
-        </div>
 
         <div class="engineering-row">
 
