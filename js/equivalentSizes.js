@@ -1,66 +1,22 @@
 // =====================================================
 // DUCTCULATOR PRO
 // equivalentSizes.js
-// Equal-Friction Equivalent Size Engine
+// Equivalent Duct Size Engine
 // =====================================================
 
 
 // ------------------------------------
-// Round to Equivalent Shapes
-// ------------------------------------
-
-function convertRoundToEquivalentSizes(roundDiameter) {
-
-    roundDiameter = Number(roundDiameter);
-
-    if (
-        !Number.isFinite(roundDiameter) ||
-        roundDiameter <= 0
-    ) {
-
-        return null;
-
-    }
-
-    const targetArea =
-        roundArea(roundDiameter);
-
-    const rectangles =
-        getEquivalentRectangleSizes(roundDiameter);
-
-    const flatOvals =
-        getEquivalentFlatOvalSizes(roundDiameter);
-
-    return {
-
-        sourceShape: "round",
-
-        sourceSize: roundDiameter,
-
-        targetArea,
-
-        rectangles,
-
-        flatOvals
-
-    };
-
-}
-
-
-// ------------------------------------
 // Rectangle Equivalent Diameter
-// Equal-Friction Correlation
 // ------------------------------------
 
 function rectangleEquivalentDiameter(width, height) {
 
-    const area =
+    const areaSquareInches =
         width * height;
 
     return (
         1.30 *
-        Math.pow(area, 0.625) /
+        Math.pow(areaSquareInches, 0.625) /
         Math.pow(width + height, 0.25)
     );
 
@@ -69,7 +25,6 @@ function rectangleEquivalentDiameter(width, height) {
 
 // ------------------------------------
 // Flat Oval Area — Square Inches
-// Racetrack / Oblong Shape
 // ------------------------------------
 
 function flatOvalAreaSquareInches(width, height) {
@@ -101,7 +56,6 @@ function flatOvalPerimeter(width, height) {
 
 // ------------------------------------
 // Flat Oval Equivalent Diameter
-// Equal-Friction Correlation
 // ------------------------------------
 
 function flatOvalEquivalentDiameter(width, height) {
@@ -128,11 +82,127 @@ function flatOvalEquivalentDiameter(width, height) {
 
 
 // ------------------------------------
-// Equivalent Rectangle Options
+// Ranking Score
+// Area match receives the most weight.
+// ------------------------------------
+
+function equivalentOptionScore(option) {
+
+    const aspectPenalty =
+        Math.max(
+            0,
+            option.aspectRatio - 1
+        );
+
+    return (
+        (Math.abs(option.areaDifference) * 7) +
+        (Math.abs(option.equivalentDifference) * 2) +
+        aspectPenalty
+    );
+
+}
+
+
+// ------------------------------------
+// Sort Equivalent Options
+// ------------------------------------
+
+function sortEquivalentOptions(options) {
+
+    options.sort((a, b) => {
+
+        const scoreDifference =
+            equivalentOptionScore(a) -
+            equivalentOptionScore(b);
+
+        if (
+            Math.abs(scoreDifference) >
+            0.000001
+        ) {
+
+            return scoreDifference;
+
+        }
+
+        return (
+            a.aspectRatio -
+            b.aspectRatio
+        );
+
+    });
+
+    return options.slice(0, 5);
+
+}
+
+
+// ------------------------------------
+// Standard Round Options
+// ------------------------------------
+
+function getEquivalentRoundSizes(
+    targetDiameter,
+    targetArea
+) {
+
+    const options = [];
+
+    for (const diameter of STANDARD_ROUND) {
+
+        const area =
+            roundArea(diameter);
+
+        const equivalentDifference =
+            (
+                (
+                    diameter -
+                    targetDiameter
+                ) /
+                targetDiameter
+            ) * 100;
+
+        const areaDifference =
+            (
+                (
+                    area -
+                    targetArea
+                ) /
+                targetArea
+            ) * 100;
+
+        options.push({
+
+            shape: "round",
+
+            diameter,
+
+            area,
+
+            areaDifference,
+
+            equivalentDiameter:
+                diameter,
+
+            equivalentDifference,
+
+            aspectRatio: 1
+
+        });
+
+    }
+
+    return sortEquivalentOptions(options);
+
+}
+
+
+// ------------------------------------
+// Rectangle Options
 // ------------------------------------
 
 function getEquivalentRectangleSizes(
-    targetDiameter
+    targetDiameter,
+    targetArea
 ) {
 
     const options = [];
@@ -173,6 +243,9 @@ function getEquivalentRectangleSizes(
 
         }
 
+        const area =
+            (width * height) / 144;
+
         const equivalentDiameter =
             rectangleEquivalentDiameter(
                 width,
@@ -180,96 +253,57 @@ function getEquivalentRectangleSizes(
             );
 
         const equivalentDifference =
-    (
-        (
-            equivalentDiameter -
-            targetDiameter
-        ) /
-        targetDiameter
-    ) * 100;
+            (
+                (
+                    equivalentDiameter -
+                    targetDiameter
+                ) /
+                targetDiameter
+            ) * 100;
 
-const targetArea =
-    roundArea(targetDiameter);
+        const areaDifference =
+            (
+                (
+                    area -
+                    targetArea
+                ) /
+                targetArea
+            ) * 100;
 
-const rectangleArea =
-    (width * height) / 144;
+        options.push({
 
-const areaDifference =
-    (
-        (
-            rectangleArea -
-            targetArea
-        ) /
-        targetArea
-    ) * 100;
+            shape: "rectangle",
 
-options.push({
+            width,
 
-    width,
+            height,
 
-    height,
+            area,
 
-    area: rectangleArea,
+            areaDifference,
 
-    areaDifference,
+            equivalentDiameter,
 
-    equivalentDiameter,
+            equivalentDifference,
 
-    equivalentDifference,
+            aspectRatio
 
-    aspectRatio
-
-});
+        });
 
     }
 
-    options.sort((a, b) => {
-
-    /*
-        Ranking priorities:
-
-        70% = cross-sectional area match
-        20% = equivalent diameter match
-        10% = reasonable aspect ratio
-    */
-
-    const aspectPenaltyA =
-        Math.max(0, a.aspectRatio - 1);
-
-    const aspectPenaltyB =
-        Math.max(0, b.aspectRatio - 1);
-
-    const scoreA =
-        (Math.abs(a.areaDifference) * 7) +
-        (Math.abs(a.equivalentDifference) * 2) +
-        aspectPenaltyA;
-
-    const scoreB =
-        (Math.abs(b.areaDifference) * 7) +
-        (Math.abs(b.equivalentDifference) * 2) +
-        aspectPenaltyB;
-
-    if (Math.abs(scoreA - scoreB) > 0.000001) {
-
-        return scoreA - scoreB;
-
-    }
-
-    return a.aspectRatio - b.aspectRatio;
-
-});
-
-    return options.slice(0, 5);
+    return sortEquivalentOptions(options);
 
 }
 
 
 // ------------------------------------
-// Equivalent Flat Oval Options
+// Flat Oval Options
 // ------------------------------------
 
 function getEquivalentFlatOvalSizes(
-    targetDiameter
+    targetDiameter,
+    targetArea
 ) {
 
     const options = [];
@@ -288,8 +322,7 @@ function getEquivalentFlatOvalSizes(
                 oval.height
             );
 
-        // Must be a true flat oval,
-        // not a round duct.
+        // True flat oval only.
         if (width <= height) {
 
             continue;
@@ -305,6 +338,12 @@ function getEquivalentFlatOvalSizes(
 
         }
 
+        const area =
+            flatOvalAreaSquareInches(
+                width,
+                height
+            ) / 144;
+
         const equivalentDiameter =
             flatOvalEquivalentDiameter(
                 width,
@@ -312,89 +351,279 @@ function getEquivalentFlatOvalSizes(
             );
 
         const equivalentDifference =
-    (
-        (
-            equivalentDiameter -
-            targetDiameter
-        ) /
-        targetDiameter
-    ) * 100;
+            (
+                (
+                    equivalentDiameter -
+                    targetDiameter
+                ) /
+                targetDiameter
+            ) * 100;
 
-const targetArea =
-    roundArea(targetDiameter);
+        const areaDifference =
+            (
+                (
+                    area -
+                    targetArea
+                ) /
+                targetArea
+            ) * 100;
 
-const ovalArea =
-    flatOvalAreaSquareInches(
-        width,
-        height
-    ) / 144;
+        options.push({
 
-const areaDifference =
-    (
-        (
-            ovalArea -
-            targetArea
-        ) /
-        targetArea
-    ) * 100;
+            shape: "flatOval",
 
-options.push({
+            width,
 
-    width,
+            height,
 
-    height,
+            area,
 
-    area: ovalArea,
+            areaDifference,
 
-    areaDifference,
+            equivalentDiameter,
 
-    equivalentDiameter,
+            equivalentDifference,
 
-    equivalentDifference,
+            aspectRatio
 
-    aspectRatio
-
-});
+        });
 
     }
 
-    options.sort((a, b) => {
+    return sortEquivalentOptions(options);
 
-    /*
-        Ranking priorities:
+}
 
-        70% = cross-sectional area match
-        20% = equivalent diameter match
-        10% = reasonable aspect ratio
-    */
 
-    const aspectPenaltyA =
-        Math.max(0, a.aspectRatio - 1);
+// ------------------------------------
+// Round Source
+// ------------------------------------
 
-    const aspectPenaltyB =
-        Math.max(0, b.aspectRatio - 1);
+function convertRoundToEquivalentSizes(
+    roundDiameter
+) {
 
-    const scoreA =
-        (Math.abs(a.areaDifference) * 7) +
-        (Math.abs(a.equivalentDifference) * 2) +
-        aspectPenaltyA;
+    roundDiameter =
+        Number(roundDiameter);
 
-    const scoreB =
-        (Math.abs(b.areaDifference) * 7) +
-        (Math.abs(b.equivalentDifference) * 2) +
-        aspectPenaltyB;
+    if (
+        !Number.isFinite(roundDiameter) ||
+        roundDiameter <= 0
+    ) {
 
-    if (Math.abs(scoreA - scoreB) > 0.000001) {
-
-        return scoreA - scoreB;
+        return null;
 
     }
 
-    return a.aspectRatio - b.aspectRatio;
+    const targetDiameter =
+        roundDiameter;
 
-});
+    const targetArea =
+        roundArea(roundDiameter);
 
-    return options.slice(0, 5);
+    return {
+
+        sourceShape: "round",
+
+        sourceLabel:
+            `${roundDiameter}" Round`,
+
+        targetDiameter,
+
+        targetArea,
+
+        resultOneTitle:
+            "▭ Rectangle",
+
+        resultOneOptions:
+            getEquivalentRectangleSizes(
+                targetDiameter,
+                targetArea
+            ),
+
+        resultTwoTitle:
+            "⬭ Flat Oval",
+
+        resultTwoOptions:
+            getEquivalentFlatOvalSizes(
+                targetDiameter,
+                targetArea
+            )
+
+    };
+
+}
+
+
+// ------------------------------------
+// Rectangle Source
+// ------------------------------------
+
+function convertRectangleToEquivalentSizes(
+    sourceWidth,
+    sourceHeight
+) {
+
+    sourceWidth =
+        Number(sourceWidth);
+
+    sourceHeight =
+        Number(sourceHeight);
+
+    if (
+        !Number.isFinite(sourceWidth) ||
+        !Number.isFinite(sourceHeight) ||
+        sourceWidth <= 0 ||
+        sourceHeight <= 0
+    ) {
+
+        return null;
+
+    }
+
+    const width =
+        Math.max(
+            sourceWidth,
+            sourceHeight
+        );
+
+    const height =
+        Math.min(
+            sourceWidth,
+            sourceHeight
+        );
+
+    const targetArea =
+        (width * height) / 144;
+
+    const targetDiameter =
+        rectangleEquivalentDiameter(
+            width,
+            height
+        );
+
+    return {
+
+        sourceShape: "rectangle",
+
+        sourceLabel:
+            `${width}" × ${height}" Rectangle`,
+
+        targetDiameter,
+
+        targetArea,
+
+        resultOneTitle:
+            "○ Round",
+
+        resultOneOptions:
+            getEquivalentRoundSizes(
+                targetDiameter,
+                targetArea
+            ),
+
+        resultTwoTitle:
+            "⬭ Flat Oval",
+
+        resultTwoOptions:
+            getEquivalentFlatOvalSizes(
+                targetDiameter,
+                targetArea
+            )
+
+    };
+
+}
+
+
+// ------------------------------------
+// Flat Oval Source
+// ------------------------------------
+
+function convertFlatOvalToEquivalentSizes(
+    sourceWidth,
+    sourceHeight
+) {
+
+    sourceWidth =
+        Number(sourceWidth);
+
+    sourceHeight =
+        Number(sourceHeight);
+
+    if (
+        !Number.isFinite(sourceWidth) ||
+        !Number.isFinite(sourceHeight) ||
+        sourceWidth <= 0 ||
+        sourceHeight <= 0
+    ) {
+
+        return null;
+
+    }
+
+    const width =
+        Math.max(
+            sourceWidth,
+            sourceHeight
+        );
+
+    const height =
+        Math.min(
+            sourceWidth,
+            sourceHeight
+        );
+
+    // Width and height cannot be equal,
+    // because that would be round duct.
+    if (width <= height) {
+
+        return null;
+
+    }
+
+    const targetArea =
+        flatOvalAreaSquareInches(
+            width,
+            height
+        ) / 144;
+
+    const targetDiameter =
+        flatOvalEquivalentDiameter(
+            width,
+            height
+        );
+
+    return {
+
+        sourceShape: "flatOval",
+
+        sourceLabel:
+            `${width}" × ${height}" Flat Oval`,
+
+        targetDiameter,
+
+        targetArea,
+
+        resultOneTitle:
+            "○ Round",
+
+        resultOneOptions:
+            getEquivalentRoundSizes(
+                targetDiameter,
+                targetArea
+            ),
+
+        resultTwoTitle:
+            "▭ Rectangle",
+
+        resultTwoOptions:
+            getEquivalentRectangleSizes(
+                targetDiameter,
+                targetArea
+            )
+
+    };
 
 }
 
@@ -404,13 +633,11 @@ options.push({
 // ------------------------------------
 
 function getEquivalentDifferenceClass(
-    equivalentDifference
+    differenceValue
 ) {
 
     const difference =
-        Math.abs(
-            equivalentDifference
-        );
+        Math.abs(differenceValue);
 
     if (difference <= 2) {
 
@@ -440,17 +667,17 @@ function getEquivalentDifferenceClass(
 // ------------------------------------
 
 function formatEquivalentDifference(
-    equivalentDifference
+    differenceValue
 ) {
 
     const sign =
-        equivalentDifference > 0
+        differenceValue > 0
             ? "+"
             : "";
 
     return (
         `${sign}` +
-        `${equivalentDifference.toFixed(2)}%`
+        `${differenceValue.toFixed(2)}%`
     );
 
 }
