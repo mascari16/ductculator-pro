@@ -744,6 +744,90 @@ TABLES
 }
 
 /*======================
+EQUIVALENT SIZES PANEL
+======================*/
+
+#equivalentWorkspace .calculator{
+
+    grid-template-columns:420px 1fr;
+
+}
+
+#equivalentWorkspace .panel:first-child{
+
+    padding:34px;
+
+}
+
+#equivalentRoundInput{
+
+    min-height:56px;
+
+    font-size:22px;
+
+    font-weight:700;
+
+}
+
+.equivalent-source-details{
+
+    margin-top:28px;
+
+    padding-top:24px;
+
+    border-top:1px solid rgba(255,255,255,.08);
+
+}
+
+.equivalent-source-details h4{
+
+    margin-bottom:16px;
+
+    font-size:16px;
+
+    color:#fff;
+
+}
+
+.equivalent-source-summary{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:16px 18px;
+
+    margin-bottom:12px;
+
+    background:#10192d;
+
+    border:1px solid var(--border);
+
+    border-radius:10px;
+
+}
+
+.equivalent-source-summary span{
+
+    color:var(--gray);
+
+    font-size:14px;
+
+}
+
+.equivalent-source-summary strong{
+
+    font-size:20px;
+
+    color:#fff;
+
+    font-weight:700;
+
+}
+
+/*======================
 ENGINEERING
 ======================*/
 
