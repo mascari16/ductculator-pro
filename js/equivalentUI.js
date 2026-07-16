@@ -54,12 +54,12 @@ function updateEquivalentSizes() {
 
                 <td class="${
                     getEquivalentDifferenceClass(
-                        rectangle.areaDifference
+                        rectangle.equivalentDifference
                     )
                 }">
 
                     ${formatEquivalentDifference(
-                        rectangle.areaDifference
+                        rectangle.equivalentDifference
                     )}
 
                 </td>
@@ -83,12 +83,12 @@ function updateEquivalentSizes() {
 
                 <td class="${
                     getEquivalentDifferenceClass(
-                        oval.areaDifference
+                        oval.equivalentDifference
                     )
                 }">
 
                     ${formatEquivalentDifference(
-                        oval.areaDifference
+                        oval.equivalentDifference
                     )}
 
                 </td>
