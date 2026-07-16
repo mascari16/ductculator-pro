@@ -167,39 +167,37 @@ function buildResults(data) {
 
         <div class="result-box">
 
-            <div class="box-label">
+    <div class="box-label">
 
-                📦 Required Area
+        📦 Required Area
 
-            </div>
+    </div>
 
-            <div class="box-value area">
+    <div class="box-value area">
 
-                ${data.actualArea === null
-    ? "Custom"
-    : `${data.actualArea.toFixed(3)} ft²`}
+        ${data.requiredArea.toFixed(3)} ft²
 
-            </div>
+    </div>
 
-        </div>
+</div>
 
         <div class="result-box">
 
-            <div class="box-label">
+    <div class="box-label">
 
-                📊 Actual Area
-
-            </div>
-
-            <div class="box-value area">
-
-            ${data.requiredArea.toFixed(3)} ft²
-
-            </div>
-
-        </div>
+        📊 Actual Area
 
     </div>
+
+    <div class="box-value area">
+
+        ${data.actualArea.toFixed(3)} ft²
+
+    </div>
+
+</div>
+
+</div>
 
 <div class="section-title">
 
