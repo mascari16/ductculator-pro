@@ -225,13 +225,29 @@ options.push({
 
     options.sort((a, b) => {
 
+    /*
+        Ranking priorities:
+
+        70% = cross-sectional area match
+        20% = equivalent diameter match
+        10% = reasonable aspect ratio
+    */
+
+    const aspectPenaltyA =
+        Math.max(0, a.aspectRatio - 1);
+
+    const aspectPenaltyB =
+        Math.max(0, b.aspectRatio - 1);
+
     const scoreA =
-        (Math.abs(a.areaDifference) * 4) +
-        Math.abs(a.equivalentDifference);
+        (Math.abs(a.areaDifference) * 7) +
+        (Math.abs(a.equivalentDifference) * 2) +
+        aspectPenaltyA;
 
     const scoreB =
-        (Math.abs(b.areaDifference) * 4) +
-        Math.abs(b.equivalentDifference);
+        (Math.abs(b.areaDifference) * 7) +
+        (Math.abs(b.equivalentDifference) * 2) +
+        aspectPenaltyB;
 
     if (Math.abs(scoreA - scoreB) > 0.000001) {
 
@@ -344,13 +360,29 @@ options.push({
 
     options.sort((a, b) => {
 
+    /*
+        Ranking priorities:
+
+        70% = cross-sectional area match
+        20% = equivalent diameter match
+        10% = reasonable aspect ratio
+    */
+
+    const aspectPenaltyA =
+        Math.max(0, a.aspectRatio - 1);
+
+    const aspectPenaltyB =
+        Math.max(0, b.aspectRatio - 1);
+
     const scoreA =
-        (Math.abs(a.areaDifference) * 4) +
-        Math.abs(a.equivalentDifference);
+        (Math.abs(a.areaDifference) * 7) +
+        (Math.abs(a.equivalentDifference) * 2) +
+        aspectPenaltyA;
 
     const scoreB =
-        (Math.abs(b.areaDifference) * 4) +
-        Math.abs(b.equivalentDifference);
+        (Math.abs(b.areaDifference) * 7) +
+        (Math.abs(b.equivalentDifference) * 2) +
+        aspectPenaltyB;
 
     if (Math.abs(scoreA - scoreB) > 0.000001) {
 
