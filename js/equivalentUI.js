@@ -48,27 +48,39 @@ function updateEquivalentSizes() {
 
             <tr>
 
-                <td>
-                    ${rectangle.width}" × ${rectangle.height}"
-                </td>
+    <td>
+        ${rectangle.width}" × ${rectangle.height}"
+    </td>
 
-                <td class="${
-                    getEquivalentDifferenceClass(
-                        rectangle.equivalentDifference
-                    )
-                }">
+    <td class="${
+        getEquivalentDifferenceClass(
+            rectangle.equivalentDifference
+        )
+    }">
 
-                    ${formatEquivalentDifference(
-                        rectangle.equivalentDifference
-                    )}
+        ${formatEquivalentDifference(
+            rectangle.equivalentDifference
+        )}
 
-                </td>
+    </td>
 
-                <td>
-                    ${rectangle.area.toFixed(3)} ft²
-                </td>
+    <td class="${
+        getEquivalentDifferenceClass(
+            rectangle.areaDifference
+        )
+    }">
 
-            </tr>
+        ${formatEquivalentDifference(
+            rectangle.areaDifference
+        )}
+
+    </td>
+
+    <td>
+        ${rectangle.area.toFixed(3)} ft²
+    </td>
+
+</tr>
 
         `).join("");
 
@@ -77,27 +89,39 @@ function updateEquivalentSizes() {
 
             <tr>
 
-                <td>
-                    ${oval.width}" × ${oval.height}"
-                </td>
+    <td>
+        ${oval.width}" × ${oval.height}"
+    </td>
 
-                <td class="${
-                    getEquivalentDifferenceClass(
-                        oval.equivalentDifference
-                    )
-                }">
+    <td class="${
+        getEquivalentDifferenceClass(
+            oval.equivalentDifference
+        )
+    }">
 
-                    ${formatEquivalentDifference(
-                        oval.equivalentDifference
-                    )}
+        ${formatEquivalentDifference(
+            oval.equivalentDifference
+        )}
 
-                </td>
+    </td>
 
-                <td>
-                    ${oval.area.toFixed(3)} ft²
-                </td>
+    <td class="${
+        getEquivalentDifferenceClass(
+            oval.areaDifference
+        )
+    }">
 
-            </tr>
+        ${formatEquivalentDifference(
+            oval.areaDifference
+        )}
+
+    </td>
+
+    <td>
+        ${oval.area.toFixed(3)} ft²
+    </td>
+
+</tr>
 
         `).join("");
 

@@ -180,58 +180,68 @@ function getEquivalentRectangleSizes(
             );
 
         const equivalentDifference =
-            (
-                (
-                    equivalentDiameter -
-                    targetDiameter
-                ) /
-                targetDiameter
-            ) * 100;
+    (
+        (
+            equivalentDiameter -
+            targetDiameter
+        ) /
+        targetDiameter
+    ) * 100;
 
-        options.push({
+const targetArea =
+    roundArea(targetDiameter);
 
-            width,
+const rectangleArea =
+    (width * height) / 144;
 
-            height,
+const areaDifference =
+    (
+        (
+            rectangleArea -
+            targetArea
+        ) /
+        targetArea
+    ) * 100;
 
-            area:
-                (width * height) / 144,
+options.push({
 
-            equivalentDiameter,
+    width,
 
-            equivalentDifference,
+    height,
 
-            aspectRatio
+    area: rectangleArea,
 
-        });
+    areaDifference,
+
+    equivalentDiameter,
+
+    equivalentDifference,
+
+    aspectRatio
+
+});
 
     }
 
     options.sort((a, b) => {
 
-        const difference =
-            Math.abs(
-                a.equivalentDifference
-            ) -
-            Math.abs(
-                b.equivalentDifference
-            );
+    const scoreA =
+        (Math.abs(a.areaDifference) * 4) +
+        Math.abs(a.equivalentDifference);
 
-        if (
-            Math.abs(difference) >
-            0.000001
-        ) {
+    const scoreB =
+        (Math.abs(b.areaDifference) * 4) +
+        Math.abs(b.equivalentDifference);
 
-            return difference;
+    if (Math.abs(scoreA - scoreB) > 0.000001) {
 
-        }
+        return scoreA - scoreB;
 
-        return (
-            a.aspectRatio -
-            b.aspectRatio
-        );
+    }
 
-    });
+    return a.aspectRatio - b.aspectRatio;
+
+});
 
     return options.slice(0, 5);
 
@@ -286,61 +296,71 @@ function getEquivalentFlatOvalSizes(
             );
 
         const equivalentDifference =
-            (
-                (
-                    equivalentDiameter -
-                    targetDiameter
-                ) /
-                targetDiameter
-            ) * 100;
+    (
+        (
+            equivalentDiameter -
+            targetDiameter
+        ) /
+        targetDiameter
+    ) * 100;
 
-        options.push({
+const targetArea =
+    roundArea(targetDiameter);
 
-            width,
+const ovalArea =
+    flatOvalAreaSquareInches(
+        width,
+        height
+    ) / 144;
 
-            height,
+const areaDifference =
+    (
+        (
+            ovalArea -
+            targetArea
+        ) /
+        targetArea
+    ) * 100;
 
-            area:
-                flatOvalAreaSquareInches(
-                    width,
-                    height
-                ) / 144,
+options.push({
 
-            equivalentDiameter,
+    width,
 
-            equivalentDifference,
+    height,
 
-            aspectRatio
+    area: ovalArea,
 
-        });
+    areaDifference,
+
+    equivalentDiameter,
+
+    equivalentDifference,
+
+    aspectRatio
+
+});
 
     }
 
     options.sort((a, b) => {
 
-        const difference =
-            Math.abs(
-                a.equivalentDifference
-            ) -
-            Math.abs(
-                b.equivalentDifference
-            );
+    const scoreA =
+        (Math.abs(a.areaDifference) * 4) +
+        Math.abs(a.equivalentDifference);
 
-        if (
-            Math.abs(difference) >
-            0.000001
-        ) {
+    const scoreB =
+        (Math.abs(b.areaDifference) * 4) +
+        Math.abs(b.equivalentDifference);
 
-            return difference;
+    if (Math.abs(scoreA - scoreB) > 0.000001) {
 
-        }
+        return scoreA - scoreB;
 
-        return (
-            a.aspectRatio -
-            b.aspectRatio
-        );
+    }
 
-    });
+    return a.aspectRatio - b.aspectRatio;
+
+});
 
     return options.slice(0, 5);
 
