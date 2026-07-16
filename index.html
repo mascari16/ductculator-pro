@@ -458,27 +458,131 @@
 
                 <select id="equivalentShape">
 
-                    <option value="round" selected>
+                    <label for="equivalentShape">
 
-                        Round
+    Known Shape
 
-                    </option>
+</label>
 
-                </select>
+<select id="equivalentShape">
 
-                <label for="equivalentRoundInput">
+    <option value="round" selected>
 
-                    Round Diameter (inches)
+        Round
 
-                </label>
+    </option>
 
-                <input
-                    id="equivalentRoundInput"
-                    type="number"
-                    min="1"
-                    step="0.01"
-                    value="12"
-                    placeholder="12">
+    <option value="rectangle">
+
+        Rectangle
+
+    </option>
+
+    <option value="flatOval">
+
+        Flat Oval
+
+    </option>
+
+</select>
+
+<!-- =========================
+     ROUND INPUT
+========================= -->
+
+<div id="equivalentRoundGroup">
+
+    <label for="equivalentRoundInput">
+
+        Round Diameter (inches)
+
+    </label>
+
+    <input
+        id="equivalentRoundInput"
+        type="number"
+        min="1"
+        step="0.01"
+        value="12"
+        placeholder="12">
+
+</div>
+
+<!-- =========================
+     RECTANGLE INPUTS
+========================= -->
+
+<div
+    id="equivalentRectangleGroup"
+    style="display:none;">
+
+    <label for="equivalentRectangleWidth">
+
+        Rectangle Width (inches)
+
+    </label>
+
+    <input
+        id="equivalentRectangleWidth"
+        type="number"
+        min="1"
+        step="0.01"
+        value="24"
+        placeholder="24">
+
+    <label for="equivalentRectangleHeight">
+
+        Rectangle Height (inches)
+
+    </label>
+
+    <input
+        id="equivalentRectangleHeight"
+        type="number"
+        min="1"
+        step="0.01"
+        value="14"
+        placeholder="14">
+
+</div>
+
+<!-- =========================
+     FLAT OVAL INPUTS
+========================= -->
+
+<div
+    id="equivalentOvalGroup"
+    style="display:none;">
+
+    <label for="equivalentOvalWidth">
+
+        Flat Oval Width (inches)
+
+    </label>
+
+    <input
+        id="equivalentOvalWidth"
+        type="number"
+        min="1"
+        step="0.01"
+        value="36"
+        placeholder="36">
+
+    <label for="equivalentOvalHeight">
+
+        Flat Oval Height (inches)
+
+    </label>
+
+    <input
+        id="equivalentOvalHeight"
+        type="number"
+        min="1"
+        step="0.01"
+        value="10"
+        placeholder="10">
+
+</div>
 
                 <div class="equivalent-source-details">
 
