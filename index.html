@@ -74,23 +74,27 @@
 
             </div>
 
-            <div class="tool-card disabled">
+            <div class="tool-card" id="openEquivalent">
 
-                <div class="tool-icon">⭕</div>
+    <div class="tool-icon">⭕</div>
 
-                <h3>Equivalent Sizes</h3>
+    <h3>Equivalent Sizes</h3>
 
-                <p>
+    <p>
 
-                    Round<br>
-                    Rectangle<br>
-                    Flat Oval
+        Round<br>
+        Rectangle<br>
+        Flat Oval
 
-                </p>
+    </p>
 
-                <span>Coming Soon</span>
+    <button>
 
-            </div>
+        Open Calculator →
+
+    </button>
+
+</div>
 
             <div class="tool-card disabled">
 
@@ -327,12 +331,271 @@
 </div>
 
 <!-- ===================================================
+     EQUIVALENT SIZES WORKSPACE
+=================================================== -->
+
+<div id="equivalentWorkspace" class="workspace">
+
+    <!-- Mobile Menu Button -->
+
+    <button
+        id="equivalentMobileMenuBtn"
+        class="mobile-menu-btn"
+        type="button">
+
+        ☰
+
+    </button>
+
+    <div
+        id="equivalentMobileOverlay"
+        class="mobile-overlay">
+
+    </div>
+
+    <!-- Sidebar -->
+
+    <aside class="sidebar equivalent-sidebar">
+
+        <div class="sidebar-top">
+
+            <button
+                id="toggleEquivalentSidebar"
+                class="toggle-btn"
+                type="button">
+
+                ☰
+
+            </button>
+
+            <h2>Ductculator</h2>
+
+        </div>
+
+        <button id="equivalentGoHome">
+
+            <span class="icon">🏠</span>
+
+            <span class="text">Dashboard</span>
+
+        </button>
+
+        <hr>
+
+        <button id="equivalentOpenAirflow">
+
+            <span class="icon">💨</span>
+
+            <span class="text">Airflow</span>
+
+        </button>
+
+        <button disabled>
+
+            <span class="icon">📏</span>
+
+            <span class="text">Pressure Loss</span>
+
+        </button>
+
+        <button class="active">
+
+            <span class="icon">⭕</span>
+
+            <span class="text">Equivalent Sizes</span>
+
+        </button>
+
+        <button disabled>
+
+            <span class="icon">🔄</span>
+
+            <span class="text">Reverse Calculator</span>
+
+        </button>
+
+        <hr>
+
+        <button disabled>
+
+            <span class="icon">⚙</span>
+
+            <span class="text">Settings</span>
+
+        </button>
+
+    </aside>
+
+    <!-- Main Content -->
+
+    <section class="content">
+
+        <header>
+
+            <h1>Equivalent Sizes</h1>
+
+            <p>
+
+                Convert round duct to rectangle and flat oval sizes
+
+            </p>
+
+        </header>
+
+        <div class="calculator">
+
+            <!-- Inputs -->
+
+            <div class="panel">
+
+                <h3>Known Duct</h3>
+
+                <label for="equivalentShape">
+
+                    Known Shape
+
+                </label>
+
+                <select id="equivalentShape">
+
+                    <option value="round" selected>
+
+                        Round
+
+                    </option>
+
+                </select>
+
+                <label for="equivalentRoundInput">
+
+                    Round Diameter (inches)
+
+                </label>
+
+                <input
+                    id="equivalentRoundInput"
+                    type="number"
+                    min="1"
+                    step="0.01"
+                    value="12"
+                    placeholder="12">
+
+                <div class="equivalent-source-summary">
+
+                    <span>Source Duct</span>
+
+                    <strong id="equivalentSourceSize">
+
+                        12" Round
+
+                    </strong>
+
+                </div>
+
+                <div class="equivalent-source-summary">
+
+                    <span>Cross-Sectional Area</span>
+
+                    <strong id="equivalentSourceArea">
+
+                        0.785 ft²
+
+                    </strong>
+
+                </div>
+
+            </div>
+
+            <!-- Results -->
+
+            <div class="panel">
+
+                <h3>Equivalent Options</h3>
+
+                <div id="equivalentResults">
+
+                    <div class="options-grid equivalent-options-grid">
+
+                        <!-- Rectangle Results -->
+
+                        <div class="options-card">
+
+                            <h3>▭ Rectangle</h3>
+
+                            <table class="options-table">
+
+                                <thead>
+
+                                    <tr>
+
+                                        <th>Size</th>
+
+                                        <th>Area Δ</th>
+
+                                        <th>Area</th>
+
+                                    </tr>
+
+                                </thead>
+
+                                <tbody id="equivalentRectangleRows">
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                        <!-- Flat Oval Results -->
+
+                        <div class="options-card">
+
+                            <h3>⬭ Flat Oval</h3>
+
+                            <table class="options-table">
+
+                                <thead>
+
+                                    <tr>
+
+                                        <th>Size</th>
+
+                                        <th>Area Δ</th>
+
+                                        <th>Area</th>
+
+                                    </tr>
+
+                                </thead>
+
+                                <tbody id="equivalentOvalRows">
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+</div>
+
+<!-- ===================================================
      JAVASCRIPT
 =================================================== -->
 
 <script src="js/formulas.js"></script>
 <script src="js/rectangle.js"></script>
 <script src="js/flatOval.js"></script>
+<script src="js/equivalentSizes.js"></script>
 <script src="js/airflow.js"></script>
 <script src="app.js"></script>
 

@@ -197,4 +197,46 @@ function updateCalculator() {
 
 updateCalculator();
 
+// =====================================================
+// Equivalent Sizes Navigation
+// =====================================================
+
+const equivalentWorkspace =
+    document.getElementById("equivalentWorkspace");
+
+const openEquivalent =
+    document.getElementById("openEquivalent");
+
+const equivalentGoHome =
+    document.getElementById("equivalentGoHome");
+
+const equivalentOpenAirflow =
+    document.getElementById("equivalentOpenAirflow");
+
+openEquivalent.addEventListener("click", () => {
+
+    dashboard.classList.remove("active");
+
+    airflowWorkspace.classList.remove("active");
+
+    equivalentWorkspace.classList.add("active");
+
+});
+
+equivalentGoHome.addEventListener("click", () => {
+
+    equivalentWorkspace.classList.remove("active");
+
+    dashboard.classList.add("active");
+
+});
+
+equivalentOpenAirflow.addEventListener("click", () => {
+
+    equivalentWorkspace.classList.remove("active");
+
+    airflowWorkspace.classList.add("active");
+
+});
+
 console.log("Ductculator Pro Loaded");
