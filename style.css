@@ -984,6 +984,17 @@ ENGINEERING BREAKDOWN
 }
 
 /*======================
+MOBILE MENU CONTROLS
+======================*/
+
+.mobile-menu-btn,
+.mobile-overlay{
+
+    display:none;
+
+}
+
+/*======================
 MOBILE
 ======================*/
 
@@ -999,22 +1010,44 @@ MOBILE
 
 @media(max-width:900px){
 
-    .workspace{
+    body{
 
-        flex-direction:column;
+        overflow:hidden;
 
     }
 
+    .workspace,
+    .workspace.active{
 
-    .calculator{
+        display:block;
 
-        grid-template-columns:1fr;
+        position:relative;
+
+        height:100dvh;
+
+        overflow:hidden;
 
     }
 
     .content{
 
-        padding:20px;
+        height:100dvh;
+
+        overflow-y:auto;
+
+        padding:75px 15px 25px;
+
+    }
+
+    .calculator{
+
+        display:block;
+
+    }
+
+    .panel{
+
+        margin-bottom:20px;
 
     }
 
@@ -1024,9 +1057,178 @@ MOBILE
 
     }
 
+    .content h1{
+
+        font-size:32px;
+
+    }
+
     .result-grid{
 
         grid-template-columns:1fr;
+
+    }
+
+    .analysis-grid{
+
+        grid-template-columns:1fr;
+
+    }
+
+    .options-grid{
+
+        grid-template-columns:1fr;
+
+    }
+
+    .options-table th,
+    .options-table td{
+
+        font-size:14px;
+
+        padding:10px;
+
+    }
+
+    .result-header h2{
+
+        font-size:34px;
+
+    }
+
+    .engineering-breakdown{
+
+        margin:20px;
+
+    }
+
+     .sidebar{
+
+        position:fixed;
+
+        top:0;
+        left:0;
+
+        width:280px;
+        height:100dvh;
+
+        padding:22px;
+
+        z-index:1000;
+
+        overflow-y:auto;
+
+        transform:translateX(-100%);
+
+        transition:transform .25s ease;
+
+        box-shadow:12px 0 35px rgba(0,0,0,.4);
+
+    }
+
+    .sidebar.mobile-open{
+
+        transform:translateX(0);
+
+    }
+
+    .sidebar.collapsed{
+
+        width:280px;
+        padding:22px;
+
+    }
+
+    .sidebar.collapsed h2,
+    .sidebar.collapsed .text{
+
+        display:inline;
+
+    }
+
+    .sidebar.collapsed .sidebar-top h2{
+
+        width:auto;
+        opacity:1;
+        overflow:visible;
+
+    }
+
+    .sidebar.collapsed button:not(.toggle-btn){
+
+        display:flex;
+
+        justify-content:flex-start;
+        align-items:center;
+
+        padding:14px;
+
+    }
+
+    .sidebar.collapsed .icon{
+
+        width:28px;
+        margin-right:8px;
+        font-size:18px;
+
+    }
+
+    .mobile-menu-btn{
+
+        position:fixed;
+
+        top:14px;
+        left:14px;
+
+        width:46px;
+        height:46px;
+
+        display:flex;
+
+        align-items:center;
+        justify-content:center;
+
+        border:1px solid var(--border);
+
+        border-radius:12px;
+
+        background:var(--card);
+
+        color:white;
+
+        font-size:22px;
+
+        cursor:pointer;
+
+        z-index:800;
+
+    }
+
+    .mobile-overlay{
+
+        position:fixed;
+
+        inset:0;
+
+        display:block;
+
+        background:rgba(0,0,0,.58);
+
+        z-index:900;
+
+        opacity:0;
+        visibility:hidden;
+
+        transition:
+            opacity .25s ease,
+            visibility .25s ease;
+
+    }
+
+    .mobile-overlay.active{
+
+        opacity:1;
+        visibility:visible;
 
     }
 

@@ -24,13 +24,66 @@ document.getElementById("goHome").addEventListener("click", () => {
 
 });
 
-// Sidebar Toggle
+// ----------------------------
+// Sidebar Controls
+// ----------------------------
+
 const sidebar = document.querySelector(".sidebar");
-const toggleSidebar = document.getElementById("toggleSidebar");
+
+const toggleSidebar =
+    document.getElementById("toggleSidebar");
+
+const mobileMenuBtn =
+    document.getElementById("mobileMenuBtn");
+
+const mobileOverlay =
+    document.getElementById("mobileOverlay");
+
+function isMobileView() {
+
+    return window.innerWidth <= 900;
+
+}
+
+function openMobileMenu() {
+
+    sidebar.classList.add("mobile-open");
+    mobileOverlay.classList.add("active");
+
+}
+
+function closeMobileMenu() {
+
+    sidebar.classList.remove("mobile-open");
+    mobileOverlay.classList.remove("active");
+
+}
 
 toggleSidebar.addEventListener("click", () => {
 
-    sidebar.classList.toggle("collapsed");
+    if (isMobileView()) {
+
+        closeMobileMenu();
+
+    } else {
+
+        sidebar.classList.toggle("collapsed");
+
+    }
+
+});
+
+mobileMenuBtn.addEventListener("click", openMobileMenu);
+
+mobileOverlay.addEventListener("click", closeMobileMenu);
+
+window.addEventListener("resize", () => {
+
+    if (!isMobileView()) {
+
+        closeMobileMenu();
+
+    }
 
 });
 
