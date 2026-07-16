@@ -346,91 +346,69 @@ ${rectangles
 
     </div>
 
-    <!-- =========================
-         FLAT OVAL OPTIONS
-    ========================== -->
+   <!-- =========================
+     FLAT OVAL OPTIONS
+========================== -->
 
-    <div class="options-card">
+<div class="options-card">
 
-        <h3>
+    <h3>
 
-            ⬭ Flat Oval
+        ⬭ Flat Oval
 
-        </h3>
+    </h3>
 
-        <table class="options-table">
+    <table class="options-table">
 
-            <thead>
+        <thead>
 
-                <tr>
+            <tr>
 
-                    <th>Size</th>
+                <th>Size</th>
 
-                    <th>Area Δ</th>
+                <th>Area Δ</th>
 
-                    <th>Velocity</th>
+                <th>Velocity</th>
 
-                </tr>
+            </tr>
 
-            </thead>
+        </thead>
 
-            <tbody>
+        <tbody>
 
-                <tr>
+${ovals
+    .filter(oval => oval)
+    .map(oval => `
 
-                    <td>52 × 20</td>
+<tr>
 
-                    <td class="good">+0.14%</td>
+    <td>${oval.width}" × ${oval.height}"</td>
 
-                    <td>1199</td>
+    <td class="${
+        Math.abs(oval.areaDifference) <= 2 ? "good" :
+        Math.abs(oval.areaDifference) <= 5 ? "okay" :
+        Math.abs(oval.areaDifference) <= 10 ? "warn" :
+        "bad"
+    }">
 
-                </tr>
+        ${oval.areaDifference > 0 ? "+" : ""}
+        ${oval.areaDifference.toFixed(2)}%
 
-                <tr>
+    </td>
 
-                    <td>54 × 18</td>
+    <td>
 
-                    <td class="good">+0.39%</td>
+        ${Math.round(oval.velocity)} FPM
 
-                    <td>1204</td>
+    </td>
 
-                </tr>
+</tr>
 
-                <tr>
+`).join("")}
 
-                    <td>48 × 22</td>
+        </tbody>
 
-                    <td class="okay">+0.71%</td>
-
-                    <td>1188</td>
-
-                </tr>
-
-                <tr>
-
-                    <td>56 × 18</td>
-
-                    <td class="warn">+1.44%</td>
-
-                    <td>1210</td>
-
-                </tr>
-
-                <tr>
-
-                    <td>60 × 16</td>
-
-                    <td class="bad">+2.09%</td>
-
-                    <td>1176</td>
-
-                </tr>
-
-            </tbody>
-
-        </table>
-
-    </div>
+    </table>
 
 </div>
 
