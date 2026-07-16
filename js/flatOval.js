@@ -34,10 +34,11 @@ for (
         height += OVAL_INCREMENT
     ) {
 
-        // Flat oval width must be at least as large as height.
-        if (width < height) {
-            continue;
-        }
+        // Flat oval must be wider than it is tall.
+// If width == height, it is simply a round duct.
+if (width <= height) {
+    continue;
+}
 
         /*
             Flat oval area:

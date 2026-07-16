@@ -155,6 +155,11 @@ function getEquivalentFlatOvalSizes(targetArea) {
         const height =
             Math.min(oval.width, oval.height);
 
+        // Skip anything that would actually be a round duct.
+if (width === height) {
+    continue;
+}
+
         const areaDifference =
             ((oval.area - targetArea) / targetArea) * 100;
 
