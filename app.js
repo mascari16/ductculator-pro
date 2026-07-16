@@ -213,6 +213,9 @@ const equivalentGoHome =
 const equivalentOpenAirflow =
     document.getElementById("equivalentOpenAirflow");
 
+const airflowOpenEquivalent =
+    document.getElementById("airflowOpenEquivalent");
+
 openEquivalent.addEventListener("click", () => {
 
     dashboard.classList.remove("active");
@@ -223,11 +226,11 @@ openEquivalent.addEventListener("click", () => {
 
 });
 
-equivalentGoHome.addEventListener("click", () => {
+airflowOpenEquivalent.addEventListener("click", () => {
 
-    equivalentWorkspace.classList.remove("active");
+    airflowWorkspace.classList.remove("active");
 
-    dashboard.classList.add("active");
+    equivalentWorkspace.classList.add("active");
 
 });
 
@@ -236,6 +239,14 @@ equivalentOpenAirflow.addEventListener("click", () => {
     equivalentWorkspace.classList.remove("active");
 
     airflowWorkspace.classList.add("active");
+
+});
+
+equivalentGoHome.addEventListener("click", () => {
+
+    equivalentWorkspace.classList.remove("active");
+
+    dashboard.classList.add("active");
 
 });
 
