@@ -1601,6 +1601,37 @@ DUCT OPTIONS
     border-color:#a83d58;
 }
 
+.offset-visual{
+    position:relative;
+    width:100%;
+    min-height:680px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    overflow:visible;
+}
+
+.offset-drawing{
+    position:relative;
+    width:760px;
+    height:620px;
+    flex:0 0 auto;
+}
+
+.offset-base-image{
+    position:absolute;
+    left:50%;
+    top:46%;
+
+    width:500px;
+    height:auto;
+    display:block;
+
+    transform:translate(-50%, -50%);
+}
+
 /* ===================================================
    Offset Diagram Dimensions
 =================================================== */
@@ -1612,10 +1643,14 @@ DUCT OPTIONS
 
 .dimension-overall{
     left:50%;
-    bottom:22px;
-    width:420px;
+    top:78%;
+
+    width:520px;
     height:58px;
-    transform:translateX(-50%);
+
+    transform:
+        translate(-50%, -50%)
+        rotate(25deg);
 }
 
 .dimension-line{
@@ -1648,6 +1683,12 @@ DUCT OPTIONS
     font-size:15px;
     font-weight:500;
     white-space:nowrap;
+}
+
+.dimension-overall .dimension-value{
+    transform:
+        translateX(-50%)
+        rotate(-25deg);
 }
 
 .dimension-value strong{
