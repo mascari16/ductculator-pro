@@ -1579,12 +1579,6 @@ DUCT OPTIONS
 }
 
 .diagram-label{
-    fill:#d9e6ff;
-    font-size:14px;
-    font-weight:600;
-}
-
-.diagram-label{
     position:absolute;
     font-weight:600;
     font-size:16px;
