@@ -1545,3 +1545,29 @@ DUCT OPTIONS
         text-align: left;
     }
 }
+
+.offset-diagram-card{
+    margin-top:24px;
+    padding:20px;
+    border:1px solid #32445f;
+    border-radius:14px;
+    background:rgba(255,255,255,0.02);
+}
+
+.offset-diagram-card h4{
+    margin:0 0 14px 0;
+    font-size:18px;
+    color:#ffffff;
+}
+
+.offset-diagram{
+    width:100%;
+    height:auto;
+    display:block;
+}
+
+.diagram-label{
+    fill:#d9e6ff;
+    font-size:14px;
+    font-weight:600;
+}

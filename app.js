@@ -425,6 +425,24 @@ const calculateOffsetBtn =
 const offsetResults =
     document.getElementById("offsetResults");
 
+const diagOverall =
+    document.getElementById("diagOverall");
+
+const diagOffset =
+    document.getElementById("diagOffset");
+
+const diagStraight =
+    document.getElementById("diagStraight");
+
+const diagAngle =
+    document.getElementById("diagAngle");
+
+const diagClr =
+    document.getElementById("diagClr");
+
+const diagThroat =
+    document.getElementById("diagThroat");    
+
 
 // -----------------------------------------------------
 // Input display controls
@@ -900,6 +918,26 @@ if (clrMultiplier.value === "custom") {
     centerlineRadius - (cheekSize / 2);
 
     offsetResults.innerHTML = `
+
+    diagOverall.textContent =
+    formatSheetMetalMeasurement(calculatedOverallLength);
+
+diagOffset.textContent =
+    formatSheetMetalMeasurement(offset);
+
+diagStraight.textContent =
+    formatSheetMetalMeasurement(straightBetweenElbows);
+
+diagAngle.textContent =
+    `${elbowAngle.toFixed(2)}°`;
+
+diagClr.textContent =
+    formatSheetMetalMeasurement(centerlineRadius);
+
+diagThroat.textContent =
+    Number.isFinite(throatRadius)
+        ? formatSheetMetalMeasurement(throatRadius)
+        : "—";
 
         <div class="result-main">
 

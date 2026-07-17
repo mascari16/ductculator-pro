@@ -1004,17 +1004,87 @@
 
     <div class="panel">
 
-        <h3>Offset Results</h3>
+    <h3>Offset Results</h3>
 
-        <div
-            id="offsetResults"
-            class="results">
+    <div
+        id="offsetResults"
+        class="results">
 
-            Enter the offset dimensions and press Calculate Offset.
-
-        </div>
+        Enter the offset dimensions and press Calculate Offset.
 
     </div>
+
+    <div class="offset-diagram-card">
+
+        <h4>Offset Diagram</h4>
+
+        <svg
+            class="offset-diagram"
+            viewBox="0 0 520 320"
+            xmlns="http://www.w3.org/2000/svg">
+
+            <!-- Duct centerline / simple visual -->
+            <path
+                d="M130 90 L200 90 L315 205 L385 205"
+                fill="none"
+                stroke="#d9e6ff"
+                stroke-width="18"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                opacity="0.9" />
+
+            <!-- Inner line -->
+            <path
+                d="M130 90 L200 90 L315 205 L385 205"
+                fill="none"
+                stroke="#0b1220"
+                stroke-width="6"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                opacity="0.45" />
+
+            <!-- Overall length dimension -->
+            <line x1="110" y1="245" x2="405" y2="245" stroke="#4f8cff" stroke-width="2" />
+            <line x1="110" y1="236" x2="110" y2="254" stroke="#4f8cff" stroke-width="2" />
+            <line x1="405" y1="236" x2="405" y2="254" stroke="#4f8cff" stroke-width="2" />
+            <text x="257" y="238" text-anchor="middle" class="diagram-label">
+                Overall Length: <tspan id="diagOverall">—</tspan>
+            </text>
+
+            <!-- Offset dimension -->
+            <line x1="445" y1="90" x2="445" y2="205" stroke="#ff7aa2" stroke-width="2" />
+            <line x1="436" y1="90" x2="454" y2="90" stroke="#ff7aa2" stroke-width="2" />
+            <line x1="436" y1="205" x2="454" y2="205" stroke="#ff7aa2" stroke-width="2" />
+            <text x="452" y="152" class="diagram-label">
+                Offset: <tspan id="diagOffset">—</tspan>
+            </text>
+
+            <!-- Straight between elbows -->
+            <line x1="215" y1="108" x2="300" y2="193" stroke="#7ce0b8" stroke-width="2" />
+            <text x="235" y="138" class="diagram-label">
+                Straight: <tspan id="diagStraight">—</tspan>
+            </text>
+
+            <!-- Angle -->
+            <text x="150" y="70" class="diagram-label">
+                Angle: <tspan id="diagAngle">—</tspan>
+            </text>
+
+            <!-- CLR -->
+            <text x="80" y="130" class="diagram-label">
+                CLR: <tspan id="diagClr">—</tspan>
+            </text>
+
+            <!-- Throat radius -->
+            <text x="80" y="155" class="diagram-label">
+                Throat: <tspan id="diagThroat">—</tspan>
+            </text>
+
+        </svg>
+
+    </div>
+
+</div>
 
 </div>
 
