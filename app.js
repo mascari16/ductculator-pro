@@ -264,6 +264,70 @@ function updateCalculator() {
 updateCalculator();
 
 // =====================================================
+// Sheet Metal Mobile Menu
+// =====================================================
+
+const sheetMetalSidebar =
+    document.querySelector(".sheet-metal-sidebar");
+
+const toggleSheetMetalSidebar =
+    document.getElementById("toggleSheetMetalSidebar");
+
+const sheetMetalMobileMenuBtn =
+    document.getElementById("sheetMetalMobileMenuBtn");
+
+const sheetMetalMobileOverlay =
+    document.getElementById("sheetMetalMobileOverlay");
+
+function openSheetMetalMobileMenu() {
+
+    sheetMetalSidebar.classList.add("mobile-open");
+    sheetMetalMobileOverlay.classList.add("active");
+
+}
+
+function closeSheetMetalMobileMenu() {
+
+    sheetMetalSidebar.classList.remove("mobile-open");
+    sheetMetalMobileOverlay.classList.remove("active");
+
+}
+
+toggleSheetMetalSidebar.addEventListener("click", () => {
+
+    if (isMobileView()) {
+
+        closeSheetMetalMobileMenu();
+
+    } else {
+
+        sheetMetalSidebar.classList.toggle("collapsed");
+
+    }
+
+});
+
+sheetMetalMobileMenuBtn.addEventListener(
+    "click",
+    openSheetMetalMobileMenu
+);
+
+sheetMetalMobileOverlay.addEventListener(
+    "click",
+    closeSheetMetalMobileMenu
+);
+
+window.addEventListener("resize", () => {
+
+    if (!isMobileView()) {
+
+        closeSheetMetalMobileMenu();
+
+    }
+
+});
+
+// =====================================================
 // Equivalent Sizes Navigation
 // =====================================================
 
@@ -320,6 +384,97 @@ equivalentGoHome.addEventListener("click", () => {
 
     equivalentWorkspace.classList.remove("active");
     airflowWorkspace.classList.remove("active");
+    dashboard.classList.add("active");
+
+});
+
+// =====================================================
+// Sheet Metal Navigation
+// =====================================================
+
+const sheetMetalWorkspace =
+    document.getElementById("sheetMetalWorkspace");
+
+const openSheetMetal =
+    document.getElementById("openSheetMetal");
+
+const airflowOpenSheetMetal =
+    document.getElementById("airflowOpenSheetMetal");
+
+const equivalentOpenSheetMetal =
+    document.getElementById("equivalentOpenSheetMetal");
+
+const sheetMetalGoHome =
+    document.getElementById("sheetMetalGoHome");
+
+const sheetMetalOpenAirflow =
+    document.getElementById("sheetMetalOpenAirflow");
+
+const sheetMetalOpenEquivalent =
+    document.getElementById("sheetMetalOpenEquivalent");
+
+openSheetMetal.addEventListener("click", () => {
+
+    closeMobileMenu();
+    closeEquivalentMobileMenu();
+    closeSheetMetalMobileMenu();
+
+    dashboard.classList.remove("active");
+    airflowWorkspace.classList.remove("active");
+    equivalentWorkspace.classList.remove("active");
+    sheetMetalWorkspace.classList.add("active");
+
+});
+
+airflowOpenSheetMetal.addEventListener("click", () => {
+
+    closeMobileMenu();
+    closeSheetMetalMobileMenu();
+
+    airflowWorkspace.classList.remove("active");
+    equivalentWorkspace.classList.remove("active");
+    sheetMetalWorkspace.classList.add("active");
+
+});
+
+equivalentOpenSheetMetal.addEventListener("click", () => {
+
+    closeEquivalentMobileMenu();
+    closeSheetMetalMobileMenu();
+
+    equivalentWorkspace.classList.remove("active");
+    airflowWorkspace.classList.remove("active");
+    sheetMetalWorkspace.classList.add("active");
+
+});
+
+sheetMetalOpenAirflow.addEventListener("click", () => {
+
+    closeSheetMetalMobileMenu();
+
+    sheetMetalWorkspace.classList.remove("active");
+    equivalentWorkspace.classList.remove("active");
+    airflowWorkspace.classList.add("active");
+
+});
+
+sheetMetalOpenEquivalent.addEventListener("click", () => {
+
+    closeSheetMetalMobileMenu();
+
+    sheetMetalWorkspace.classList.remove("active");
+    airflowWorkspace.classList.remove("active");
+    equivalentWorkspace.classList.add("active");
+
+});
+
+sheetMetalGoHome.addEventListener("click", () => {
+
+    closeSheetMetalMobileMenu();
+
+    sheetMetalWorkspace.classList.remove("active");
+    airflowWorkspace.classList.remove("active");
+    equivalentWorkspace.classList.remove("active");
     dashboard.classList.add("active");
 
 });
