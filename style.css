@@ -1692,3 +1692,24 @@ DUCT OPTIONS
     right:0;
     transform:rotate(135deg);
 }
+
+.offset-visual{
+    position:relative;
+    width:100%;
+    min-height:500px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    overflow:hidden;
+}
+
+.offset-base-image{
+    display:block;
+    width:260px;
+    max-width:70%;
+    height:auto;
+
+    transform:translateX(18px);
+}
