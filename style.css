@@ -1332,11 +1332,6 @@ MOBILE
 
     @media(max-width:600px){
 
-    .dimension-overall{
-        width:82%;
-        bottom:15px;
-    }
-
     .dimension-value{
         font-size:13px;
         padding:4px 8px;
@@ -1642,36 +1637,42 @@ DUCT OPTIONS
 }
 
 .dimension-overall{
-    left:50%;
-    top:78%;
+    position:absolute;
 
-    width:520px;
-    height:58px;
+    left:80px;
+    top:50%;
+
+    width:90px;
+    height:500px;
+
+    transform:translateY(-50%);
+}
+
+/* Vertical overall-length line */
+.dimension-overall .dimension-line{
+    position:absolute;
+
+    left:50%;
+    top:0;
+
+    width:0;
+    height:100%;
+
+    transform:translateX(-50%);
+
+    border-left:2px solid #69a7ff;
+}
+
+/* Overall-length text */
+.dimension-overall .dimension-value{
+    position:absolute;
+
+    left:50%;
+    top:50%;
 
     transform:
         translate(-50%, -50%)
-        rotate(25deg);
-}
-
-.dimension-line{
-    position:absolute;
-    left:0;
-    right:0;
-    bottom:0;
-    height:32px;
-
-    display:flex;
-    align-items:center;
-    justify-content:center;
-
-    border-top:2px solid #69a7ff;
-}
-
-.dimension-value{
-    position:absolute;
-    left:50%;
-    top:-17px;
-    transform:translateX(-50%);
+        rotate(-90deg);
 
     padding:5px 12px;
 
@@ -1683,39 +1684,42 @@ DUCT OPTIONS
     font-size:15px;
     font-weight:500;
     white-space:nowrap;
+
+    z-index:2;
 }
 
-.dimension-overall .dimension-value{
-    transform:
-        translateX(-50%)
-        rotate(-25deg);
-}
-
-.dimension-value strong{
+.dimension-overall .dimension-value strong{
     color:#ffffff;
     margin-left:4px;
 }
 
-.dimension-extension{
+/* Horizontal extension lines at top and bottom */
+.dimension-overall .dimension-extension{
     position:absolute;
+
+    left:50%;
+
+    width:90px;
+    height:0;
+
+    transform:translateX(-50%);
+
+    border-top:2px dashed rgba(105,167,255,.7);
+}
+
+.dimension-overall .extension-left{
     top:0;
-    bottom:25px;
-
-    width:0;
-    border-left:2px dashed rgba(105,167,255,.7);
 }
 
-.extension-left{
-    left:0;
+.dimension-overall .extension-right{
+    bottom:0;
 }
 
-.extension-right{
-    right:0;
-}
-
-.dimension-arrow{
+/* Shared arrow styling */
+.dimension-overall .dimension-arrow{
     position:absolute;
-    top:-7px;
+
+    left:50%;
 
     width:12px;
     height:12px;
@@ -1724,14 +1728,22 @@ DUCT OPTIONS
     border-left:2px solid #69a7ff;
 }
 
-.arrow-left{
-    left:0;
-    transform:rotate(-45deg);
+/* Top arrow points downward */
+.dimension-overall .arrow-left{
+    top:0;
+
+    transform:
+        translate(-50%, -1px)
+        rotate(135deg);
 }
 
-.arrow-right{
-    right:0;
-    transform:rotate(135deg);
+/* Bottom arrow points upward */
+.dimension-overall .arrow-right{
+    bottom:0;
+
+    transform:
+        translate(-50%, 1px)
+        rotate(-45deg);
 }
 
 .offset-visual{
