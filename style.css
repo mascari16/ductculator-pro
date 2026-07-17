@@ -1590,3 +1590,11 @@ DUCT OPTIONS
     bottom:18px;
     transform:translateX(-50%);
 }
+
+.offset-label{
+    right:24px;
+    top:50%;
+    transform:translateY(-50%);
+    color:#ff6b8a;
+    border-color:#a83d58;
+}
