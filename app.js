@@ -710,17 +710,21 @@ calculateOffsetBtn.addEventListener("click", () => {
 
     let centerlineRadius;
 
-    if (clrMultiplier.value === "custom") {
+if (clrMultiplier.value === "custom") {
 
-        centerlineRadius =
-            parseSheetMetalMeasurement(customClrInput.value);
+    centerlineRadius =
+        parseSheetMetalMeasurement(customClrInput.value);
 
-    } else {
+} else if (clrMultiplier.value === "auto") {
 
-        centerlineRadius =
-            cheekSize * Number(clrMultiplier.value);
+    centerlineRadius = NaN;
 
-    }
+} else {
+
+    centerlineRadius =
+        cheekSize * Number(clrMultiplier.value);
+
+}
 
     if (
         !Number.isFinite(offset) ||
@@ -738,59 +742,67 @@ calculateOffsetBtn.addEventListener("click", () => {
     }
 
     if (
+    clrMultiplier.value !== "auto" &&
+    clrMultiplier.value !== "custom" &&
+    (
         !Number.isFinite(cheekSize) ||
         cheekSize <= 0
-    ) {
+    )
+) {
 
-        offsetResults.innerHTML = `
-            <p class="error">
-                Enter a valid cheek size.
-            </p>
-        `;
+    offsetResults.innerHTML = `
+        <p class="error">
+            Enter a valid cheek size.
+        </p>
+    `;
 
-        return;
+    return;
 
-    }
-
-    if (
-        !Number.isFinite(centerlineRadius) ||
-        centerlineRadius <= 0
-    ) {
-
-        offsetResults.innerHTML = `
-            <p class="error">
-                Enter a valid centerline radius.
-            </p>
-        `;
-
-        return;
-
-    }
+}
 
     let elbowAngle;
     let requestedOverallLength = null;
 
     if (offsetMode.value === "solveAngle") {
 
-        requestedOverallLength =
-            parseSheetMetalMeasurement(
-                overallLengthInput.value
-            );
+    requestedOverallLength =
+        parseSheetMetalMeasurement(
+            overallLengthInput.value
+        );
 
-        if (
-            !Number.isFinite(requestedOverallLength) ||
-            requestedOverallLength <= 0
-        ) {
+    if (
+        !Number.isFinite(requestedOverallLength) ||
+        requestedOverallLength <= 0
+    ) {
 
-            offsetResults.innerHTML = `
-                <p class="error">
-                    Enter a valid overall length.
-                </p>
-            `;
+        offsetResults.innerHTML = `
+            <p class="error">
+                Enter a valid overall length.
+            </p>
+        `;
 
-            return;
+        return;
 
-        }
+    }
+
+    if (clrMultiplier.value === "auto") {
+
+        centerlineRadius =
+            (
+                Math.pow(offset, 2) +
+                Math.pow(requestedOverallLength, 2)
+            ) /
+            (4 * offset);
+
+        elbowAngle =
+            2 *
+            Math.atan(
+                offset / requestedOverallLength
+            ) *
+            180 /
+            Math.PI;
+
+    } else {
 
         elbowAngle =
             solveOffsetAngle(
@@ -812,7 +824,9 @@ calculateOffsetBtn.addEventListener("click", () => {
 
         }
 
-    } else {
+    }
+
+} else {
 
         elbowAngle =
             Number(elbowAngleInput.value);
@@ -832,6 +846,21 @@ calculateOffsetBtn.addEventListener("click", () => {
             return;
 
         }
+
+    }
+
+    if (
+        !Number.isFinite(centerlineRadius) ||
+        centerlineRadius <= 0
+    ) {
+
+        offsetResults.innerHTML = `
+            <p class="error">
+                Enter a valid centerline radius.
+            </p>
+        `;
+
+        return;
 
     }
 
@@ -922,6 +951,23 @@ calculateOffsetBtn.addEventListener("click", () => {
             </strong>
 
         </div>
+
+        ${
+    Number.isFinite(cheekSize) &&
+    cheekSize > 0
+        ? `
+            <div class="result-row">
+
+                <span>Equivalent CLR</span>
+
+                <strong>
+                    ${(centerlineRadius / cheekSize).toFixed(2)}× CLR
+                </strong>
+
+            </div>
+        `
+        : ""
+}
 
         <div class="result-row">
 
