@@ -1571,3 +1571,22 @@ DUCT OPTIONS
     font-size:14px;
     font-weight:600;
 }
+
+.diagram-label{
+    position:absolute;
+    font-weight:600;
+    font-size:16px;
+    color:#69a7ff;
+    background:rgba(22,32,52,.92);
+    border:1px solid #3d69b8;
+    border-radius:8px;
+    padding:6px 12px;
+    white-space:nowrap;
+    box-shadow:0 0 10px rgba(0,0,0,.35);
+}
+
+.overall-length{
+    left:50%;
+    bottom:18px;
+    transform:translateX(-50%);
+}
