@@ -896,6 +896,9 @@ if (clrMultiplier.value === "custom") {
 
     }
 
+    const throatRadius =
+    centerlineRadius - (cheekSize / 2);
+
     offsetResults.innerHTML = `
 
         <div class="result-main">
@@ -951,6 +954,18 @@ if (clrMultiplier.value === "custom") {
             </strong>
 
         </div>
+
+        <div class="result-row">
+
+    <span>Throat Radius</span>
+
+    <strong>
+        ${formatSheetMetalMeasurement(
+            throatRadius
+        )}
+    </strong>
+
+</div>
 
         ${
     Number.isFinite(cheekSize) &&
