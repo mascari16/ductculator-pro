@@ -852,31 +852,165 @@
 
         <div class="calculator">
 
-            <div class="panel">
+    <div class="panel">
 
-                <h3>Offset Inputs</h3>
+        <h3>Offset Inputs</h3>
 
-                <p>
+        <label for="offsetMode">
 
-                    Calculator inputs will go here next.
+            Calculation Mode
 
-                </p>
+        </label>
 
-            </div>
+        <select id="offsetMode">
 
-            <div class="panel">
+            <option value="solveAngle" selected>
 
-                <h3>Offset Results</h3>
+                Solve Elbow Angle
 
-                <p>
+            </option>
 
-                    Results and the fitting diagram will go here next.
+            <option value="knownAngle">
 
-                </p>
+                Known Elbow Angle
 
-            </div>
+            </option>
+
+        </select>
+
+        <label for="offsetInput">
+
+            Offset
+
+        </label>
+
+        <input
+            id="offsetInput"
+            type="text"
+            inputmode="decimal"
+            placeholder="46 1/4">
+
+        <label for="overallLengthInput">
+
+            Overall Length
+
+        </label>
+
+        <input
+            id="overallLengthInput"
+            type="text"
+            inputmode="decimal"
+            placeholder="64">
+
+        <label for="cheekSizeInput">
+
+            Cheek Size
+
+        </label>
+
+        <input
+            id="cheekSizeInput"
+            type="text"
+            inputmode="decimal"
+            placeholder="34">
+
+        <label for="clrMultiplier">
+
+            CLR Multiplier
+
+        </label>
+
+        <select id="clrMultiplier">
+
+            <option value="1" selected>
+
+                1× CLR
+
+            </option>
+
+            <option value="1.5">
+
+                1.5× CLR
+
+            </option>
+
+            <option value="2">
+
+                2× CLR
+
+            </option>
+
+            <option value="custom">
+
+                Custom CLR
+
+            </option>
+
+        </select>
+
+        <div
+            id="customClrGroup"
+            style="display:none;">
+
+            <label for="customClrInput">
+
+                Custom Centerline Radius
+
+            </label>
+
+            <input
+                id="customClrInput"
+                type="text"
+                inputmode="decimal"
+                placeholder="34">
 
         </div>
+
+        <div
+            id="knownAngleGroup"
+            style="display:none;">
+
+            <label for="elbowAngleInput">
+
+                Elbow Angle
+
+            </label>
+
+            <input
+                id="elbowAngleInput"
+                type="number"
+                min="1"
+                max="90"
+                step="0.01"
+                placeholder="45">
+
+        </div>
+
+        <button
+            id="calculateOffsetBtn"
+            type="button">
+
+            Calculate Offset
+
+        </button>
+
+    </div>
+
+    <div class="panel">
+
+        <h3>Offset Results</h3>
+
+        <div
+            id="offsetResults"
+            class="results">
+
+            Enter the offset dimensions and press Calculate Offset.
+
+        </div>
+
+    </div>
+
+</div>
 
     </section>
 

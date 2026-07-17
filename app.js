@@ -389,6 +389,581 @@ equivalentGoHome.addEventListener("click", () => {
 });
 
 // =====================================================
+// Two-Elbow Offset Calculator
+// =====================================================
+
+const offsetMode =
+    document.getElementById("offsetMode");
+
+const offsetInput =
+    document.getElementById("offsetInput");
+
+const overallLengthInput =
+    document.getElementById("overallLengthInput");
+
+const cheekSizeInput =
+    document.getElementById("cheekSizeInput");
+
+const clrMultiplier =
+    document.getElementById("clrMultiplier");
+
+const customClrGroup =
+    document.getElementById("customClrGroup");
+
+const customClrInput =
+    document.getElementById("customClrInput");
+
+const knownAngleGroup =
+    document.getElementById("knownAngleGroup");
+
+const elbowAngleInput =
+    document.getElementById("elbowAngleInput");
+
+const calculateOffsetBtn =
+    document.getElementById("calculateOffsetBtn");
+
+const offsetResults =
+    document.getElementById("offsetResults");
+
+
+// -----------------------------------------------------
+// Input display controls
+// -----------------------------------------------------
+
+offsetMode.addEventListener("change", () => {
+
+    if (offsetMode.value === "knownAngle") {
+
+        knownAngleGroup.style.display = "block";
+
+    } else {
+
+        knownAngleGroup.style.display = "none";
+
+    }
+
+});
+
+
+clrMultiplier.addEventListener("change", () => {
+
+    if (clrMultiplier.value === "custom") {
+
+        customClrGroup.style.display = "block";
+
+    } else {
+
+        customClrGroup.style.display = "none";
+
+    }
+
+});
+
+
+// -----------------------------------------------------
+// Convert feet, inches and fractions into decimal inches
+// -----------------------------------------------------
+
+function parseSheetMetalMeasurement(value) {
+
+    if (!value) {
+
+        return NaN;
+
+    }
+
+    let text = value
+        .trim()
+        .toLowerCase()
+        .replace(/inches|inch|in\./g, "")
+        .replace(/"/g, "")
+        .replace(/\s+/g, " ");
+
+    let totalInches = 0;
+
+    // Handle feet, such as 3' 10 1/4
+
+    if (text.includes("'")) {
+
+        const parts = text.split("'");
+
+        const feet = Number(parts[0].trim());
+
+        if (!Number.isFinite(feet)) {
+
+            return NaN;
+
+        }
+
+        totalInches += feet * 12;
+
+        text = parts[1].trim();
+
+    }
+
+    // Convert formats such as 46-1/4 into 46 1/4
+
+    text = text.replace(
+        /^(-?\d+(?:\.\d+)?)-(\d+)\/(\d+)$/,
+        "$1 $2/$3"
+    );
+
+    if (!text) {
+
+        return totalInches;
+
+    }
+
+    const parts = text.split(" ");
+
+    for (const part of parts) {
+
+        if (!part) {
+
+            continue;
+
+        }
+
+        if (part.includes("/")) {
+
+            const fractionParts = part.split("/");
+
+            if (fractionParts.length !== 2) {
+
+                return NaN;
+
+            }
+
+            const numerator = Number(fractionParts[0]);
+            const denominator = Number(fractionParts[1]);
+
+            if (
+                !Number.isFinite(numerator) ||
+                !Number.isFinite(denominator) ||
+                denominator === 0
+            ) {
+
+                return NaN;
+
+            }
+
+            totalInches += numerator / denominator;
+
+        } else {
+
+            const number = Number(part);
+
+            if (!Number.isFinite(number)) {
+
+                return NaN;
+
+            }
+
+            totalInches += number;
+
+        }
+
+    }
+
+    return totalInches;
+
+}
+
+
+// -----------------------------------------------------
+// Format decimal inches to the nearest 1/16 inch
+// -----------------------------------------------------
+
+function formatSheetMetalMeasurement(value) {
+
+    if (!Number.isFinite(value)) {
+
+        return "—";
+
+    }
+
+    const roundedSixteenths =
+        Math.round(value * 16);
+
+    let wholeInches =
+        Math.floor(roundedSixteenths / 16);
+
+    const remainder =
+        roundedSixteenths % 16;
+
+    if (remainder === 0) {
+
+        return `${wholeInches}"`;
+
+    }
+
+    const divisor =
+        greatestCommonDivisor(remainder, 16);
+
+    const numerator =
+        remainder / divisor;
+
+    const denominator =
+        16 / divisor;
+
+    return `${wholeInches} ${numerator}/${denominator}"`;
+
+}
+
+
+function greatestCommonDivisor(a, b) {
+
+    while (b !== 0) {
+
+        const temporary = b;
+
+        b = a % b;
+        a = temporary;
+
+    }
+
+    return Math.abs(a);
+
+}
+
+
+// -----------------------------------------------------
+// Find the elbow angle from offset and overall length
+// -----------------------------------------------------
+
+function solveOffsetAngle(offset, overallLength, radius) {
+
+    function calculatedLength(angleDegrees) {
+
+        const angleRadians =
+            angleDegrees * Math.PI / 180;
+
+        const centerlineRise =
+            radius * Math.tan(angleRadians / 2);
+
+        return (
+            offset / Math.tan(angleRadians) +
+            2 * centerlineRise
+        );
+
+    }
+
+    let lowestAngle = 0.1;
+    let highestAngle = 89.9;
+
+    const lowestLength =
+        calculatedLength(lowestAngle);
+
+    const highestLength =
+        calculatedLength(highestAngle);
+
+    /*
+        The requested length must fall within the range
+        the two elbows can physically produce.
+    */
+
+    if (
+        overallLength > lowestLength ||
+        overallLength < highestLength
+    ) {
+
+        return NaN;
+
+    }
+
+    for (let i = 0; i < 100; i++) {
+
+        const middleAngle =
+            (lowestAngle + highestAngle) / 2;
+
+        const middleLength =
+            calculatedLength(middleAngle);
+
+        if (middleLength > overallLength) {
+
+            lowestAngle = middleAngle;
+
+        } else {
+
+            highestAngle = middleAngle;
+
+        }
+
+    }
+
+    return (lowestAngle + highestAngle) / 2;
+
+}
+
+
+// -----------------------------------------------------
+// Calculate offset
+// -----------------------------------------------------
+
+calculateOffsetBtn.addEventListener("click", () => {
+
+    const offset =
+        parseSheetMetalMeasurement(offsetInput.value);
+
+    const cheekSize =
+        parseSheetMetalMeasurement(cheekSizeInput.value);
+
+    let centerlineRadius;
+
+    if (clrMultiplier.value === "custom") {
+
+        centerlineRadius =
+            parseSheetMetalMeasurement(customClrInput.value);
+
+    } else {
+
+        centerlineRadius =
+            cheekSize * Number(clrMultiplier.value);
+
+    }
+
+    if (
+        !Number.isFinite(offset) ||
+        offset <= 0
+    ) {
+
+        offsetResults.innerHTML = `
+            <p class="error">
+                Enter a valid offset.
+            </p>
+        `;
+
+        return;
+
+    }
+
+    if (
+        !Number.isFinite(cheekSize) ||
+        cheekSize <= 0
+    ) {
+
+        offsetResults.innerHTML = `
+            <p class="error">
+                Enter a valid cheek size.
+            </p>
+        `;
+
+        return;
+
+    }
+
+    if (
+        !Number.isFinite(centerlineRadius) ||
+        centerlineRadius <= 0
+    ) {
+
+        offsetResults.innerHTML = `
+            <p class="error">
+                Enter a valid centerline radius.
+            </p>
+        `;
+
+        return;
+
+    }
+
+    let elbowAngle;
+    let requestedOverallLength = null;
+
+    if (offsetMode.value === "solveAngle") {
+
+        requestedOverallLength =
+            parseSheetMetalMeasurement(
+                overallLengthInput.value
+            );
+
+        if (
+            !Number.isFinite(requestedOverallLength) ||
+            requestedOverallLength <= 0
+        ) {
+
+            offsetResults.innerHTML = `
+                <p class="error">
+                    Enter a valid overall length.
+                </p>
+            `;
+
+            return;
+
+        }
+
+        elbowAngle =
+            solveOffsetAngle(
+                offset,
+                requestedOverallLength,
+                centerlineRadius
+            );
+
+        if (!Number.isFinite(elbowAngle)) {
+
+            offsetResults.innerHTML = `
+                <p class="error">
+                    That offset and overall length cannot
+                    be made with the selected CLR.
+                </p>
+            `;
+
+            return;
+
+        }
+
+    } else {
+
+        elbowAngle =
+            Number(elbowAngleInput.value);
+
+        if (
+            !Number.isFinite(elbowAngle) ||
+            elbowAngle <= 0 ||
+            elbowAngle >= 90
+        ) {
+
+            offsetResults.innerHTML = `
+                <p class="error">
+                    Enter an elbow angle between 0° and 90°.
+                </p>
+            `;
+
+            return;
+
+        }
+
+    }
+
+    const angleRadians =
+        elbowAngle * Math.PI / 180;
+
+    const centerlineRise =
+        centerlineRadius *
+        Math.tan(angleRadians / 2);
+
+    const centerlineTravel =
+        offset / Math.sin(angleRadians);
+
+    const calculatedOverallLength =
+        offset / Math.tan(angleRadians) +
+        2 * centerlineRise;
+
+    const straightBetweenElbows =
+        centerlineTravel -
+        2 * centerlineRise;
+
+    if (straightBetweenElbows < 0) {
+
+        offsetResults.innerHTML = `
+            <p class="error">
+                This layout causes the elbows to overlap.
+                Increase the overall length, reduce the CLR,
+                or use a steeper elbow angle.
+            </p>
+        `;
+
+        return;
+
+    }
+
+    offsetResults.innerHTML = `
+
+        <div class="result-main">
+
+            <span>Required Elbow Angle</span>
+
+            <strong>
+                ${elbowAngle.toFixed(2)}°
+            </strong>
+
+        </div>
+
+        <div class="result-row">
+
+            <span>Offset</span>
+
+            <strong>
+                ${formatSheetMetalMeasurement(offset)}
+            </strong>
+
+        </div>
+
+        <div class="result-row">
+
+            <span>Overall Length</span>
+
+            <strong>
+                ${formatSheetMetalMeasurement(
+                    calculatedOverallLength
+                )}
+            </strong>
+
+        </div>
+
+        <div class="result-row">
+
+            <span>Cheek Size</span>
+
+            <strong>
+                ${formatSheetMetalMeasurement(cheekSize)}
+            </strong>
+
+        </div>
+
+        <div class="result-row">
+
+            <span>Centerline Radius</span>
+
+            <strong>
+                ${formatSheetMetalMeasurement(
+                    centerlineRadius
+                )}
+            </strong>
+
+        </div>
+
+        <div class="result-row">
+
+            <span>Centerline Rise</span>
+
+            <strong>
+                ${formatSheetMetalMeasurement(
+                    centerlineRise
+                )}
+            </strong>
+
+        </div>
+
+        <div class="result-row">
+
+            <span>Centerline Travel</span>
+
+            <strong>
+                ${formatSheetMetalMeasurement(
+                    centerlineTravel
+                )}
+            </strong>
+
+        </div>
+
+        <div class="result-row">
+
+            <span>Straight Between Elbows</span>
+
+            <strong>
+                ${formatSheetMetalMeasurement(
+                    straightBetweenElbows
+                )}
+            </strong>
+
+        </div>
+
+    `;
+
+});
+
+// =====================================================
 // Sheet Metal Navigation
 // =====================================================
 
