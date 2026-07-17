@@ -1328,6 +1328,8 @@ MOBILE
 
     }
 
+}
+
     @media(max-width:600px){
 
     .dimension-overall{
@@ -1689,5 +1691,4 @@ DUCT OPTIONS
 .arrow-right{
     right:0;
     transform:rotate(135deg);
-}
 }
