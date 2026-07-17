@@ -1571,17 +1571,3 @@ DUCT OPTIONS
     font-size:14px;
     font-weight:600;
 }
-
-.offset-seam{
-    position:absolute;
-    left:50%;
-    top:49%;
-    width:3px;
-    height:31%;
-    background:#293241;
-    border-radius:2px;
-    transform:translate(-50%, -50%) rotate(-28deg);
-    transform-origin:center;
-    opacity:.95;
-    pointer-events:none;
-}
