@@ -19,6 +19,8 @@ document.getElementById("openAirflow").addEventListener("click", () => {
 
 document.getElementById("goHome").addEventListener("click", () => {
 
+    closeMobileMenu();
+
     airflowWorkspace.classList.remove("active");
     dashboard.classList.add("active");
 
@@ -82,6 +84,70 @@ window.addEventListener("resize", () => {
     if (!isMobileView()) {
 
         closeMobileMenu();
+
+    }
+
+});
+
+// ----------------------------
+// Equivalent Sizes Mobile Menu
+// ----------------------------
+
+const equivalentSidebar =
+    document.querySelector(".equivalent-sidebar");
+
+const toggleEquivalentSidebar =
+    document.getElementById("toggleEquivalentSidebar");
+
+const equivalentMobileMenuBtn =
+    document.getElementById("equivalentMobileMenuBtn");
+
+const equivalentMobileOverlay =
+    document.getElementById("equivalentMobileOverlay");
+
+function openEquivalentMobileMenu() {
+
+    equivalentSidebar.classList.add("mobile-open");
+    equivalentMobileOverlay.classList.add("active");
+
+}
+
+function closeEquivalentMobileMenu() {
+
+    equivalentSidebar.classList.remove("mobile-open");
+    equivalentMobileOverlay.classList.remove("active");
+
+}
+
+toggleEquivalentSidebar.addEventListener("click", () => {
+
+    if (isMobileView()) {
+
+        closeEquivalentMobileMenu();
+
+    } else {
+
+        equivalentSidebar.classList.toggle("collapsed");
+
+    }
+
+});
+
+equivalentMobileMenuBtn.addEventListener(
+    "click",
+    openEquivalentMobileMenu
+);
+
+equivalentMobileOverlay.addEventListener(
+    "click",
+    closeEquivalentMobileMenu
+);
+
+window.addEventListener("resize", () => {
+
+    if (!isMobileView()) {
+
+        closeEquivalentMobileMenu();
 
     }
 
@@ -218,34 +284,42 @@ const airflowOpenEquivalent =
 
 openEquivalent.addEventListener("click", () => {
 
+    closeMobileMenu();
+    closeEquivalentMobileMenu();
+
     dashboard.classList.remove("active");
-
     airflowWorkspace.classList.remove("active");
-
     equivalentWorkspace.classList.add("active");
 
 });
 
 airflowOpenEquivalent.addEventListener("click", () => {
 
-    airflowWorkspace.classList.remove("active");
+    closeMobileMenu();
+    closeEquivalentMobileMenu();
 
+    airflowWorkspace.classList.remove("active");
     equivalentWorkspace.classList.add("active");
 
 });
 
 equivalentOpenAirflow.addEventListener("click", () => {
 
-    equivalentWorkspace.classList.remove("active");
+    closeEquivalentMobileMenu();
+    closeMobileMenu();
 
+    equivalentWorkspace.classList.remove("active");
     airflowWorkspace.classList.add("active");
 
 });
 
 equivalentGoHome.addEventListener("click", () => {
 
-    equivalentWorkspace.classList.remove("active");
+    closeEquivalentMobileMenu();
+    closeMobileMenu();
 
+    equivalentWorkspace.classList.remove("active");
+    airflowWorkspace.classList.remove("active");
     dashboard.classList.add("active");
 
 });
