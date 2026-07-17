@@ -1328,6 +1328,18 @@ MOBILE
 
     }
 
+    @media(max-width:600px){
+
+    .dimension-overall{
+        width:82%;
+        bottom:15px;
+    }
+
+    .dimension-value{
+        font-size:13px;
+        padding:4px 8px;
+    }
+
 }
 
 /*======================
@@ -1585,16 +1597,102 @@ DUCT OPTIONS
     box-shadow:0 0 10px rgba(0,0,0,.35);
 }
 
-.overall-length{
-    left:50%;
-    bottom:18px;
-    transform:translateX(-50%);
-}
-
 .offset-label{
     right:24px;
     top:50%;
     transform:translateY(-50%);
     color:#ff6b8a;
     border-color:#a83d58;
+}
+
+/* ===================================================
+   Offset Diagram Dimensions
+=================================================== */
+
+.dimension{
+    position:absolute;
+    pointer-events:none;
+}
+
+.dimension-overall{
+    left:50%;
+    bottom:22px;
+    width:420px;
+    height:58px;
+    transform:translateX(-50%);
+}
+
+.dimension-line{
+    position:absolute;
+    left:0;
+    right:0;
+    bottom:0;
+    height:32px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    border-top:2px solid #69a7ff;
+}
+
+.dimension-value{
+    position:absolute;
+    left:50%;
+    top:-17px;
+    transform:translateX(-50%);
+
+    padding:5px 12px;
+
+    color:#69a7ff;
+    background:#1d2b43;
+    border:1px solid #3d69b8;
+    border-radius:7px;
+
+    font-size:15px;
+    font-weight:500;
+    white-space:nowrap;
+}
+
+.dimension-value strong{
+    color:#ffffff;
+    margin-left:4px;
+}
+
+.dimension-extension{
+    position:absolute;
+    top:0;
+    bottom:25px;
+
+    width:0;
+    border-left:2px dashed rgba(105,167,255,.7);
+}
+
+.extension-left{
+    left:0;
+}
+
+.extension-right{
+    right:0;
+}
+
+.dimension-arrow{
+    position:absolute;
+    top:-7px;
+
+    width:12px;
+    height:12px;
+
+    border-top:2px solid #69a7ff;
+    border-left:2px solid #69a7ff;
+}
+
+.arrow-left{
+    left:0;
+    transform:rotate(-45deg);
+}
+
+.arrow-right{
+    right:0;
+    transform:rotate(135deg);
 }
