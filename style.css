@@ -1447,3 +1447,97 @@ DUCT OPTIONS
     }
 
 }
+
+/* ===================================================
+   Sheet Metal Offset Calculator
+=================================================== */
+
+#sheetMetalWorkspace .panel label {
+    display: block;
+    margin-top: 18px;
+    margin-bottom: 8px;
+    color: #9fb3cf;
+}
+
+#sheetMetalWorkspace .panel input,
+#sheetMetalWorkspace .panel select {
+    width: 100%;
+}
+
+#calculateOffsetBtn {
+    width: 100%;
+    margin-top: 22px;
+    padding: 14px 18px;
+    border: 1px solid #4f8cff;
+    border-radius: 10px;
+    background: #4f8cff;
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+#calculateOffsetBtn:hover {
+    filter: brightness(1.08);
+}
+
+#offsetResults {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+#offsetResults .result-main,
+#offsetResults .result-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 14px 0;
+    border-bottom: 1px solid #32445f;
+}
+
+#offsetResults .result-main {
+    margin-bottom: 4px;
+    padding: 16px;
+    border: 1px solid #4f8cff;
+    border-radius: 10px;
+    background: rgba(79, 140, 255, 0.1);
+}
+
+#offsetResults .result-main span,
+#offsetResults .result-row span {
+    color: #9fb3cf;
+}
+
+#offsetResults .result-main strong {
+    color: #ffffff;
+    font-size: 24px;
+}
+
+#offsetResults .result-row strong {
+    color: #ffffff;
+    text-align: right;
+}
+
+#offsetResults .error {
+    padding: 14px;
+    border: 1px solid #c94b5e;
+    border-radius: 10px;
+    background: rgba(201, 75, 94, 0.12);
+    color: #ffb4bf;
+    line-height: 1.5;
+}
+
+@media (max-width: 600px) {
+    #offsetResults .result-main,
+    #offsetResults .result-row {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    #offsetResults .result-row strong {
+        text-align: left;
+    }
+}
