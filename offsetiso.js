@@ -7,12 +7,12 @@
    to fabricate the calculated offset.
 
    Supported:
-   - Full duct width × height
-   - Bend on width or bend on height
+   - Full duct width × depth
+   - Width is always the cheek side
    - Accurate centerline, throat, and heel radii
    - Correct calculated elbow angle
    - Straight added per elbow
-   - Isometric depth based on the non-bending dimension
+   - Isometric depth based on the duct depth
    - Readable calculated-data panel
    ========================================================= */
 
@@ -28,8 +28,7 @@
         offset: "offsetInput",
         overall: "overallLengthInput",
         width: "ductWidthInput",
-        height: "ductHeightInput",
-        bendOn: "bendOnSelect",
+        depth: "ductDepthInput",
         clrMultiplier: "clrMultiplier",
         customClr: "customClrInput",
         angle: "elbowAngleInput"
@@ -347,31 +346,22 @@
                 getValue(ids.width, 60)
             );
 
-        const ductHeight =
+        const ductDepth =
             Math.max(
                 0.01,
-                getValue(ids.height, 24)
+                getValue(ids.depth, 24)
             );
 
-        const bendOnElement =
-            document.getElementById(
-                ids.bendOn
-            );
-
-        const bendOn =
-            bendOnElement
-                ? bendOnElement.value
-                : "height";
-
+        /*
+         * Shop convention:
+         * Width always controls the cheek profile.
+         * Depth always controls the isometric extrusion.
+         */
         const bendDimension =
-            bendOn === "width"
-                ? ductWidth
-                : ductHeight;
+            ductWidth;
 
         const elbowDepth =
-            bendOn === "width"
-                ? ductHeight
-                : ductWidth;
+            ductDepth;
 
         const clrElement =
             document.getElementById(
@@ -496,8 +486,7 @@
             offset,
             overallLength,
             ductWidth,
-            ductHeight,
-            bendOn,
+            ductDepth,
             bendDimension,
             elbowDepth,
             centerlineRadius,
@@ -1142,15 +1131,15 @@
                     )
                 } × ${
                     formatMeasurement(
-                        model.ductHeight
+                        model.ductDepth
                     )
                 }`
             ],
             [
-                "Bend On",
-                model.bendOn === "width"
-                    ? "Width"
-                    : "Height"
+                "Width (Cheek)",
+                formatMeasurement(
+                    model.ductWidth
+                )
             ],
             [
                 "Elbow Angle",
@@ -1185,8 +1174,10 @@
                 )
             ],
             [
-                "Quantity",
-                "2"
+                "Depth",
+                formatMeasurement(
+                    model.ductDepth
+                )
             ]
         ];
 
@@ -1273,7 +1264,7 @@
                 y: noteY + 52,
                 fill: "#8fa6c9",
                 "font-size": 13
-            }, `Elbow depth: ${
+            }, `Quantity: 2 elbows  •  Depth: ${
                 formatMeasurement(
                     model.elbowDepth
                 )
@@ -1744,8 +1735,7 @@
             ids.offset,
             ids.overall,
             ids.width,
-            ids.height,
-            ids.bendOn,
+            ids.depth,
             ids.clrMultiplier,
             ids.customClr,
             ids.angle

@@ -404,57 +404,8 @@ const overallLengthInput =
 const ductWidthInput =
     document.getElementById("ductWidthInput");
 
-const ductHeightInput =
-    document.getElementById("ductHeightInput");
-
-/*
- * Add the Bend On selector automatically if it is not already in the HTML.
- * This keeps the current page working without requiring another HTML edit.
- */
-let bendOnSelect =
-    document.getElementById("bendOnSelect");
-
-if (!bendOnSelect && ductHeightInput) {
-
-    const bendGroup =
-        document.createElement("div");
-
-    bendGroup.className = "input-group";
-    bendGroup.id = "bendOnGroup";
-
-    bendGroup.innerHTML = `
-        <label for="bendOnSelect">
-            Bend On
-        </label>
-
-        <select id="bendOnSelect">
-            <option value="height" selected>
-                Height
-            </option>
-
-            <option value="width">
-                Width
-            </option>
-        </select>
-    `;
-
-    const heightGroup =
-        ductHeightInput.closest(".input-group") ||
-        ductHeightInput.parentElement;
-
-    if (heightGroup && heightGroup.parentElement) {
-
-        heightGroup.insertAdjacentElement(
-            "afterend",
-            bendGroup
-        );
-
-        bendOnSelect =
-            document.getElementById("bendOnSelect");
-
-    }
-
-}
+const ductDepthInput =
+    document.getElementById("ductDepthInput");
 
 const clrMultiplier =
     document.getElementById("clrMultiplier");
@@ -778,23 +729,19 @@ calculateOffsetBtn.addEventListener("click", () => {
     const ductWidth =
         parseSheetMetalMeasurement(ductWidthInput.value);
 
-    const ductHeight =
-        parseSheetMetalMeasurement(ductHeightInput.value);
+    const ductDepth =
+        parseSheetMetalMeasurement(ductDepthInput.value);
 
-    const bendOn =
-        bendOnSelect
-            ? bendOnSelect.value
-            : "height";
-
+    /*
+     * Shop convention:
+     * Width is always the cheek / bending dimension.
+     * Depth is always the straight extrusion dimension.
+     */
     const bendDimension =
-        bendOn === "width"
-            ? ductWidth
-            : ductHeight;
+        ductWidth;
 
     const elbowDepth =
-        bendOn === "width"
-            ? ductHeight
-            : ductWidth;
+        ductDepth;
 
     if (
         !Number.isFinite(offset) ||
@@ -814,13 +761,13 @@ calculateOffsetBtn.addEventListener("click", () => {
     if (
         !Number.isFinite(ductWidth) ||
         ductWidth <= 0 ||
-        !Number.isFinite(ductHeight) ||
-        ductHeight <= 0
+        !Number.isFinite(ductDepth) ||
+        ductDepth <= 0
     ) {
 
         offsetResults.innerHTML = `
             <p class="error">
-                Enter a valid duct width and height.
+                Enter a valid width and depth.
             </p>
         `;
 
@@ -967,7 +914,7 @@ calculateOffsetBtn.addEventListener("click", () => {
         offsetResults.innerHTML = `
             <p class="error">
                 The selected CLR is too small for the
-                ${bendOn} bend dimension.
+                cheek width.
             </p>
         `;
 
@@ -1034,24 +981,14 @@ calculateOffsetBtn.addEventListener("click", () => {
             <strong>
                 ${formatSheetMetalMeasurement(ductWidth)}
                 ×
-                ${formatSheetMetalMeasurement(ductHeight)}
+                ${formatSheetMetalMeasurement(ductDepth)}
             </strong>
 
         </div>
 
         <div class="result-row">
 
-            <span>Bend On</span>
-
-            <strong>
-                ${bendOn === "width" ? "Width" : "Height"}
-            </strong>
-
-        </div>
-
-        <div class="result-row">
-
-            <span>Bend Dimension</span>
+            <span>Width (Cheek)</span>
 
             <strong>
                 ${formatSheetMetalMeasurement(bendDimension)}
@@ -1061,7 +998,7 @@ calculateOffsetBtn.addEventListener("click", () => {
 
         <div class="result-row">
 
-            <span>Elbow Depth</span>
+            <span>Depth</span>
 
             <strong>
                 ${formatSheetMetalMeasurement(elbowDepth)}
@@ -1232,8 +1169,7 @@ calculateOffsetBtn.addEventListener("click", () => {
                     overallLength:
                         calculatedOverallLength,
                     ductWidth,
-                    ductHeight,
-                    bendOn,
+                    ductDepth,
                     bendDimension,
                     elbowDepth,
                     centerlineRadius,
@@ -1258,12 +1194,11 @@ calculateOffsetBtn.addEventListener("click", () => {
     offsetInput,
     overallLengthInput,
     ductWidthInput,
-    ductHeightInput,
+    ductDepthInput,
     clrMultiplier,
     customClrInput,
     elbowAngleInput,
     offsetMode,
-    bendOnSelect
 ]
 .filter(Boolean)
 .forEach((element) => {
