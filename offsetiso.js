@@ -371,6 +371,18 @@
         return points.map((point) => transform(point));
     }
 
+    /*
+     * Rotate the fitting so the overall-length direction reads vertically
+     * on screen. Original model X becomes screen-up, and original model Y
+     * becomes screen-right.
+     */
+    function orientVertical(points) {
+        return points.map((point) => ({
+            x: point.y,
+            y: -point.x
+        }));
+    }
+
     function fitTransform(allPoints, width, height) {
         const xs = allPoints.map((point) => point.x);
         const ys = allPoints.map((point) => point.y);
@@ -479,26 +491,35 @@
             y: point.y + isoDepth.y
         }));
 
+        /*
+         * Turn the complete fitting upright before scaling it into the SVG.
+         */
+        const verticalLower = orientVertical(lower);
+        const verticalUpper = orientVertical(upper);
+        const verticalBackLower = orientVertical(backLower);
+        const verticalBackUpper = orientVertical(backUpper);
+        const verticalCenter = orientVertical(center.points);
+
         const allModelPoints = [
-            ...lower,
-            ...upper,
-            ...backLower,
-            ...backUpper
+            ...verticalLower,
+            ...verticalUpper,
+            ...verticalBackLower,
+            ...verticalBackUpper
         ];
 
         const viewWidth = 1000;
-        const viewHeight = 610;
+        const viewHeight = 700;
         const transform = fitTransform(
             allModelPoints,
             viewWidth,
             viewHeight
         );
 
-        const L = transformPoints(lower, transform);
-        const U = transformPoints(upper, transform);
-        const BL = transformPoints(backLower, transform);
-        const BU = transformPoints(backUpper, transform);
-        const C = transformPoints(center.points, transform);
+        const L = transformPoints(verticalLower, transform);
+        const U = transformPoints(verticalUpper, transform);
+        const BL = transformPoints(verticalBackLower, transform);
+        const BU = transformPoints(verticalBackUpper, transform);
+        const C = transformPoints(verticalCenter, transform);
 
         container.replaceChildren();
 
@@ -629,45 +650,20 @@
         });
 
         /*
-         * Dimensions.
+         * Dimensions for the upright orientation.
+         * Overall length now reads vertically and offset reads horizontally.
          */
         const dimensionGroup = svg("g");
 
         const startCenter = C[1];
         const endCenter = C[C.length - 2];
 
-        const runY = viewHeight - 42;
+        const overallX = 48;
 
         dimensionGroup.appendChild(svg("line", {
             x1: startCenter.x,
             y1: startCenter.y,
-            x2: startCenter.x,
-            y2: runY,
-            class: "offset-iso-extension-line"
-        }));
-
-        dimensionGroup.appendChild(svg("line", {
-            x1: endCenter.x,
-            y1: endCenter.y,
-            x2: endCenter.x,
-            y2: runY,
-            class: "offset-iso-extension-line"
-        }));
-
-        drawDimension(
-            dimensionGroup,
-            { x: startCenter.x, y: runY },
-            { x: endCenter.x, y: runY },
-            `Overall Length: ${format(model.run)}"`,
-            -16
-        );
-
-        const riseX = viewWidth - 44;
-
-        dimensionGroup.appendChild(svg("line", {
-            x1: startCenter.x,
-            y1: startCenter.y,
-            x2: riseX,
+            x2: overallX,
             y2: startCenter.y,
             class: "offset-iso-extension-line"
         }));
@@ -675,17 +671,43 @@
         dimensionGroup.appendChild(svg("line", {
             x1: endCenter.x,
             y1: endCenter.y,
-            x2: riseX,
+            x2: overallX,
             y2: endCenter.y,
             class: "offset-iso-extension-line"
         }));
 
         drawDimension(
             dimensionGroup,
-            { x: riseX, y: startCenter.y },
-            { x: riseX, y: endCenter.y },
+            { x: overallX, y: startCenter.y },
+            { x: overallX, y: endCenter.y },
+            `Overall Length: ${format(model.run)}"`,
+            -18
+        );
+
+        const offsetY = viewHeight - 42;
+
+        dimensionGroup.appendChild(svg("line", {
+            x1: startCenter.x,
+            y1: startCenter.y,
+            x2: startCenter.x,
+            y2: offsetY,
+            class: "offset-iso-extension-line"
+        }));
+
+        dimensionGroup.appendChild(svg("line", {
+            x1: endCenter.x,
+            y1: endCenter.y,
+            x2: endCenter.x,
+            y2: offsetY,
+            class: "offset-iso-extension-line"
+        }));
+
+        drawDimension(
+            dimensionGroup,
+            { x: startCenter.x, y: offsetY },
+            { x: endCenter.x, y: offsetY },
             `Offset: ${format(model.rise)}"`,
-            28
+            -16
         );
 
         drawing.appendChild(dimensionGroup);
