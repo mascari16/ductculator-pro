@@ -1352,11 +1352,12 @@
 
     function addDataPanel(
         drawing,
-        model
+        model,
+        panelLayout = null
     ) {
 
-        const panel = {
-            x: 925,
+        const panel = panelLayout || {
+            x: 850,
             y: 50,
             width: 400,
             height: 560
@@ -1654,15 +1655,48 @@
             ...farHeel
         ];
 
-        const viewWidth = 1240;
-        const viewHeight = 660;
+        /*
+         * Use a stacked layout on phones so the elbow and
+         * fabrication data remain large enough to read.
+         */
+        const isMobile =
+            container.clientWidth <= 700;
 
-        const drawingArea = {
-            x: 65,
-            y: 55,
-            width: 655,
-            height: 520
-        };
+        const viewWidth =
+            isMobile ? 600 : 1240;
+
+        const viewHeight =
+            isMobile ? 1210 : 660;
+
+        const drawingArea =
+            isMobile
+                ? {
+                    x: 38,
+                    y: 45,
+                    width: 524,
+                    height: 500
+                }
+                : {
+                    x: 65,
+                    y: 55,
+                    width: 655,
+                    height: 520
+                };
+
+        const dataPanelLayout =
+            isMobile
+                ? {
+                    x: 38,
+                    y: 625,
+                    width: 524,
+                    height: 540
+                }
+                : {
+                    x: 850,
+                    y: 50,
+                    width: 400,
+                    height: 560
+                };
 
         const transform =
             createTransform(
@@ -1711,6 +1745,8 @@
         const drawing =
             svg("svg", {
                 class: "offset-iso-svg",
+                width: "100%",
+                height: "auto",
                 viewBox:
                     `0 0 ${
                         viewWidth
@@ -2213,7 +2249,8 @@
 
         addDataPanel(
             drawing,
-            model
+            model,
+            dataPanelLayout
         );
 
         addClrWarning(
