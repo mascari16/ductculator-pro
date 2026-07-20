@@ -1162,10 +1162,8 @@
                 )
             ],
             [
-                "Heel Radius",
-                formatMeasurement(
-                    model.heelRadius
-                )
+                "Quantity",
+                "2 elbows"
             ],
             [
                 "Straight / Elbow",
@@ -1264,11 +1262,7 @@
                 y: noteY + 52,
                 fill: "#8fa6c9",
                 "font-size": 13
-            }, `Quantity: 2 elbows  •  Depth: ${
-                formatMeasurement(
-                    model.elbowDepth
-                )
-            }`)
+            }, `Use two matching elbows for this offset.`)
         );
 
         drawing.appendChild(group);
@@ -1575,64 +1569,11 @@
         const dimensionGroup =
             svg("g");
 
-        const bendDimensionStart = {
-            x:
-                nearHeel[0].x - 36,
-            y:
-                nearHeel[0].y
-        };
-
-        const bendDimensionEnd = {
-            x:
-                nearThroat[0].x - 36,
-            y:
-                nearThroat[0].y
-        };
-
-        dimensionGroup.appendChild(
-            svg("line", {
-                x1: nearHeel[0].x,
-                y1: nearHeel[0].y,
-                x2:
-                    bendDimensionStart.x,
-                y2:
-                    bendDimensionStart.y,
-                class:
-                    "offset-iso-extension-line"
-            })
-        );
-
-        dimensionGroup.appendChild(
-            svg("line", {
-                x1: nearThroat[0].x,
-                y1: nearThroat[0].y,
-                x2:
-                    bendDimensionEnd.x,
-                y2:
-                    bendDimensionEnd.y,
-                class:
-                    "offset-iso-extension-line"
-            })
-        );
-
-        addDimension(
-            dimensionGroup,
-            bendDimensionStart,
-            bendDimensionEnd,
-            `${
-                model.bendOn === "width"
-                    ? "Width"
-                    : "Height"
-            }: ${
-                formatMeasurement(
-                    model.bendDimension
-                )
-            }`,
-            {
-                rotate: -90,
-                dx: -16
-            }
-        );
+        /*
+         * Width (cheek), depth, CLR, and throat radius are shown
+         * in the data panel. Keeping them off the fitting prevents
+         * overlapping annotations on smaller screens.
+         */
 
         if (model.straightPerElbow > 0.01) {
 
@@ -1645,35 +1586,51 @@
                 nearHeel[last];
 
             const lineOffset = {
-                x: 23,
-                y: -23
+                x: 38,
+                y: -38
             };
+
+            const dimensionStart = {
+                x:
+                    straightStart.x +
+                    lineOffset.x,
+                y:
+                    straightStart.y +
+                    lineOffset.y
+            };
+
+            const dimensionEnd = {
+                x:
+                    straightEnd.x +
+                    lineOffset.x,
+                y:
+                    straightEnd.y +
+                    lineOffset.y
+            };
+
+            const straightLabelAngle =
+                Math.atan2(
+                    dimensionEnd.y -
+                    dimensionStart.y,
+                    dimensionEnd.x -
+                    dimensionStart.x
+                ) *
+                180 /
+                Math.PI;
 
             addDimension(
                 dimensionGroup,
-                {
-                    x:
-                        straightStart.x +
-                        lineOffset.x,
-                    y:
-                        straightStart.y +
-                        lineOffset.y
-                },
-                {
-                    x:
-                        straightEnd.x +
-                        lineOffset.x,
-                    y:
-                        straightEnd.y +
-                        lineOffset.y
-                },
-                `Straight: ${
+                dimensionStart,
+                dimensionEnd,
+                `Straight / Elbow: ${
                     formatMeasurement(
                         model.straightPerElbow
                     )
                 }`,
                 {
-                    dy: -13
+                    dy: -15,
+                    rotate:
+                        straightLabelAngle
                 }
             );
 
@@ -1685,21 +1642,19 @@
 
         drawing.appendChild(
             svg("text", {
-                x: 68,
-                y: 34,
+                x: 92,
+                y: 36,
                 class:
                     "offset-iso-size-text"
-            }, `ONE ${
-                formatDecimal(
-                    model.elbowAngle
-                )
-            }° RADIUS ELBOW`)
+            }, `${formatDecimal(
+                model.elbowAngle
+            )}° RADIUS ELBOW`)
         );
 
         drawing.appendChild(
             svg("text", {
-                x: 68,
-                y: 615,
+                x: 92,
+                y: 620,
                 class:
                     "offset-iso-title-text"
             }, `Duct: ${
@@ -1708,7 +1663,7 @@
                 )
             } × ${
                 formatMeasurement(
-                    model.ductHeight
+                    model.ductDepth
                 )
             }  •  CLR: ${
                 formatMeasurement(
