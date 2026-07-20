@@ -36,6 +36,162 @@
 
     let latestCalculatedData = null;
 
+
+    function ensureClrWarningStyles() {
+
+        if (
+            document.getElementById(
+                "offsetIsoClrWarningStyles"
+            )
+        ) {
+
+            return;
+
+        }
+
+        const style =
+            document.createElement("style");
+
+        style.id =
+            "offsetIsoClrWarningStyles";
+
+        style.textContent = `
+            .offset-iso-clr-warning{
+                display:flex;
+                align-items:flex-start;
+                gap:12px;
+
+                margin:0 0 18px;
+                padding:14px 16px;
+
+                border:2px solid #ff4d4d;
+                border-radius:10px;
+
+                background:
+                    rgba(92, 14, 14, .96);
+
+                color:#fff;
+                font-size:14px;
+                line-height:1.45;
+                font-weight:600;
+
+                box-shadow:
+                    0 0 0 rgba(255, 77, 77, 0);
+
+                animation:
+                    offsetIsoClrWarningPulse
+                    1.2s
+                    ease-in-out
+                    infinite;
+            }
+
+            .offset-iso-clr-warning-icon{
+                flex:0 0 auto;
+                font-size:20px;
+                line-height:1;
+                margin-top:1px;
+            }
+
+            .offset-iso-clr-warning strong{
+                display:block;
+                margin-bottom:2px;
+                letter-spacing:.04em;
+            }
+
+            @keyframes offsetIsoClrWarningPulse{
+
+                0%,
+                100%{
+                    border-color:#ff4d4d;
+                    box-shadow:
+                        0 0 0 rgba(255, 77, 77, 0);
+                }
+
+                50%{
+                    border-color:#ff8a8a;
+                    box-shadow:
+                        0 0 18px
+                        rgba(255, 77, 77, .42);
+                }
+
+            }
+
+            @media (
+                prefers-reduced-motion:
+                reduce
+            ){
+
+                .offset-iso-clr-warning{
+                    animation:none;
+                }
+
+            }
+        `;
+
+        document.head.appendChild(
+            style
+        );
+
+    }
+
+    function addClrWarning(
+        container,
+        model
+    ) {
+
+        const equivalentClr =
+            model.centerlineRadius /
+            model.ductWidth;
+
+        if (
+            !Number.isFinite(
+                equivalentClr
+            ) ||
+            equivalentClr >= 0.75
+        ) {
+
+            return;
+
+        }
+
+        ensureClrWarningStyles();
+
+        const warning =
+            document.createElement("div");
+
+        warning.className =
+            "offset-iso-clr-warning";
+
+        warning.innerHTML = `
+            <span
+                class="
+                    offset-iso-clr-warning-icon
+                "
+                aria-hidden="true"
+            >
+                ⚠
+            </span>
+
+            <div>
+                <strong>
+                    LOW EQUIVALENT CLR
+                </strong>
+
+                Equivalent CLR is
+                ${equivalentClr.toFixed(2)}× CLR,
+                which is below the recommended
+                0.75× minimum. The throat radius
+                may be too small for practical
+                fabrication.
+            </div>
+        `;
+
+        container.appendChild(
+            warning
+        );
+
+    }
+
     function svg(
         tag,
         attributes = {},
@@ -1308,6 +1464,8 @@
 
         }
 
+        container.innerHTML = "";
+
         const model =
             getModel();
 
@@ -1915,6 +2073,11 @@
 
         addDataPanel(
             drawing,
+            model
+        );
+
+        addClrWarning(
+            container,
             model
         );
 
