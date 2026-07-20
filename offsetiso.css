@@ -1,0 +1,214 @@
+/* =========================================================
+   LIVE ISOMETRIC OFFSET DRAWING
+   File: offsetiso.css
+   ========================================================= */
+
+.offset-iso-card {
+    width: 100%;
+    margin-top: 24px;
+    padding: 18px;
+    box-sizing: border-box;
+
+    background: #111827;
+    border: 1px solid #29364a;
+    border-radius: 14px;
+
+    overflow: hidden;
+}
+
+.offset-iso-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+
+    margin-bottom: 12px;
+}
+
+.offset-iso-header h3 {
+    margin: 0;
+
+    color: #ffffff;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.offset-iso-note {
+    margin: 0;
+
+    color: #94a3b8;
+    font-size: 12px;
+}
+
+.offset-iso-container {
+    width: 100%;
+    min-height: 420px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #0b1220;
+    border: 1px solid #22304a;
+    border-radius: 10px;
+
+    overflow: hidden;
+}
+
+.offset-iso-svg {
+    display: block;
+
+    width: 100%;
+    height: auto;
+    max-height: 560px;
+
+    user-select: none;
+}
+
+/* Duct surfaces */
+
+.offset-iso-top-panel {
+    fill: rgba(79, 140, 255, 0.3);
+
+    stroke: #7da6ff;
+    stroke-width: 2;
+    stroke-linejoin: round;
+}
+
+.offset-iso-bottom-panel {
+    fill: rgba(79, 140, 255, 0.12);
+
+    stroke: #7da6ff;
+    stroke-width: 2;
+    stroke-linejoin: round;
+}
+
+.offset-iso-side-panel {
+    fill: rgba(79, 140, 255, 0.2);
+
+    stroke: #7da6ff;
+    stroke-width: 2;
+    stroke-linejoin: round;
+}
+
+.offset-iso-end-face {
+    fill: rgba(79, 140, 255, 0.14);
+
+    stroke: #a7c2ff;
+    stroke-width: 2.25;
+    stroke-linejoin: round;
+}
+
+.offset-iso-hidden-line {
+    fill: none;
+
+    stroke: #53627a;
+    stroke-width: 1.5;
+    stroke-dasharray: 7 6;
+}
+
+/* Centerline */
+
+.offset-iso-center-line {
+    fill: none;
+
+    stroke: #94a3b8;
+    stroke-width: 1.5;
+    stroke-dasharray: 10 7;
+}
+
+/* Dimensions */
+
+.offset-iso-dimension-line {
+    fill: none;
+
+    stroke: #f4b942;
+    stroke-width: 1.6;
+}
+
+.offset-iso-extension-line {
+    fill: none;
+
+    stroke: #f4b942;
+    stroke-width: 1.2;
+}
+
+.offset-iso-dimension-text {
+    fill: #f4b942;
+
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+
+    text-anchor: middle;
+    dominant-baseline: middle;
+
+    paint-order: stroke;
+    stroke: #0b1220;
+    stroke-width: 5px;
+    stroke-linejoin: round;
+}
+
+.offset-iso-size-text {
+    fill: #dbeafe;
+
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+
+    text-anchor: middle;
+
+    paint-order: stroke;
+    stroke: #0b1220;
+    stroke-width: 5px;
+    stroke-linejoin: round;
+}
+
+.offset-iso-title-text {
+    fill: #94a3b8;
+
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+
+    text-anchor: middle;
+}
+
+/* Error display */
+
+.offset-iso-error {
+    display: none;
+
+    width: 100%;
+    padding: 20px;
+
+    color: #fca5a5;
+    text-align: center;
+    font-size: 14px;
+}
+
+.offset-iso-error.is-visible {
+    display: block;
+}
+
+/* Mobile */
+
+@media (max-width: 700px) {
+    .offset-iso-card {
+        padding: 12px;
+    }
+
+    .offset-iso-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .offset-iso-container {
+        min-height: 300px;
+    }
+
+    .offset-iso-dimension-text,
+    .offset-iso-size-text {
+        font-size: 14px;
+    }
+}

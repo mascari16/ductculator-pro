@@ -10,6 +10,8 @@
 
     <link rel="stylesheet" href="style.css">
 
+    <link rel="stylesheet" href="offsetiso.css">
+
 </head>
 
 <body>
@@ -1014,44 +1016,24 @@
 
     </div>
 
-<div class="offset-diagram-card" style="display:none;">
+    <div class="offset-iso-card">
 
-    <h4>Offset Diagram</h4>
+    <div class="offset-iso-header">
 
-    <div class="offset-visual">
+        <h3>Live Isometric Preview</h3>
 
-    <div class="offset-drawing">
-
-        <img
-            src="images/offset.png"
-            alt="Offset Diagram"
-            class="offset-base-image">
-
-        <div class="dimension dimension-overall">
-
-            <div class="dimension-extension extension-left"></div>
-            <div class="dimension-extension extension-right"></div>
-
-            <div class="dimension-line">
-
-                <span class="dimension-arrow arrow-left"></span>
-
-                <span class="dimension-value">
-                    Overall Length:
-                    <strong id="diagOverall">--</strong>
-                </span>
-
-                <span class="dimension-arrow arrow-right"></span>
-
-            </div>
-
-        </div>
+        <p class="offset-iso-note">
+            Preview updates as dimensions change.
+        </p>
 
     </div>
 
-</div>
+    <div
+        id="offsetIsoContainer"
+        class="offset-iso-container">
+    </div>
 
-</div>    
+</div>
 
 </div>
 
@@ -1071,6 +1053,22 @@
 <script src="js/equivalentSizes.js"></script>
 <script src="js/airflow.js"></script>
 <script src="app.js"></script>
+<script src="offsetiso.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    OffsetIso.render({
+        containerId: "offsetIsoContainer",
+        width: 34,
+        height: 12,
+        rise: 46.25,
+        run: 69
+    });
+
+});
+</script>
+
 <script src="js/equivalentUI.js"></script>
 
 </body>
