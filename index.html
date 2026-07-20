@@ -881,30 +881,26 @@
         </select>
 
         <label for="offsetInput">
+    Offset
+</label>
 
-            Offset
+<input
+    id="offsetInput"
+    type="text"
+    inputmode="decimal"
+    value="46 1/4">
 
-        </label>
+<label for="overallLengthInput">
+    Overall Length
+</label>
 
-        <input
-            id="offsetInput"
-            type="text"
-            inputmode="decimal"
-            placeholder="46 1/4">
+<input
+    id="overallLengthInput"
+    type="text"
+    inputmode="decimal"
+    value="69">
 
-        <label for="overallLengthInput">
-
-            Overall Length
-
-        </label>
-
-        <input
-            id="overallLengthInput"
-            type="text"
-            inputmode="decimal"
-            placeholder="69">
-
-        <label for="ductWidthInput">
+<label for="ductWidthInput">
     Duct Width
 </label>
 
@@ -912,7 +908,7 @@
     id="ductWidthInput"
     type="text"
     inputmode="decimal"
-    placeholder="60">
+    value="60">
 
 <label for="ductHeightInput">
     Duct Height
@@ -922,7 +918,27 @@
     id="ductHeightInput"
     type="text"
     inputmode="decimal"
-    placeholder="24">
+    value="24">
+
+<div class="input-group">
+
+    <label for="bendOnSelect">
+        Bend On
+    </label>
+
+    <select id="bendOnSelect">
+
+        <option value="height" selected>
+            Height
+        </option>
+
+        <option value="width">
+            Width
+        </option>
+
+    </select>
+
+</div>    
 
         <label for="clrMultiplier">
 
