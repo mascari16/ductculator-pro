@@ -1356,7 +1356,7 @@
     ) {
 
         const panel = {
-            x: 850,
+            x: 950,
             y: 50,
             width: 400,
             height: 560
