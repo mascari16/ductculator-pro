@@ -108,6 +108,14 @@
                 white-space:nowrap;
             }
 
+            .offset-iso-clr-warning-tooltip strong{
+                display:block;
+                margin-bottom:5px;
+                color:#ffb0b0;
+                font-size:12px;
+                letter-spacing:.04em;
+            }
+
             .offset-iso-clr-warning-tooltip{
                 position:absolute;
                 top:calc(100% + 9px);
@@ -249,12 +257,19 @@
                     offset-iso-clr-warning-tooltip
                 "
             >
+                <strong>
+                    LOW EQUIVALENT CLR
+                </strong>
+
                 Equivalent CLR is
                 ${equivalentClr.toFixed(2)}× CLR,
                 which is below the recommended
                 0.75× minimum. The throat radius
-                may be too small for practical
-                fabrication.
+                may become extremely small,
+                making the elbow difficult or
+                impractical to fabricate.
+                Consider increasing the
+                centerline radius.
             </span>
         `;
 
@@ -1416,6 +1431,12 @@
                 )
             ],
             [
+                "CLR",
+                formatMeasurement(
+                    model.centerlineRadius
+                )
+            ],
+            [
                 "Straight",
                 formatMeasurement(
                     model.straightPerElbow
@@ -1426,10 +1447,6 @@
                 formatMeasurement(
                     model.offset
                 )
-            ],
-            [
-                "Quantity",
-                "2 Elbows"
             ]
         ];
 
@@ -1473,6 +1490,49 @@
                 );
 
             }
+        );
+
+        const quantityY =
+            panel.y + 414;
+
+        group.appendChild(
+            svg("rect", {
+                x: panel.x + padding,
+                y: quantityY,
+                width:
+                    panel.width -
+                    padding * 2,
+                height: 48,
+                rx: 10,
+                fill: "#111d31",
+                stroke: "#2a3d5c",
+                "stroke-width": 1.1
+            })
+        );
+
+        group.appendChild(
+            svg("text", {
+                x: panel.x + padding + 14,
+                y: quantityY + 20,
+                fill: "#8fa6c9",
+                "font-size": 12,
+                "font-weight": 650
+            }, "QUANTITY")
+        );
+
+        group.appendChild(
+            svg("text", {
+                x:
+                    panel.x +
+                    panel.width -
+                    padding -
+                    14,
+                y: quantityY + 31,
+                fill: "#f4f7ff",
+                "font-size": 18,
+                "font-weight": 750,
+                "text-anchor": "end"
+            }, "2 Elbows")
         );
 
         const noteY =
