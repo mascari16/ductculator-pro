@@ -654,65 +654,153 @@ function greatestCommonDivisor(a, b) {
 
 function solveOffsetAngle(offset, overallLength, radius) {
 
-    function calculatedLength(angleDegrees) {
-
-        const angleRadians =
-            angleDegrees * Math.PI / 180;
-
-        const centerlineRise =
-            radius * Math.tan(angleRadians / 2);
-
-        return (
-            offset / Math.tan(angleRadians) +
-            2 * centerlineRise
-        );
-
-    }
-
-    let lowestAngle = 0.1;
-    let highestAngle = 89.9;
-
-    const lowestLength =
-        calculatedLength(lowestAngle);
-
-    const highestLength =
-        calculatedLength(highestAngle);
-
     /*
-        The requested length must fall within the range
-        the two elbows can physically produce.
-    */
+     * Solve:
+     *
+     * overallLength =
+     * offset / tan(angle) +
+     * 2 * radius * tan(angle / 2)
+     *
+     * Using t = tan(angle / 2), this becomes:
+     *
+     * (4R - O)t² - 2Lt + O = 0
+     */
 
-    if (
-        overallLength > lowestLength ||
-        overallLength < highestLength
-    ) {
+    const coefficientA =
+        4 * radius - offset;
 
-        return NaN;
+    const coefficientB =
+        -2 * overallLength;
 
-    }
+    const coefficientC =
+        offset;
 
-    for (let i = 0; i < 100; i++) {
+    const candidates = [];
 
-        const middleAngle =
-            (lowestAngle + highestAngle) / 2;
+    if (Math.abs(coefficientA) < 0.000001) {
 
-        const middleLength =
-            calculatedLength(middleAngle);
+        const t =
+            -coefficientC /
+            coefficientB;
 
-        if (middleLength > overallLength) {
+        if (t > 0) {
 
-            lowestAngle = middleAngle;
+            candidates.push(t);
 
-        } else {
+        }
 
-            highestAngle = middleAngle;
+    } else {
+
+        const discriminant =
+            Math.pow(coefficientB, 2) -
+            4 *
+            coefficientA *
+            coefficientC;
+
+        if (discriminant < -0.000001) {
+
+            return NaN;
+
+        }
+
+        const safeDiscriminant =
+            Math.max(0, discriminant);
+
+        const squareRoot =
+            Math.sqrt(safeDiscriminant);
+
+        const firstT =
+            (
+                -coefficientB +
+                squareRoot
+            ) /
+            (2 * coefficientA);
+
+        const secondT =
+            (
+                -coefficientB -
+                squareRoot
+            ) /
+            (2 * coefficientA);
+
+        if (firstT > 0) {
+
+            candidates.push(firstT);
+
+        }
+
+        if (
+            secondT > 0 &&
+            Math.abs(secondT - firstT) >
+                0.000001
+        ) {
+
+            candidates.push(secondT);
 
         }
 
     }
 
-    return (lowestAngle + highestAngle) / 2;
+    const validAngles =
+        candidates
+            .map(t => {
+
+                return (
+                    2 *
+                    Math.atan(t) *
+                    180 /
+                    Math.PI
+                );
+
+            })
+            .filter(angle => {
+
+                if (
+                    angle <= 0 ||
+                    angle >= 90
+                ) {
+
+                    return false;
+
+                }
+
+                const angleRadians =
+                    angle *
+                    Math.PI /
+                    180;
+
+                const centerlineRise =
+                    radius *
+                    Math.tan(
+                        angleRadians / 2
+                    );
+
+                const centerlineTravel =
+                    offset /
+                    Math.sin(
+                        angleRadians
+                    );
+
+                const straight =
+                    centerlineTravel -
+                    2 * centerlineRise;
+
+                return straight >= -0.001;
+
+            });
+
+    if (!validAngles.length) {
+
+        return NaN;
+
+    }
+
+    /*
+     * When two mathematical solutions exist, use the
+     * steeper elbow. It produces the shorter, more
+     * practical straight section between elbows.
+     */
+    return Math.max(...validAngles);
 
 }
 
@@ -936,6 +1024,18 @@ calculateOffsetBtn.addEventListener("click", () => {
             `;
 
             return;
+
+        }
+
+        /*
+         * With a user-entered elbow angle there is no
+         * requested overall length limiting the radius,
+         * so Auto uses the preferred full 1.00× CLR.
+         */
+        if (clrMultiplier.value === "auto") {
+
+            centerlineRadius =
+                bendDimension;
 
         }
 
