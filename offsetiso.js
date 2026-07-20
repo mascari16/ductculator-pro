@@ -1357,7 +1357,7 @@
     ) {
 
         const panel = panelLayout || {
-            x: 1100,
+            x: 920,
             y: 50,
             width: 400,
             height: 560
@@ -1671,17 +1671,17 @@
             ).matches;
 
         const viewWidth =
-            isMobile ? 600 : 1240;
+            isMobile ? 520 : 1240;
 
         const viewHeight =
-            isMobile ? 1210 : 660;
+            isMobile ? 1080 : 660;
 
         const drawingArea =
             isMobile
                 ? {
-                    x: 38,
-                    y: 45,
-                    width: 524,
+                    x: 20,
+                    y: 20,
+                    width: 480,
                     height: 500
                 }
                 : {
@@ -1694,13 +1694,13 @@
         const dataPanelLayout =
             isMobile
                 ? {
-                    x: 38,
-                    y: 625,
-                    width: 524,
-                    height: 540
+                    x: 20,
+                    y: 555,
+                    width: 480,
+                    height: 500
                 }
                 : {
-                    x: 1100,
+                    x: 920,
                     y: 50,
                     width: 400,
                     height: 560
@@ -1782,7 +1782,10 @@
                         .reverse()
                 ], true),
                 class:
-                    "offset-iso-back-panel"
+                    "offset-iso-back-panel",
+                fill: "#1d3155",
+                stroke: "#78a7ff",
+                "stroke-width": 2
             })
         );
 
@@ -1798,7 +1801,10 @@
                         .reverse()
                 ], true),
                 class:
-                    "offset-iso-top-panel"
+                    "offset-iso-top-panel",
+                fill: "#294678",
+                stroke: "#78a7ff",
+                "stroke-width": 2
             })
         );
 
@@ -1814,7 +1820,10 @@
                         .reverse()
                 ], true),
                 class:
-                    "offset-iso-bottom-panel"
+                    "offset-iso-bottom-panel",
+                fill: "#20385f",
+                stroke: "#78a7ff",
+                "stroke-width": 2
             })
         );
 
@@ -1830,7 +1839,10 @@
                         .reverse()
                 ], true),
                 class:
-                    "offset-iso-side-panel"
+                    "offset-iso-side-panel",
+                fill: "#31518a",
+                stroke: "#78a7ff",
+                "stroke-width": 2
             })
         );
 
@@ -1854,7 +1866,10 @@
                     )
                     .join(" "),
                 class:
-                    "offset-iso-end-face"
+                    "offset-iso-end-face",
+                fill: "#243b68",
+                stroke: "#78a7ff",
+                "stroke-width": 2
             })
         );
 
@@ -1872,7 +1887,10 @@
                     )
                     .join(" "),
                 class:
-                    "offset-iso-end-face"
+                    "offset-iso-end-face",
+                fill: "#243b68",
+                stroke: "#78a7ff",
+                "stroke-width": 2
             })
         );
 
