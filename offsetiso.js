@@ -62,8 +62,8 @@
 
             .offset-iso-clr-warning{
                 position:absolute;
-                top:5px;
-                right:14px;
+                top:10px;
+                right:10px;
                 z-index:10;
 
                 display:inline-flex;
@@ -189,8 +189,20 @@
                     display:block;
                     width:100%;
                     max-width:none;
+                    height:auto;
                     margin:0;
+                    border:0;
                     border-radius:0;
+                    background:transparent;
+                }
+
+                .offset-iso-clr-warning{
+                    top:10px;
+                    right:10px;
+                    left:auto;
+                    max-width:210px;
+                    padding:8px 11px;
+                    font-size:11px;
                 }
 
             }
@@ -1684,18 +1696,18 @@
             ).matches;
 
         const viewWidth =
-            isMobile ? 500 : 1240;
+            isMobile ? 500 : 1540;
 
         const viewHeight =
-            isMobile ? 1030 : 660;
+            isMobile ? 1180 : 660;
 
         const drawingArea =
             isMobile
                 ? {
-                    x: 8,
-                    y: 8,
-                    width: 484,
-                    height: 500
+                    x: 15,
+                    y: 55,
+                    width: 470,
+                    height: 485
                 }
                 : {
                     x: 65,
@@ -1707,10 +1719,10 @@
         const dataPanelLayout =
             isMobile
                 ? {
-                    x: 8,
-                    y: 600,
-                    width: 484,
-                    height: 430
+                    x: 15,
+                    y: 620,
+                    width: 470,
+                    height: 530
                 }
                 : {
                     x: 1100,
@@ -1799,7 +1811,7 @@
                 ], true),
                 class:
                     "offset-iso-back-panel",
-                fill: "#1d3155",
+                fill: "#31518a",
                 stroke: "#78a7ff",
                 "stroke-width": 2
             })
@@ -1818,7 +1830,7 @@
                 ], true),
                 class:
                     "offset-iso-top-panel",
-                fill: "#294678",
+                fill: "#31518a",
                 stroke: "#78a7ff",
                 "stroke-width": 2
             })
@@ -1837,7 +1849,7 @@
                 ], true),
                 class:
                     "offset-iso-bottom-panel",
-                fill: "#162946",
+                fill: "#31518a",
                 stroke: "#78a7ff",
                 "stroke-width": 2
             })
@@ -1883,7 +1895,7 @@
                     .join(" "),
                 class:
                     "offset-iso-end-face",
-                fill: "#13243d",
+                fill: "#31518a",
                 stroke: "#78a7ff",
                 "stroke-width": 2
             })
@@ -1904,7 +1916,7 @@
                     .join(" "),
                 class:
                     "offset-iso-end-face",
-                fill: "#13243d",
+                fill: "#31518a",
                 stroke: "#78a7ff",
                 "stroke-width": 2
             })
