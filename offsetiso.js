@@ -1659,8 +1659,16 @@
          * Use a stacked layout on phones so the elbow and
          * fabrication data remain large enough to read.
          */
+        /*
+         * Detect the actual browser viewport instead of the
+         * SVG container. The container can briefly report a
+         * small or zero width while the desktop page is
+         * rendering, which incorrectly triggered mobile mode.
+         */
         const isMobile =
-            container.clientWidth <= 700;
+            window.matchMedia(
+                "(max-width: 700px)"
+            ).matches;
 
         const viewWidth =
             isMobile ? 600 : 1240;
