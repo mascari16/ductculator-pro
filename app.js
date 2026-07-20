@@ -1221,6 +1221,49 @@ window.addEventListener("DOMContentLoaded", () => {
 
 });
 
+
+// -----------------------------------------------------
+// Keep Live Isometric Preview above the offset results
+// -----------------------------------------------------
+
+function placeOffsetPreviewAboveResults() {
+
+    const previewCard =
+        document.querySelector(".offset-iso-card");
+
+    const resultsPanel =
+        document.getElementById("offsetResults");
+
+    if (
+        !previewCard ||
+        !resultsPanel ||
+        !resultsPanel.parentElement
+    ) {
+
+        return;
+
+    }
+
+    resultsPanel.parentElement.insertBefore(
+        previewCard,
+        resultsPanel
+    );
+
+}
+
+if (document.readyState === "loading") {
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        placeOffsetPreviewAboveResults
+    );
+
+} else {
+
+    placeOffsetPreviewAboveResults();
+
+}
+
 // =====================================================
 // Sheet Metal Navigation
 // =====================================================
