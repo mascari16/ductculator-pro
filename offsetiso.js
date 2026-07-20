@@ -1,789 +1,1814 @@
 /* =========================================================
-   LIVE ISOMETRIC TWO-ELBOW RECTANGULAR DUCT OFFSET
+   DUCTCULATOR PRO
+   LIVE SINGLE RECTANGULAR RADIUS ELBOW PREVIEW
    File: offsetiso.js
-   Replace the entire old offsetiso.js with this file.
+
+   This preview shows ONE of the two matching elbows used
+   to fabricate the calculated offset.
+
+   Supported:
+   - Full duct width × height
+   - Bend on width or bend on height
+   - Accurate centerline, throat, and heel radii
+   - Correct calculated elbow angle
+   - Straight added per elbow
+   - Isometric depth based on the non-bending dimension
+   - Readable calculated-data panel
    ========================================================= */
 
 (function () {
     "use strict";
 
-    const NS = "http://www.w3.org/2000/svg";
+    const NS =
+        "http://www.w3.org/2000/svg";
 
     const ids = {
         container: "offsetIsoContainer",
         mode: "offsetMode",
         offset: "offsetInput",
         overall: "overallLengthInput",
-        cheek: "cheekSizeInput",
+        width: "ductWidthInput",
+        height: "ductHeightInput",
+        bendOn: "bendOnSelect",
         clrMultiplier: "clrMultiplier",
         customClr: "customClrInput",
         angle: "elbowAngleInput"
     };
 
-    function svg(tag, attrs = {}, text = "") {
-        const el = document.createElementNS(NS, tag);
+    let latestCalculatedData = null;
 
-        Object.entries(attrs).forEach(([key, value]) => {
-            el.setAttribute(key, String(value));
-        });
+    function svg(
+        tag,
+        attributes = {},
+        text = ""
+    ) {
 
-        if (text) {
-            el.textContent = text;
+        const element =
+            document.createElementNS(
+                NS,
+                tag
+            );
+
+        Object.entries(attributes)
+            .forEach(([key, value]) => {
+
+                element.setAttribute(
+                    key,
+                    String(value)
+                );
+
+            });
+
+        if (text !== "") {
+
+            element.textContent = text;
+
         }
 
-        return el;
+        return element;
+
     }
 
-    function numberFromDimension(value, fallback = 0) {
-        const text = String(value ?? "")
-            .trim()
-            .replace(/["']/g, "")
-            .replace(/\s+/g, " ");
+    function parseMeasurement(
+        value,
+        fallback = 0
+    ) {
+
+        let text =
+            String(value ?? "")
+                .trim()
+                .toLowerCase()
+                .replace(/inches|inch|in\./g, "")
+                .replace(/"/g, "")
+                .replace(/\s+/g, " ");
 
         if (!text) {
+
             return fallback;
+
         }
 
-        if (/^-?\d+(\.\d+)?$/.test(text)) {
-            return Number(text);
-        }
+        let total = 0;
 
-        const mixed = text.match(/^(-?\d+)\s+(\d+)\s*\/\s*(\d+)$/);
+        if (text.includes("'")) {
 
-        if (mixed) {
-            const whole = Number(mixed[1]);
-            const numerator = Number(mixed[2]);
-            const denominator = Number(mixed[3]);
+            const parts =
+                text.split("'");
 
-            if (denominator === 0) {
+            const feet =
+                Number(parts[0].trim());
+
+            if (!Number.isFinite(feet)) {
+
                 return fallback;
+
             }
 
-            return whole < 0
-                ? whole - numerator / denominator
-                : whole + numerator / denominator;
+            total += feet * 12;
+            text =
+                (parts[1] || "").trim();
+
         }
 
-        const fraction = text.match(/^(-?\d+)\s*\/\s*(\d+)$/);
+        text = text.replace(
+            /^(-?\d+(?:\.\d+)?)-(\d+)\/(\d+)$/,
+            "$1 $2/$3"
+        );
 
-        if (fraction) {
-            const numerator = Number(fraction[1]);
-            const denominator = Number(fraction[2]);
+        if (!text) {
 
-            return denominator === 0
-                ? fallback
-                : numerator / denominator;
+            return total;
+
         }
 
-        return fallback;
+        for (const part of text.split(" ")) {
+
+            if (!part) {
+
+                continue;
+
+            }
+
+            if (part.includes("/")) {
+
+                const values =
+                    part.split("/");
+
+                const numerator =
+                    Number(values[0]);
+
+                const denominator =
+                    Number(values[1]);
+
+                if (
+                    !Number.isFinite(numerator) ||
+                    !Number.isFinite(denominator) ||
+                    denominator === 0
+                ) {
+
+                    return fallback;
+
+                }
+
+                total +=
+                    numerator / denominator;
+
+            } else {
+
+                const number =
+                    Number(part);
+
+                if (!Number.isFinite(number)) {
+
+                    return fallback;
+
+                }
+
+                total += number;
+
+            }
+
+        }
+
+        return total;
+
     }
 
-    function format(value) {
+    function getValue(
+        id,
+        fallback = 0
+    ) {
+
+        const element =
+            document.getElementById(id);
+
+        return element
+            ? parseMeasurement(
+                element.value,
+                fallback
+            )
+            : fallback;
+
+    }
+
+    function formatDecimal(value) {
+
         if (!Number.isFinite(value)) {
-            return "--";
+
+            return "—";
+
         }
 
         return value
             .toFixed(2)
             .replace(/\.00$/, "")
             .replace(/(\.\d)0$/, "$1");
+
     }
 
-    function getValue(id, fallback = 0) {
-        const element = document.getElementById(id);
+    function gcd(a, b) {
 
-        return element
-            ? numberFromDimension(element.value, fallback)
-            : fallback;
-    }
+        while (b !== 0) {
 
-    function getClr(cheek) {
-        const select = document.getElementById(ids.clrMultiplier);
-        const selected = select ? select.value : "auto";
+            const temporary = b;
 
-        if (selected === "custom") {
-            return Math.max(
-                1,
-                getValue(ids.customClr, cheek)
-            );
+            b = a % b;
+            a = temporary;
+
         }
 
-        /*
-         * Visual centerline-radius choice:
-         * Auto uses one-half cheek size.
-         * The other selections multiply that base radius.
-         *
-         * This affects only the preview geometry.
-         */
-        const baseRadius = Math.max(1, cheek / 2);
+        return Math.abs(a);
 
-        if (selected === "1.5") {
-            return baseRadius * 1.5;
+    }
+
+    function formatMeasurement(value) {
+
+        if (!Number.isFinite(value)) {
+
+            return "—";
+
         }
 
-        if (selected === "2") {
-            return baseRadius * 2;
-        }
+        const sixteenths =
+            Math.round(value * 16);
 
-        return baseRadius;
-    }
-
-    function solveStraight(run, rise, radius, angleDegrees) {
-        const angle = angleDegrees * Math.PI / 180;
-        const sin = Math.sin(angle);
-        const cos = Math.cos(angle);
-
-        const fromRun =
-            Math.abs(cos) > 0.0001
-                ? (run - 2 * radius * sin) / cos
-                : 0;
-
-        const fromRise =
-            Math.abs(sin) > 0.0001
-                ? (rise - 2 * radius * (1 - cos)) / sin
-                : 0;
-
-        const values = [fromRun, fromRise]
-            .filter(Number.isFinite);
-
-        return Math.max(
-            0,
-            values.length
-                ? values.reduce((sum, value) => sum + value, 0) / values.length
-                : 0
-        );
-    }
-
-    function geometryError(run, rise, radius, angle) {
-        const straight = solveStraight(
-            run,
-            rise,
-            radius,
-            angle
-        );
-
-        const radians = angle * Math.PI / 180;
-
-        const calculatedRun =
-            2 * radius * Math.sin(radians) +
-            straight * Math.cos(radians);
-
-        const calculatedRise =
-            2 * radius * (1 - Math.cos(radians)) +
-            straight * Math.sin(radians);
-
-        return Math.hypot(
-            calculatedRun - run,
-            calculatedRise - rise
-        );
-    }
-
-    function solveAngle(run, rise, radius) {
-        let bestAngle = 45;
-        let bestError = Infinity;
-
-        for (let angle = 5; angle <= 85; angle += 0.05) {
-            const error = geometryError(
-                run,
-                rise,
-                radius,
-                angle
+        const whole =
+            Math.floor(
+                sixteenths / 16
             );
 
-            if (error < bestError) {
-                bestError = error;
-                bestAngle = angle;
+        const remainder =
+            sixteenths % 16;
+
+        if (remainder === 0) {
+
+            return `${whole}"`;
+
+        }
+
+        const divisor =
+            gcd(remainder, 16);
+
+        return `${whole} ${
+            remainder / divisor
+        }/${
+            16 / divisor
+        }"`;
+
+    }
+
+    function solveOffsetAngle(
+        offset,
+        overallLength,
+        radius
+    ) {
+
+        function calculatedLength(
+            angleDegrees
+        ) {
+
+            const angle =
+                angleDegrees *
+                Math.PI /
+                180;
+
+            const centerlineRise =
+                radius *
+                Math.tan(angle / 2);
+
+            return (
+                offset /
+                Math.tan(angle) +
+                2 *
+                centerlineRise
+            );
+
+        }
+
+        let low = 0.1;
+        let high = 89.9;
+
+        if (
+            overallLength >
+                calculatedLength(low) ||
+            overallLength <
+                calculatedLength(high)
+        ) {
+
+            return NaN;
+
+        }
+
+        for (
+            let index = 0;
+            index < 100;
+            index += 1
+        ) {
+
+            const middle =
+                (low + high) / 2;
+
+            if (
+                calculatedLength(middle) >
+                overallLength
+            ) {
+
+                low = middle;
+
+            } else {
+
+                high = middle;
+
             }
+
         }
 
-        return bestAngle;
+        return (low + high) / 2;
+
+    }
+
+    function calculateFromInputs() {
+
+        const offset =
+            Math.max(
+                0.01,
+                getValue(ids.offset, 46.25)
+            );
+
+        const overallLength =
+            Math.max(
+                0.01,
+                getValue(ids.overall, 69)
+            );
+
+        const ductWidth =
+            Math.max(
+                0.01,
+                getValue(ids.width, 60)
+            );
+
+        const ductHeight =
+            Math.max(
+                0.01,
+                getValue(ids.height, 24)
+            );
+
+        const bendOnElement =
+            document.getElementById(
+                ids.bendOn
+            );
+
+        const bendOn =
+            bendOnElement
+                ? bendOnElement.value
+                : "height";
+
+        const bendDimension =
+            bendOn === "width"
+                ? ductWidth
+                : ductHeight;
+
+        const elbowDepth =
+            bendOn === "width"
+                ? ductHeight
+                : ductWidth;
+
+        const clrElement =
+            document.getElementById(
+                ids.clrMultiplier
+            );
+
+        const clrMode =
+            clrElement
+                ? clrElement.value
+                : "auto";
+
+        let centerlineRadius;
+
+        if (clrMode === "custom") {
+
+            centerlineRadius =
+                Math.max(
+                    0.01,
+                    getValue(
+                        ids.customClr,
+                        bendDimension
+                    )
+                );
+
+        } else if (clrMode === "auto") {
+
+            centerlineRadius =
+                (
+                    offset * offset +
+                    overallLength *
+                    overallLength
+                ) /
+                (4 * offset);
+
+        } else {
+
+            centerlineRadius =
+                bendDimension *
+                Number(clrMode);
+
+        }
+
+        const modeElement =
+            document.getElementById(
+                ids.mode
+            );
+
+        const mode =
+            modeElement
+                ? modeElement.value
+                : "solveAngle";
+
+        let elbowAngle;
+
+        if (mode === "knownAngle") {
+
+            elbowAngle =
+                Math.max(
+                    0.1,
+                    Math.min(
+                        89.9,
+                        getValue(
+                            ids.angle,
+                            45
+                        )
+                    )
+                );
+
+        } else if (clrMode === "auto") {
+
+            elbowAngle =
+                2 *
+                Math.atan(
+                    offset /
+                    overallLength
+                ) *
+                180 /
+                Math.PI;
+
+        } else {
+
+            elbowAngle =
+                solveOffsetAngle(
+                    offset,
+                    overallLength,
+                    centerlineRadius
+                );
+
+        }
+
+        if (!Number.isFinite(elbowAngle)) {
+
+            elbowAngle = 45;
+
+        }
+
+        const radians =
+            elbowAngle *
+            Math.PI /
+            180;
+
+        const centerlineRise =
+            centerlineRadius *
+            Math.tan(radians / 2);
+
+        const centerlineTravel =
+            offset /
+            Math.sin(radians);
+
+        const totalStraight =
+            Math.max(
+                0,
+                centerlineTravel -
+                2 *
+                centerlineRise
+            );
+
+        const straightPerElbow =
+            totalStraight / 2;
+
+        return {
+            offset,
+            overallLength,
+            ductWidth,
+            ductHeight,
+            bendOn,
+            bendDimension,
+            elbowDepth,
+            centerlineRadius,
+            throatRadius:
+                centerlineRadius -
+                bendDimension / 2,
+            heelRadius:
+                centerlineRadius +
+                bendDimension / 2,
+            elbowAngle,
+            totalStraight,
+            straightPerElbow,
+            quantity: 2
+        };
+
     }
 
     function getModel() {
-        const rise = Math.max(0, getValue(ids.offset, 46.25));
-        const run = Math.max(1, getValue(ids.overall, 69));
-        const cheek = Math.max(1, getValue(ids.cheek, 34));
-        const radius = getClr(cheek);
-
-        const modeElement = document.getElementById(ids.mode);
-        const mode = modeElement ? modeElement.value : "solveAngle";
-
-        let angle =
-            mode === "knownAngle"
-                ? Math.max(1, Math.min(89, getValue(ids.angle, 45)))
-                : solveAngle(run, rise, radius);
-
-        const straight = solveStraight(
-            run,
-            rise,
-            radius,
-            angle
-        );
-
-        /*
-         * The calculator currently has one cheek dimension, not separate
-         * duct width and depth fields. The preview uses cheek as the visible
-         * face height and a restrained depth purely for isometric appearance.
-         */
-        const depth = Math.max(
-            8,
-            Math.min(cheek * 0.42, 18)
-        );
 
         return {
-            rise,
-            run,
-            cheek,
-            depth,
-            radius,
-            angle,
-            straight
+            ...calculateFromInputs(),
+            ...(latestCalculatedData || {})
         };
+
     }
 
-    function centerlinePoints(model) {
-        const angle = model.angle * Math.PI / 180;
-        const r = model.radius;
-        const s = model.straight;
-
-        const arcSteps = 18;
-        const points = [];
-
-        /*
-         * Start with a short inlet straight so the open end is visible.
-         */
-        const inletLead = Math.max(
-            model.cheek * 0.35,
-            model.run * 0.08,
-            7
-        );
-
-        points.push({ x: -inletLead, y: 0 });
-        points.push({ x: 0, y: 0 });
-
-        /*
-         * First elbow:
-         * tangent changes from horizontal to the selected offset angle.
-         */
-        for (let i = 1; i <= arcSteps; i += 1) {
-            const t = angle * i / arcSteps;
-
-            points.push({
-                x: r * Math.sin(t),
-                y: r * (1 - Math.cos(t))
-            });
-        }
-
-        const firstEnd = points[points.length - 1];
-
-        /*
-         * Middle straight only appears when the geometry calls for it.
-         */
-        const secondStart = {
-            x: firstEnd.x + s * Math.cos(angle),
-            y: firstEnd.y + s * Math.sin(angle)
-        };
-
-        if (s > 0.05) {
-            points.push(secondStart);
-        }
-
-        /*
-         * Second elbow:
-         * tangent changes from the offset angle back to horizontal.
-         */
-        for (let i = 1; i <= arcSteps; i += 1) {
-            const u = angle * i / arcSteps;
-
-            points.push({
-                x:
-                    secondStart.x +
-                    r * (
-                        Math.sin(angle) -
-                        Math.sin(angle - u)
-                    ),
-
-                y:
-                    secondStart.y +
-                    r * (
-                        Math.cos(angle - u) -
-                        Math.cos(angle)
-                    )
-            });
-        }
-
-        const outletStart = points[points.length - 1];
-        const outletLead = inletLead;
-
-        points.push({
-            x: outletStart.x + outletLead,
-            y: outletStart.y
-        });
+    function pointOnArc(
+        center,
+        radius,
+        angle
+    ) {
 
         return {
-            points,
+            x:
+                center.x +
+                radius *
+                Math.cos(angle),
+
+            y:
+                center.y +
+                radius *
+                Math.sin(angle)
+        };
+
+    }
+
+    function buildElbowProfile(model) {
+
+        const angle =
+            model.elbowAngle *
+            Math.PI /
+            180;
+
+        const centerRadius =
+            model.centerlineRadius;
+
+        const throatRadius =
+            Math.max(
+                0.05,
+                model.throatRadius
+            );
+
+        const heelRadius =
+            Math.max(
+                throatRadius + 0.05,
+                model.heelRadius
+            );
+
+        /*
+         * Arc center is at the origin.
+         * Incoming tangent is vertical.
+         * Outgoing tangent turns clockwise by the elbow angle.
+         */
+        const startAngle = Math.PI;
+        const endAngle =
+            Math.PI - angle;
+
+        const arcSteps = 120;
+
+        function arc(radius) {
+
+            const points = [];
+
+            for (
+                let index = 0;
+                index <= arcSteps;
+                index += 1
+            ) {
+
+                const progress =
+                    index / arcSteps;
+
+                const currentAngle =
+                    startAngle -
+                    angle * progress;
+
+                points.push(
+                    pointOnArc(
+                        { x: 0, y: 0 },
+                        radius,
+                        currentAngle
+                    )
+                );
+
+            }
+
+            return points;
+
+        }
+
+        const throatArc =
+            arc(throatRadius);
+
+        const heelArc =
+            arc(heelRadius);
+
+        const centerArc =
+            arc(centerRadius);
+
+        const incomingDirection = {
+            x: 0,
+            y: 1
+        };
+
+        const outgoingDirection = {
+            x: Math.sin(angle),
+            y: Math.cos(angle)
+        };
+
+        /*
+         * Show the calculated straight amount attached to this one elbow.
+         * A small minimum lead keeps the inlet face readable even when
+         * no added straight is required.
+         */
+        const minimumLead =
+            Math.max(
+                model.bendDimension * 0.18,
+                3
+            );
+
+        const addedStraight =
+            Math.max(
+                0,
+                model.straightPerElbow
+            );
+
+        const inletLead =
+            minimumLead;
+
+        const outletLead =
+            minimumLead +
+            addedStraight;
+
+        const throatStart =
+            throatArc[0];
+
+        const heelStart =
+            heelArc[0];
+
+        const throatEnd =
+            throatArc[
+                throatArc.length - 1
+            ];
+
+        const heelEnd =
+            heelArc[
+                heelArc.length - 1
+            ];
+
+        const centerStart =
+            centerArc[0];
+
+        const centerEnd =
+            centerArc[
+                centerArc.length - 1
+            ];
+
+        const inletThroat = {
+            x:
+                throatStart.x -
+                incomingDirection.x *
+                inletLead,
+            y:
+                throatStart.y -
+                incomingDirection.y *
+                inletLead
+        };
+
+        const inletHeel = {
+            x:
+                heelStart.x -
+                incomingDirection.x *
+                inletLead,
+            y:
+                heelStart.y -
+                incomingDirection.y *
+                inletLead
+        };
+
+        const inletCenter = {
+            x:
+                centerStart.x -
+                incomingDirection.x *
+                inletLead,
+            y:
+                centerStart.y -
+                incomingDirection.y *
+                inletLead
+        };
+
+        const outletThroat = {
+            x:
+                throatEnd.x +
+                outgoingDirection.x *
+                outletLead,
+            y:
+                throatEnd.y +
+                outgoingDirection.y *
+                outletLead
+        };
+
+        const outletHeel = {
+            x:
+                heelEnd.x +
+                outgoingDirection.x *
+                outletLead,
+            y:
+                heelEnd.y +
+                outgoingDirection.y *
+                outletLead
+        };
+
+        const outletCenter = {
+            x:
+                centerEnd.x +
+                outgoingDirection.x *
+                outletLead,
+            y:
+                centerEnd.y +
+                outgoingDirection.y *
+                outletLead
+        };
+
+        return {
+            nearThroat: [
+                inletThroat,
+                throatStart,
+                ...throatArc.slice(1),
+                outletThroat
+            ],
+            nearHeel: [
+                inletHeel,
+                heelStart,
+                ...heelArc.slice(1),
+                outletHeel
+            ],
+            centerline: [
+                inletCenter,
+                centerStart,
+                ...centerArc.slice(1),
+                outletCenter
+            ],
+            inlet: {
+                throat: inletThroat,
+                heel: inletHeel,
+                center: inletCenter
+            },
+            outlet: {
+                throat: outletThroat,
+                heel: outletHeel,
+                center: outletCenter
+            },
+            tangentStart: {
+                throat: throatStart,
+                heel: heelStart
+            },
+            tangentEnd: {
+                throat: throatEnd,
+                heel: heelEnd
+            },
+            outgoingDirection,
             inletLead,
             outletLead,
-            firstEnd,
-            secondStart,
-            outletStart
+            addedStraight
         };
+
     }
 
-    function offsetPolyline(points, distance) {
-        const output = [];
+    function path(points, close = false) {
 
-        for (let i = 0; i < points.length; i += 1) {
-            const previous = points[Math.max(0, i - 1)];
-            const next = points[Math.min(points.length - 1, i + 1)];
-
-            const dx = next.x - previous.x;
-            const dy = next.y - previous.y;
-            const length = Math.hypot(dx, dy) || 1;
-
-            const nx = -dy / length;
-            const ny = dx / length;
-
-            output.push({
-                x: points[i].x + nx * distance,
-                y: points[i].y + ny * distance
-            });
-        }
-
-        return output;
-    }
-
-    function pathFromPoints(points, close = false) {
         if (!points.length) {
+
             return "";
+
         }
 
-        const body = points
-            .map((point, index) =>
-                `${index === 0 ? "M" : "L"} ${point.x} ${point.y}`
-            )
-            .join(" ");
+        const result =
+            points
+                .map(
+                    (point, index) =>
+                        `${
+                            index === 0
+                                ? "M"
+                                : "L"
+                        } ${point.x} ${point.y}`
+                )
+                .join(" ");
 
-        return close ? `${body} Z` : body;
+        return close
+            ? `${result} Z`
+            : result;
+
     }
 
-    function transformPoints(points, transform) {
-        return points.map((point) => transform(point));
-    }
+    function shift(
+        points,
+        vector
+    ) {
 
-    /*
-     * Rotate the fitting so the overall-length direction reads vertically
-     * on screen. Original model X becomes screen-up, and original model Y
-     * becomes screen-right.
-     */
-    function orientVertical(points) {
         return points.map((point) => ({
-            x: point.y,
-            y: -point.x
+            x: point.x + vector.x,
+            y: point.y + vector.y
         }));
+
     }
 
-    function fitTransform(allPoints, width, height) {
-        const xs = allPoints.map((point) => point.x);
-        const ys = allPoints.map((point) => point.y);
+    function bounds(points) {
 
-        const minX = Math.min(...xs);
-        const maxX = Math.max(...xs);
-        const minY = Math.min(...ys);
-        const maxY = Math.max(...ys);
+        const xs =
+            points.map(point => point.x);
 
-        const margin = 85;
+        const ys =
+            points.map(point => point.y);
 
-        const scale = Math.min(
-            (width - margin * 2) / Math.max(1, maxX - minX),
-            (height - margin * 2) / Math.max(1, maxY - minY)
-        );
+        return {
+            minX: Math.min(...xs),
+            maxX: Math.max(...xs),
+            minY: Math.min(...ys),
+            maxY: Math.max(...ys)
+        };
+
+    }
+
+    function createTransform(
+        points,
+        area
+    ) {
+
+        const box =
+            bounds(points);
+
+        const sourceWidth =
+            Math.max(
+                1,
+                box.maxX - box.minX
+            );
+
+        const sourceHeight =
+            Math.max(
+                1,
+                box.maxY - box.minY
+            );
+
+        const scale =
+            Math.min(
+                area.width / sourceWidth,
+                area.height / sourceHeight
+            );
+
+        const renderedWidth =
+            sourceWidth * scale;
+
+        const renderedHeight =
+            sourceHeight * scale;
+
+        const originX =
+            area.x +
+            (
+                area.width -
+                renderedWidth
+            ) /
+            2;
+
+        const originY =
+            area.y +
+            (
+                area.height -
+                renderedHeight
+            ) /
+            2;
 
         return function (point) {
+
             return {
                 x:
-                    margin +
-                    (point.x - minX) * scale,
+                    originX +
+                    (
+                        point.x -
+                        box.minX
+                    ) *
+                    scale,
 
                 y:
-                    height -
-                    margin -
-                    (point.y - minY) * scale
+                    originY +
+                    (
+                        box.maxY -
+                        point.y
+                    ) *
+                    scale
             };
+
         };
+
     }
 
-    function addArrowMarkers(defs) {
-        const marker = svg("marker", {
-            id: "offsetIsoArrow",
-            markerWidth: 8,
-            markerHeight: 8,
-            refX: 4,
-            refY: 4,
-            orient: "auto-start-reverse",
-            markerUnits: "strokeWidth"
-        });
+    function transformPoints(
+        points,
+        transform
+    ) {
 
-        marker.appendChild(svg("path", {
-            d: "M 0 0 L 8 4 L 0 8",
-            fill: "none",
-            stroke: "#f4b942",
-            "stroke-width": 1.4
-        }));
+        return points.map(transform);
 
-        defs.appendChild(marker);
     }
 
-    function drawDimension(group, a, b, label, textOffset = 0) {
-        const line = svg("line", {
-            x1: a.x,
-            y1: a.y,
-            x2: b.x,
-            y2: b.y,
-            class: "offset-iso-dimension-line",
-            "marker-start": "url(#offsetIsoArrow)",
-            "marker-end": "url(#offsetIsoArrow)"
-        });
+    function addDefinitions(drawing) {
 
-        group.appendChild(line);
+        const defs =
+            svg("defs");
 
-        const mx = (a.x + b.x) / 2;
-        const my = (a.y + b.y) / 2;
+        const arrow =
+            svg("marker", {
+                id: "singleElbowArrow",
+                markerWidth: 8,
+                markerHeight: 8,
+                refX: 4,
+                refY: 4,
+                orient: "auto-start-reverse",
+                markerUnits: "strokeWidth"
+            });
 
-        group.appendChild(svg("text", {
-            x: mx,
-            y: my + textOffset,
-            class: "offset-iso-dimension-text"
-        }, label));
+        arrow.appendChild(
+            svg("path", {
+                d: "M 0 0 L 8 4 L 0 8",
+                fill: "none",
+                stroke: "#f4b942",
+                "stroke-width": 1.4
+            })
+        );
+
+        defs.appendChild(arrow);
+
+        const gradient =
+            svg("linearGradient", {
+                id: "singleElbowDataGradient",
+                x1: "0%",
+                y1: "0%",
+                x2: "100%",
+                y2: "100%"
+            });
+
+        gradient.appendChild(
+            svg("stop", {
+                offset: "0%",
+                "stop-color": "#17243a"
+            })
+        );
+
+        gradient.appendChild(
+            svg("stop", {
+                offset: "100%",
+                "stop-color": "#0d1728"
+            })
+        );
+
+        defs.appendChild(gradient);
+        drawing.appendChild(defs);
+
+    }
+
+    function addDimension(
+        group,
+        start,
+        end,
+        label,
+        options = {}
+    ) {
+
+        group.appendChild(
+            svg("line", {
+                x1: start.x,
+                y1: start.y,
+                x2: end.x,
+                y2: end.y,
+                class:
+                    "offset-iso-dimension-line",
+                "marker-start":
+                    "url(#singleElbowArrow)",
+                "marker-end":
+                    "url(#singleElbowArrow)"
+            })
+        );
+
+        const middle = {
+            x:
+                (start.x + end.x) / 2,
+            y:
+                (start.y + end.y) / 2
+        };
+
+        const text =
+            svg("text", {
+                x:
+                    middle.x +
+                    (options.dx || 0),
+                y:
+                    middle.y +
+                    (options.dy || 0),
+                class:
+                    "offset-iso-dimension-text",
+                "text-anchor": "middle",
+                "dominant-baseline":
+                    "middle"
+            }, label);
+
+        if (options.rotate) {
+
+            text.setAttribute(
+                "transform",
+                `rotate(${
+                    options.rotate
+                } ${
+                    middle.x
+                } ${
+                    middle.y
+                })`
+            );
+
+        }
+
+        group.appendChild(text);
+
+    }
+
+    function addDataCard(
+        group,
+        x,
+        y,
+        width,
+        label,
+        value
+    ) {
+
+        group.appendChild(
+            svg("rect", {
+                x,
+                y,
+                width,
+                height: 70,
+                rx: 10,
+                fill: "#111d31",
+                stroke: "#2a3d5c",
+                "stroke-width": 1.1
+            })
+        );
+
+        group.appendChild(
+            svg("text", {
+                x: x + 14,
+                y: y + 22,
+                fill: "#8fa6c9",
+                "font-size": 12,
+                "font-weight": 650
+            }, label.toUpperCase())
+        );
+
+        group.appendChild(
+            svg("text", {
+                x: x + 14,
+                y: y + 50,
+                fill: "#f4f7ff",
+                "font-size": 18,
+                "font-weight": 750
+            }, value)
+        );
+
+    }
+
+    function addDataPanel(
+        drawing,
+        model
+    ) {
+
+        const panel = {
+            x: 790,
+            y: 50,
+            width: 400,
+            height: 560
+        };
+
+        const group =
+            svg("g");
+
+        group.appendChild(
+            svg("rect", {
+                x: panel.x,
+                y: panel.y,
+                width: panel.width,
+                height: panel.height,
+                rx: 18,
+                fill:
+                    "url(#singleElbowDataGradient)",
+                stroke: "#2a3d5c",
+                "stroke-width": 1.4
+            })
+        );
+
+        group.appendChild(
+            svg("text", {
+                x: panel.x + 24,
+                y: panel.y + 36,
+                fill: "#f4f7ff",
+                "font-size": 21,
+                "font-weight": 760
+            }, "One-Elbow Fabrication Data")
+        );
+
+        group.appendChild(
+            svg("text", {
+                x: panel.x + 24,
+                y: panel.y + 59,
+                fill: "#8097ba",
+                "font-size": 13
+            }, "Two matching elbows are required for the offset.")
+        );
+
+        const values = [
+            [
+                "Duct Size",
+                `${
+                    formatMeasurement(
+                        model.ductWidth
+                    )
+                } × ${
+                    formatMeasurement(
+                        model.ductHeight
+                    )
+                }`
+            ],
+            [
+                "Bend On",
+                model.bendOn === "width"
+                    ? "Width"
+                    : "Height"
+            ],
+            [
+                "Elbow Angle",
+                `${
+                    formatDecimal(
+                        model.elbowAngle
+                    )
+                }°`
+            ],
+            [
+                "CLR",
+                formatMeasurement(
+                    model.centerlineRadius
+                )
+            ],
+            [
+                "Throat Radius",
+                formatMeasurement(
+                    model.throatRadius
+                )
+            ],
+            [
+                "Heel Radius",
+                formatMeasurement(
+                    model.heelRadius
+                )
+            ],
+            [
+                "Straight / Elbow",
+                formatMeasurement(
+                    model.straightPerElbow
+                )
+            ],
+            [
+                "Quantity",
+                "2"
+            ]
+        ];
+
+        const padding = 24;
+        const gap = 12;
+
+        const cardWidth =
+            (
+                panel.width -
+                padding * 2 -
+                gap
+            ) / 2;
+
+        values.forEach(
+            (entry, index) => {
+
+                const column =
+                    index % 2;
+
+                const row =
+                    Math.floor(
+                        index / 2
+                    );
+
+                addDataCard(
+                    group,
+                    panel.x +
+                        padding +
+                        column *
+                        (
+                            cardWidth +
+                            gap
+                        ),
+                    panel.y +
+                        86 +
+                        row *
+                        82,
+                    cardWidth,
+                    entry[0],
+                    entry[1]
+                );
+
+            }
+        );
+
+        const noteY =
+            panel.y +
+            panel.height -
+            82;
+
+        group.appendChild(
+            svg("line", {
+                x1: panel.x + 24,
+                y1: noteY,
+                x2:
+                    panel.x +
+                    panel.width -
+                    24,
+                y2: noteY,
+                stroke: "#2a3d5c",
+                "stroke-width": 1
+            })
+        );
+
+        group.appendChild(
+            svg("text", {
+                x: panel.x + 24,
+                y: noteY + 28,
+                fill: "#8fa6c9",
+                "font-size": 13
+            }, model.straightPerElbow > 0.01
+                ? `Add ${
+                    formatMeasurement(
+                        model.straightPerElbow
+                    )
+                } of straight to each elbow.`
+                : "No added straight is required."
+            )
+        );
+
+        group.appendChild(
+            svg("text", {
+                x: panel.x + 24,
+                y: noteY + 52,
+                fill: "#8fa6c9",
+                "font-size": 13
+            }, `Elbow depth: ${
+                formatMeasurement(
+                    model.elbowDepth
+                )
+            }`)
+        );
+
+        drawing.appendChild(group);
+
     }
 
     function render() {
-        const container = document.getElementById(ids.container);
+
+        const container =
+            document.getElementById(
+                ids.container
+            );
 
         if (!container) {
+
             return;
+
         }
 
-        const model = getModel();
-        const center = centerlinePoints(model);
+        const model =
+            getModel();
 
-        const half = model.cheek / 2;
-
-        const lower = offsetPolyline(center.points, -half);
-        const upper = offsetPolyline(center.points, half);
+        const profile =
+            buildElbowProfile(model);
 
         /*
-         * Isometric depth shift. This creates the 3D view while preserving
-         * the accurate two-elbow side profile.
+         * The isometric extrusion is proportional to the real
+         * non-bending duct dimension.
          */
-        const isoDepth = {
-            x: model.depth * 0.9,
-            y: model.depth * 0.55
+        const depthVector = {
+            x:
+                Math.max(
+                    3,
+                    model.elbowDepth
+                ) * 0.62,
+            y:
+                Math.max(
+                    3,
+                    model.elbowDepth
+                ) * 0.34
         };
 
-        const backLower = lower.map((point) => ({
-            x: point.x + isoDepth.x,
-            y: point.y + isoDepth.y
-        }));
+        const farThroat =
+            shift(
+                profile.nearThroat,
+                depthVector
+            );
 
-        const backUpper = upper.map((point) => ({
-            x: point.x + isoDepth.x,
-            y: point.y + isoDepth.y
-        }));
+        const farHeel =
+            shift(
+                profile.nearHeel,
+                depthVector
+            );
 
-        /*
-         * Turn the complete fitting upright before scaling it into the SVG.
-         */
-        const verticalLower = orientVertical(lower);
-        const verticalUpper = orientVertical(upper);
-        const verticalBackLower = orientVertical(backLower);
-        const verticalBackUpper = orientVertical(backUpper);
-        const verticalCenter = orientVertical(center.points);
+        const farCenter =
+            shift(
+                profile.centerline,
+                depthVector
+            );
 
-        const allModelPoints = [
-            ...verticalLower,
-            ...verticalUpper,
-            ...verticalBackLower,
-            ...verticalBackUpper
+        const allPoints = [
+            ...profile.nearThroat,
+            ...profile.nearHeel,
+            ...farThroat,
+            ...farHeel
         ];
 
-        const viewWidth = 1000;
-        const viewHeight = 700;
-        const transform = fitTransform(
-            allModelPoints,
-            viewWidth,
-            viewHeight
-        );
+        const viewWidth = 1240;
+        const viewHeight = 660;
 
-        const L = transformPoints(verticalLower, transform);
-        const U = transformPoints(verticalUpper, transform);
-        const BL = transformPoints(verticalBackLower, transform);
-        const BU = transformPoints(verticalBackUpper, transform);
-        const C = transformPoints(verticalCenter, transform);
+        const drawingArea = {
+            x: 65,
+            y: 55,
+            width: 655,
+            height: 520
+        };
+
+        const transform =
+            createTransform(
+                allPoints,
+                drawingArea
+            );
+
+        const nearThroat =
+            transformPoints(
+                profile.nearThroat,
+                transform
+            );
+
+        const nearHeel =
+            transformPoints(
+                profile.nearHeel,
+                transform
+            );
+
+        const center =
+            transformPoints(
+                profile.centerline,
+                transform
+            );
+
+        const farThroatT =
+            transformPoints(
+                farThroat,
+                transform
+            );
+
+        const farHeelT =
+            transformPoints(
+                farHeel,
+                transform
+            );
+
+        const farCenterT =
+            transformPoints(
+                farCenter,
+                transform
+            );
 
         container.replaceChildren();
 
-        const drawing = svg("svg", {
-            class: "offset-iso-svg",
-            viewBox: `0 0 ${viewWidth} ${viewHeight}`,
-            preserveAspectRatio: "xMidYMid meet",
-            role: "img",
-            "aria-label": "Isometric two-elbow rectangular duct offset"
-        });
+        const drawing =
+            svg("svg", {
+                class: "offset-iso-svg",
+                viewBox:
+                    `0 0 ${
+                        viewWidth
+                    } ${
+                        viewHeight
+                    }`,
+                preserveAspectRatio:
+                    "xMidYMid meet",
+                role: "img",
+                "aria-label":
+                    "Isometric rectangular radius elbow fabrication preview"
+            });
 
-        const defs = svg("defs");
-        addArrowMarkers(defs);
-        drawing.appendChild(defs);
+        addDefinitions(drawing);
 
         /*
          * Far side face.
          */
-        drawing.appendChild(svg("path", {
-            d: pathFromPoints([
-                ...BU,
-                ...BL.slice().reverse()
-            ], true),
-            class: "offset-iso-back-panel"
-        }));
+        drawing.appendChild(
+            svg("path", {
+                d: path([
+                    ...farHeelT,
+                    ...farThroatT
+                        .slice()
+                        .reverse()
+                ], true),
+                class:
+                    "offset-iso-back-panel"
+            })
+        );
 
         /*
-         * Upper/top surface.
+         * Heel surface.
          */
-        drawing.appendChild(svg("path", {
-            d: pathFromPoints([
-                ...U,
-                ...BU.slice().reverse()
-            ], true),
-            class: "offset-iso-top-panel"
-        }));
+        drawing.appendChild(
+            svg("path", {
+                d: path([
+                    ...nearHeel,
+                    ...farHeelT
+                        .slice()
+                        .reverse()
+                ], true),
+                class:
+                    "offset-iso-top-panel"
+            })
+        );
 
         /*
-         * Lower surface.
+         * Throat surface.
          */
-        drawing.appendChild(svg("path", {
-            d: pathFromPoints([
-                ...L,
-                ...BL.slice().reverse()
-            ], true),
-            class: "offset-iso-bottom-panel"
-        }));
+        drawing.appendChild(
+            svg("path", {
+                d: path([
+                    ...nearThroat,
+                    ...farThroatT
+                        .slice()
+                        .reverse()
+                ], true),
+                class:
+                    "offset-iso-bottom-panel"
+            })
+        );
 
         /*
-         * Near side profile: the key S-shaped fitting face.
+         * Near cheek/side profile.
          */
-        drawing.appendChild(svg("path", {
-            d: pathFromPoints([
-                ...U,
-                ...L.slice().reverse()
-            ], true),
-            class: "offset-iso-side-panel"
-        }));
+        drawing.appendChild(
+            svg("path", {
+                d: path([
+                    ...nearHeel,
+                    ...nearThroat
+                        .slice()
+                        .reverse()
+                ], true),
+                class:
+                    "offset-iso-side-panel"
+            })
+        );
+
+        const last =
+            nearHeel.length - 1;
 
         /*
-         * Inlet and outlet end faces.
+         * Inlet and outlet faces.
          */
-        drawing.appendChild(svg("polygon", {
-            points: [
-                U[0],
-                BU[0],
-                BL[0],
-                L[0]
-            ].map((point) => `${point.x},${point.y}`).join(" "),
-            class: "offset-iso-end-face"
-        }));
+        drawing.appendChild(
+            svg("polygon", {
+                points: [
+                    nearHeel[0],
+                    farHeelT[0],
+                    farThroatT[0],
+                    nearThroat[0]
+                ]
+                    .map(
+                        point =>
+                            `${point.x},${point.y}`
+                    )
+                    .join(" "),
+                class:
+                    "offset-iso-end-face"
+            })
+        );
 
-        const last = U.length - 1;
-
-        drawing.appendChild(svg("polygon", {
-            points: [
-                U[last],
-                BU[last],
-                BL[last],
-                L[last]
-            ].map((point) => `${point.x},${point.y}`).join(" "),
-            class: "offset-iso-end-face"
-        }));
+        drawing.appendChild(
+            svg("polygon", {
+                points: [
+                    nearHeel[last],
+                    farHeelT[last],
+                    farThroatT[last],
+                    nearThroat[last]
+                ]
+                    .map(
+                        point =>
+                            `${point.x},${point.y}`
+                    )
+                    .join(" "),
+                class:
+                    "offset-iso-end-face"
+            })
+        );
 
         /*
-         * Centerline.
+         * Centerlines on near and far cheek.
          */
-        drawing.appendChild(svg("path", {
-            d: pathFromPoints(C),
-            class: "offset-iso-center-line"
-        }));
+        drawing.appendChild(
+            svg("path", {
+                d: path(center),
+                class:
+                    "offset-iso-center-line"
+            })
+        );
+
+        drawing.appendChild(
+            svg("path", {
+                d: path(farCenterT),
+                class:
+                    "offset-iso-center-line offset-iso-center-line-back"
+            })
+        );
 
         /*
-         * Joint lines at the tangent points. When straight is zero, the two
-         * tangent lines meet, matching the user's original two-elbow picture.
+         * Tangent/seam lines where the radius begins and ends.
          */
-        const jointIndexes = [];
-        const arcSteps = 18;
+        const tangentStartIndex = 1;
+        const tangentEndIndex =
+            nearHeel.length - 2;
 
-        jointIndexes.push(2 + arcSteps);
+        [
+            tangentStartIndex,
+            tangentEndIndex
+        ].forEach(index => {
 
-        if (model.straight > 0.05) {
-            jointIndexes.push(3 + arcSteps);
-        }
+            drawing.appendChild(
+                svg("line", {
+                    x1: nearHeel[index].x,
+                    y1: nearHeel[index].y,
+                    x2: nearThroat[index].x,
+                    y2: nearThroat[index].y,
+                    class:
+                        "offset-iso-joint-line"
+                })
+            );
 
-        jointIndexes.forEach((index) => {
-            if (!U[index] || !L[index]) {
-                return;
-            }
+            drawing.appendChild(
+                svg("line", {
+                    x1: farHeelT[index].x,
+                    y1: farHeelT[index].y,
+                    x2: farThroatT[index].x,
+                    y2: farThroatT[index].y,
+                    class:
+                        "offset-iso-joint-line offset-iso-joint-back"
+                })
+            );
 
-            drawing.appendChild(svg("line", {
-                x1: U[index].x,
-                y1: U[index].y,
-                x2: L[index].x,
-                y2: L[index].y,
-                class: "offset-iso-joint-line"
-            }));
-
-            if (BU[index] && BL[index]) {
-                drawing.appendChild(svg("line", {
-                    x1: BU[index].x,
-                    y1: BU[index].y,
-                    x2: BL[index].x,
-                    y2: BL[index].y,
-                    class: "offset-iso-joint-line offset-iso-joint-back"
-                }));
-            }
         });
 
         /*
-         * Dimensions for the upright orientation.
-         * Overall length now reads vertically and offset reads horizontally.
+         * Dimensions.
          */
-        const dimensionGroup = svg("g");
+        const dimensionGroup =
+            svg("g");
 
-        const startCenter = C[1];
-        const endCenter = C[C.length - 2];
+        const bendDimensionStart = {
+            x:
+                nearHeel[0].x - 36,
+            y:
+                nearHeel[0].y
+        };
 
-        const overallX = 48;
+        const bendDimensionEnd = {
+            x:
+                nearThroat[0].x - 36,
+            y:
+                nearThroat[0].y
+        };
 
-        dimensionGroup.appendChild(svg("line", {
-            x1: startCenter.x,
-            y1: startCenter.y,
-            x2: overallX,
-            y2: startCenter.y,
-            class: "offset-iso-extension-line"
-        }));
-
-        dimensionGroup.appendChild(svg("line", {
-            x1: endCenter.x,
-            y1: endCenter.y,
-            x2: overallX,
-            y2: endCenter.y,
-            class: "offset-iso-extension-line"
-        }));
-
-        drawDimension(
-            dimensionGroup,
-            { x: overallX, y: startCenter.y },
-            { x: overallX, y: endCenter.y },
-            `Overall Length: ${format(model.run)}"`,
-            -18
+        dimensionGroup.appendChild(
+            svg("line", {
+                x1: nearHeel[0].x,
+                y1: nearHeel[0].y,
+                x2:
+                    bendDimensionStart.x,
+                y2:
+                    bendDimensionStart.y,
+                class:
+                    "offset-iso-extension-line"
+            })
         );
 
-        const offsetY = viewHeight - 42;
-
-        dimensionGroup.appendChild(svg("line", {
-            x1: startCenter.x,
-            y1: startCenter.y,
-            x2: startCenter.x,
-            y2: offsetY,
-            class: "offset-iso-extension-line"
-        }));
-
-        dimensionGroup.appendChild(svg("line", {
-            x1: endCenter.x,
-            y1: endCenter.y,
-            x2: endCenter.x,
-            y2: offsetY,
-            class: "offset-iso-extension-line"
-        }));
-
-        drawDimension(
-            dimensionGroup,
-            { x: startCenter.x, y: offsetY },
-            { x: endCenter.x, y: offsetY },
-            `Offset: ${format(model.rise)}"`,
-            -16
+        dimensionGroup.appendChild(
+            svg("line", {
+                x1: nearThroat[0].x,
+                y1: nearThroat[0].y,
+                x2:
+                    bendDimensionEnd.x,
+                y2:
+                    bendDimensionEnd.y,
+                class:
+                    "offset-iso-extension-line"
+            })
         );
 
-        drawing.appendChild(dimensionGroup);
+        addDimension(
+            dimensionGroup,
+            bendDimensionStart,
+            bendDimensionEnd,
+            `${
+                model.bendOn === "width"
+                    ? "Width"
+                    : "Height"
+            }: ${
+                formatMeasurement(
+                    model.bendDimension
+                )
+            }`,
+            {
+                rotate: -90,
+                dx: -16
+            }
+        );
 
-        /*
-         * Labels.
-         */
-        drawing.appendChild(svg("text", {
-            x: 112,
-            y: viewHeight - 85,
-            class: "offset-iso-size-text"
-        }, `Cheek: ${format(model.cheek)}"`));
+        if (model.straightPerElbow > 0.01) {
 
-        drawing.appendChild(svg("text", {
-            x: viewWidth / 2,
-            y: 42,
-            class: "offset-iso-size-text"
-        }, `${format(model.angle)}° elbows`));
+            const straightStart =
+                transform(
+                    profile.tangentEnd.heel
+                );
 
-        drawing.appendChild(svg("text", {
-            x: viewWidth / 2,
-            y: 68,
-            class: "offset-iso-title-text"
-        }, model.straight > 0.05
-            ? `Middle straight: ${format(model.straight)}"`
-            : "Elbows meet — no middle straight"
-        ));
+            const straightEnd =
+                nearHeel[last];
 
-        drawing.appendChild(svg("text", {
-            x: viewWidth - 150,
-            y: 42,
-            class: "offset-iso-title-text"
-        }, `CLR: ${format(model.radius)}"`));
+            const lineOffset = {
+                x: 23,
+                y: -23
+            };
 
-        container.appendChild(drawing);
+            addDimension(
+                dimensionGroup,
+                {
+                    x:
+                        straightStart.x +
+                        lineOffset.x,
+                    y:
+                        straightStart.y +
+                        lineOffset.y
+                },
+                {
+                    x:
+                        straightEnd.x +
+                        lineOffset.x,
+                    y:
+                        straightEnd.y +
+                        lineOffset.y
+                },
+                `Straight: ${
+                    formatMeasurement(
+                        model.straightPerElbow
+                    )
+                }`,
+                {
+                    dy: -13
+                }
+            );
+
+        }
+
+        drawing.appendChild(
+            dimensionGroup
+        );
+
+        drawing.appendChild(
+            svg("text", {
+                x: 68,
+                y: 34,
+                class:
+                    "offset-iso-size-text"
+            }, `ONE ${
+                formatDecimal(
+                    model.elbowAngle
+                )
+            }° RADIUS ELBOW`)
+        );
+
+        drawing.appendChild(
+            svg("text", {
+                x: 68,
+                y: 615,
+                class:
+                    "offset-iso-title-text"
+            }, `Duct: ${
+                formatMeasurement(
+                    model.ductWidth
+                )
+            } × ${
+                formatMeasurement(
+                    model.ductHeight
+                )
+            }  •  CLR: ${
+                formatMeasurement(
+                    model.centerlineRadius
+                )
+            }`)
+        );
+
+        addDataPanel(
+            drawing,
+            model
+        );
+
+        container.appendChild(
+            drawing
+        );
+
     }
 
     function bind() {
+
         const watchedIds = [
             ids.mode,
             ids.offset,
             ids.overall,
-            ids.cheek,
+            ids.width,
+            ids.height,
+            ids.bendOn,
             ids.clrMultiplier,
             ids.customClr,
             ids.angle
         ];
 
-        watchedIds.forEach((id) => {
-            const element = document.getElementById(id);
+        watchedIds.forEach(id => {
+
+            const element =
+                document.getElementById(id);
 
             if (!element) {
+
                 return;
+
             }
 
-            element.addEventListener("input", render);
-            element.addEventListener("change", render);
+            element.addEventListener(
+                "input",
+                render
+            );
+
+            element.addEventListener(
+                "change",
+                render
+            );
+
         });
 
-        /*
-         * Keep compatibility with manual calls from the page.
-         */
+        document.addEventListener(
+            "ductculator:offset-calculated",
+            event => {
+
+                latestCalculatedData =
+                    event.detail;
+
+                render();
+
+            }
+        );
+
         window.OffsetIso = {
             render,
             bindInputs: bind
         };
 
         render();
+
     }
 
-    if (document.readyState === "loading") {
+    if (
+        document.readyState ===
+        "loading"
+    ) {
+
         document.addEventListener(
             "DOMContentLoaded",
             bind
         );
+
     } else {
+
         bind();
+
     }
+
 })();

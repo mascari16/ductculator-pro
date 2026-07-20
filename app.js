@@ -401,8 +401,60 @@ const offsetInput =
 const overallLengthInput =
     document.getElementById("overallLengthInput");
 
-const cheekSizeInput =
-    document.getElementById("cheekSizeInput");
+const ductWidthInput =
+    document.getElementById("ductWidthInput");
+
+const ductHeightInput =
+    document.getElementById("ductHeightInput");
+
+/*
+ * Add the Bend On selector automatically if it is not already in the HTML.
+ * This keeps the current page working without requiring another HTML edit.
+ */
+let bendOnSelect =
+    document.getElementById("bendOnSelect");
+
+if (!bendOnSelect && ductHeightInput) {
+
+    const bendGroup =
+        document.createElement("div");
+
+    bendGroup.className = "input-group";
+    bendGroup.id = "bendOnGroup";
+
+    bendGroup.innerHTML = `
+        <label for="bendOnSelect">
+            Bend On
+        </label>
+
+        <select id="bendOnSelect">
+            <option value="height" selected>
+                Height
+            </option>
+
+            <option value="width">
+                Width
+            </option>
+        </select>
+    `;
+
+    const heightGroup =
+        ductHeightInput.closest(".input-group") ||
+        ductHeightInput.parentElement;
+
+    if (heightGroup && heightGroup.parentElement) {
+
+        heightGroup.insertAdjacentElement(
+            "afterend",
+            bendGroup
+        );
+
+        bendOnSelect =
+            document.getElementById("bendOnSelect");
+
+    }
+
+}
 
 const clrMultiplier =
     document.getElementById("clrMultiplier");
@@ -723,26 +775,26 @@ calculateOffsetBtn.addEventListener("click", () => {
     const offset =
         parseSheetMetalMeasurement(offsetInput.value);
 
-    const cheekSize =
-        parseSheetMetalMeasurement(cheekSizeInput.value);
+    const ductWidth =
+        parseSheetMetalMeasurement(ductWidthInput.value);
 
-    let centerlineRadius;
+    const ductHeight =
+        parseSheetMetalMeasurement(ductHeightInput.value);
 
-if (clrMultiplier.value === "custom") {
+    const bendOn =
+        bendOnSelect
+            ? bendOnSelect.value
+            : "height";
 
-    centerlineRadius =
-        parseSheetMetalMeasurement(customClrInput.value);
+    const bendDimension =
+        bendOn === "width"
+            ? ductWidth
+            : ductHeight;
 
-} else if (clrMultiplier.value === "auto") {
-
-    centerlineRadius = NaN;
-
-} else {
-
-    centerlineRadius =
-        cheekSize * Number(clrMultiplier.value);
-
-}
+    const elbowDepth =
+        bendOn === "width"
+            ? ductHeight
+            : ductWidth;
 
     if (
         !Number.isFinite(offset) ||
@@ -760,42 +812,15 @@ if (clrMultiplier.value === "custom") {
     }
 
     if (
-    clrMultiplier.value !== "auto" &&
-    clrMultiplier.value !== "custom" &&
-    (
-        !Number.isFinite(cheekSize) ||
-        cheekSize <= 0
-    )
-) {
-
-    offsetResults.innerHTML = `
-        <p class="error">
-            Enter a valid cheek size.
-        </p>
-    `;
-
-    return;
-
-}
-
-    let elbowAngle;
-    let requestedOverallLength = null;
-
-    if (offsetMode.value === "solveAngle") {
-
-    requestedOverallLength =
-        parseSheetMetalMeasurement(
-            overallLengthInput.value
-        );
-
-    if (
-        !Number.isFinite(requestedOverallLength) ||
-        requestedOverallLength <= 0
+        !Number.isFinite(ductWidth) ||
+        ductWidth <= 0 ||
+        !Number.isFinite(ductHeight) ||
+        ductHeight <= 0
     ) {
 
         offsetResults.innerHTML = `
             <p class="error">
-                Enter a valid overall length.
+                Enter a valid duct width and height.
             </p>
         `;
 
@@ -803,38 +828,45 @@ if (clrMultiplier.value === "custom") {
 
     }
 
-    if (clrMultiplier.value === "auto") {
+    let centerlineRadius;
+
+    if (clrMultiplier.value === "custom") {
 
         centerlineRadius =
-            (
-                Math.pow(offset, 2) +
-                Math.pow(requestedOverallLength, 2)
-            ) /
-            (4 * offset);
+            parseSheetMetalMeasurement(
+                customClrInput.value
+            );
 
-        elbowAngle =
-            2 *
-            Math.atan(
-                offset / requestedOverallLength
-            ) *
-            180 /
-            Math.PI;
+    } else if (clrMultiplier.value === "auto") {
+
+        centerlineRadius = NaN;
 
     } else {
 
-        elbowAngle =
-            solveOffsetAngle(
-                offset,
-                requestedOverallLength,
-                centerlineRadius
+        centerlineRadius =
+            bendDimension *
+            Number(clrMultiplier.value);
+
+    }
+
+    let elbowAngle;
+    let requestedOverallLength = null;
+
+    if (offsetMode.value === "solveAngle") {
+
+        requestedOverallLength =
+            parseSheetMetalMeasurement(
+                overallLengthInput.value
             );
 
-        if (!Number.isFinite(elbowAngle)) {
+        if (
+            !Number.isFinite(requestedOverallLength) ||
+            requestedOverallLength <= 0
+        ) {
 
             offsetResults.innerHTML = `
                 <p class="error">
-                    That offset and overall length cannot
-                    be made with the selected CLR.
+                    Enter a valid overall length.
                 </p>
             `;
 
@@ -842,9 +874,49 @@ if (clrMultiplier.value === "custom") {
 
         }
 
-    }
+        if (clrMultiplier.value === "auto") {
 
-} else {
+            centerlineRadius =
+                (
+                    Math.pow(offset, 2) +
+                    Math.pow(requestedOverallLength, 2)
+                ) /
+                (4 * offset);
+
+            elbowAngle =
+                2 *
+                Math.atan(
+                    offset /
+                    requestedOverallLength
+                ) *
+                180 /
+                Math.PI;
+
+        } else {
+
+            elbowAngle =
+                solveOffsetAngle(
+                    offset,
+                    requestedOverallLength,
+                    centerlineRadius
+                );
+
+            if (!Number.isFinite(elbowAngle)) {
+
+                offsetResults.innerHTML = `
+                    <p class="error">
+                        That offset and overall length cannot
+                        be made with the selected CLR.
+                    </p>
+                `;
+
+                return;
+
+            }
+
+        }
+
+    } else {
 
         elbowAngle =
             Number(elbowAngleInput.value);
@@ -882,6 +954,27 @@ if (clrMultiplier.value === "custom") {
 
     }
 
+    const throatRadius =
+        centerlineRadius -
+        bendDimension / 2;
+
+    const heelRadius =
+        centerlineRadius +
+        bendDimension / 2;
+
+    if (throatRadius < 0) {
+
+        offsetResults.innerHTML = `
+            <p class="error">
+                The selected CLR is too small for the
+                ${bendOn} bend dimension.
+            </p>
+        `;
+
+        return;
+
+    }
+
     const angleRadians =
         elbowAngle * Math.PI / 180;
 
@@ -890,17 +983,19 @@ if (clrMultiplier.value === "custom") {
         Math.tan(angleRadians / 2);
 
     const centerlineTravel =
-        offset / Math.sin(angleRadians);
+        offset /
+        Math.sin(angleRadians);
 
     const calculatedOverallLength =
-        offset / Math.tan(angleRadians) +
+        offset /
+        Math.tan(angleRadians) +
         2 * centerlineRise;
 
     const straightBetweenElbows =
         centerlineTravel -
         2 * centerlineRise;
 
-    if (straightBetweenElbows < 0) {
+    if (straightBetweenElbows < -0.001) {
 
         offsetResults.innerHTML = `
             <p class="error">
@@ -914,8 +1009,11 @@ if (clrMultiplier.value === "custom") {
 
     }
 
-    const throatRadius =
-    centerlineRadius - (cheekSize / 2);
+    const usableStraight =
+        Math.max(0, straightBetweenElbows);
+
+    const straightPerElbow =
+        usableStraight / 2;
 
     offsetResults.innerHTML = `
 
@@ -925,6 +1023,48 @@ if (clrMultiplier.value === "custom") {
 
             <strong>
                 ${elbowAngle.toFixed(2)}°
+            </strong>
+
+        </div>
+
+        <div class="result-row">
+
+            <span>Duct Size</span>
+
+            <strong>
+                ${formatSheetMetalMeasurement(ductWidth)}
+                ×
+                ${formatSheetMetalMeasurement(ductHeight)}
+            </strong>
+
+        </div>
+
+        <div class="result-row">
+
+            <span>Bend On</span>
+
+            <strong>
+                ${bendOn === "width" ? "Width" : "Height"}
+            </strong>
+
+        </div>
+
+        <div class="result-row">
+
+            <span>Bend Dimension</span>
+
+            <strong>
+                ${formatSheetMetalMeasurement(bendDimension)}
+            </strong>
+
+        </div>
+
+        <div class="result-row">
+
+            <span>Elbow Depth</span>
+
+            <strong>
+                ${formatSheetMetalMeasurement(elbowDepth)}
             </strong>
 
         </div>
@@ -953,16 +1093,6 @@ if (clrMultiplier.value === "custom") {
 
         <div class="result-row">
 
-            <span>Cheek Size</span>
-
-            <strong>
-                ${formatSheetMetalMeasurement(cheekSize)}
-            </strong>
-
-        </div>
-
-        <div class="result-row">
-
             <span>Centerline Radius</span>
 
             <strong>
@@ -975,40 +1105,11 @@ if (clrMultiplier.value === "custom") {
 
         <div class="result-row">
 
-    <span>Throat Radius</span>
-
-    <strong>
-        ${formatSheetMetalMeasurement(
-            throatRadius
-        )}
-    </strong>
-
-</div>
-
-        ${
-    Number.isFinite(cheekSize) &&
-    cheekSize > 0
-        ? `
-            <div class="result-row">
-
-                <span>Equivalent CLR</span>
-
-                <strong>
-                    ${(centerlineRadius / cheekSize).toFixed(2)}× CLR
-                </strong>
-
-            </div>
-        `
-        : ""
-}
-
-        <div class="result-row">
-
-            <span>Centerline Rise</span>
+            <span>Throat Radius</span>
 
             <strong>
                 ${formatSheetMetalMeasurement(
-                    centerlineRise
+                    throatRadius
                 )}
             </strong>
 
@@ -1016,11 +1117,11 @@ if (clrMultiplier.value === "custom") {
 
         <div class="result-row">
 
-            <span>Centerline Travel</span>
+            <span>Heel Radius</span>
 
             <strong>
                 ${formatSheetMetalMeasurement(
-                    centerlineTravel
+                    heelRadius
                 )}
             </strong>
 
@@ -1028,37 +1129,160 @@ if (clrMultiplier.value === "custom") {
 
         <div class="result-row">
 
-            <span>Straight Between Elbows</span>
+            <span>Equivalent CLR</span>
+
+            <strong>
+                ${(centerlineRadius / bendDimension).toFixed(2)}× CLR
+            </strong>
+
+        </div>
+
+        <div class="result-row">
+
+            <span>Total Straight Between Elbows</span>
 
             <strong>
                 ${formatSheetMetalMeasurement(
-                    straightBetweenElbows
+                    usableStraight
                 )}
+            </strong>
+
+        </div>
+
+        <div class="result-row">
+
+            <span>Straight Added Per Elbow</span>
+
+            <strong>
+                ${formatSheetMetalMeasurement(
+                    straightPerElbow
+                )}
+            </strong>
+
+        </div>
+
+        <div class="result-row">
+
+            <span>Elbow Quantity</span>
+
+            <strong>
+                2
             </strong>
 
         </div>
 
     `;
 
-diagOverall.textContent =
-    formatSheetMetalMeasurement(calculatedOverallLength);
+    if (diagOverall) {
 
-diagOffset.textContent =
-    formatSheetMetalMeasurement(offset);
+        diagOverall.textContent =
+            formatSheetMetalMeasurement(
+                calculatedOverallLength
+            );
 
-diagStraight.textContent =
-    formatSheetMetalMeasurement(straightBetweenElbows);
+    }
 
-diagAngle.textContent =
-    `${elbowAngle.toFixed(2)}°`;
+    if (diagOffset) {
 
-diagClr.textContent =
-    formatSheetMetalMeasurement(centerlineRadius);
+        diagOffset.textContent =
+            formatSheetMetalMeasurement(offset);
 
-diagThroat.textContent =
-    Number.isFinite(throatRadius)
-        ? formatSheetMetalMeasurement(throatRadius)
-        : "—";
+    }
+
+    if (diagStraight) {
+
+        diagStraight.textContent =
+            formatSheetMetalMeasurement(
+                straightPerElbow
+            );
+
+    }
+
+    if (diagAngle) {
+
+        diagAngle.textContent =
+            `${elbowAngle.toFixed(2)}°`;
+
+    }
+
+    if (diagClr) {
+
+        diagClr.textContent =
+            formatSheetMetalMeasurement(
+                centerlineRadius
+            );
+
+    }
+
+    if (diagThroat) {
+
+        diagThroat.textContent =
+            formatSheetMetalMeasurement(
+                throatRadius
+            );
+
+    }
+
+    document.dispatchEvent(
+        new CustomEvent(
+            "ductculator:offset-calculated",
+            {
+                detail: {
+                    offset,
+                    overallLength:
+                        calculatedOverallLength,
+                    ductWidth,
+                    ductHeight,
+                    bendOn,
+                    bendDimension,
+                    elbowDepth,
+                    centerlineRadius,
+                    throatRadius,
+                    heelRadius,
+                    elbowAngle,
+                    totalStraight:
+                        usableStraight,
+                    straightPerElbow,
+                    quantity: 2
+                }
+            }
+        )
+    );
+
+});
+// -----------------------------------------------------
+// Live offset recalculation
+// -----------------------------------------------------
+
+[
+    offsetInput,
+    overallLengthInput,
+    ductWidthInput,
+    ductHeightInput,
+    clrMultiplier,
+    customClrInput,
+    elbowAngleInput,
+    offsetMode,
+    bendOnSelect
+]
+.filter(Boolean)
+.forEach((element) => {
+
+    element.addEventListener(
+        "input",
+        () => calculateOffsetBtn.click()
+    );
+
+    element.addEventListener(
+        "change",
+        () => calculateOffsetBtn.click()
+    );
+
+});
+
+window.addEventListener("DOMContentLoaded", () => {
+
+    calculateOffsetBtn.click();
 
 });
 
