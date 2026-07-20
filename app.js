@@ -913,24 +913,23 @@ calculateOffsetBtn.addEventListener("click", () => {
              * AUTO CLR RULES
              *
              * 1. Prefer a full 1.00× cheek-width CLR.
-             * 2. Reduce the CLR only when the requested
-             *    offset and overall length require it.
-             * 3. Never allow Auto CLR below 0.75×.
-             * 4. If 0.75× cannot fit, stop and show a
-             *    geometry error instead of creating a
-             *    low-CLR elbow.
+             * 2. If 1.00× will not fit, use the largest
+             *    CLR that the requested geometry allows.
+             * 3. Allow Auto to reduce as low as 0.60×.
+             * 4. The ISO preview warning handles any
+             *    result below the recommended 0.75×.
              */
 
             const preferredAutoClr =
                 bendDimension;
 
             const minimumAutoClr =
-                bendDimension * 0.75;
+                bendDimension * 0.60;
 
             /*
-             * This is the largest radius that can fit
-             * when the straight between the two elbows
-             * reaches exactly zero.
+             * This is the largest CLR that fits when the
+             * straight section between the two elbows is
+             * exactly zero.
              */
             const maximumFittingClr =
                 (
@@ -947,11 +946,10 @@ calculateOffsetBtn.addEventListener("click", () => {
                 offsetResults.innerHTML = `
                     <p class="error">
                         This offset cannot be made with
-                        Auto CLR. The available geometry
-                        requires less than the minimum
-                        0.75× CLR. Increase the overall
-                        length, reduce the offset, or
-                        reduce the cheek width.
+                        Auto CLR without going below the
+                        minimum 0.60× CLR. Increase the
+                        overall length, reduce the offset,
+                        or reduce the cheek width.
                     </p>
                 `;
 
@@ -960,9 +958,8 @@ calculateOffsetBtn.addEventListener("click", () => {
             }
 
             /*
-             * Use 1.00× whenever it fits. Otherwise use
-             * the largest radius that physically fits,
-             * which will still be at least 0.75×.
+             * Use 1.00× whenever possible. Otherwise use
+             * the largest CLR that physically fits.
              */
             centerlineRadius =
                 Math.min(
