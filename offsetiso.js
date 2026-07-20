@@ -1166,7 +1166,7 @@
                 "2 elbows"
             ],
             [
-                "Straight / Elbow",
+                "Straight",
                 formatMeasurement(
                     model.straightPerElbow
                 )
@@ -1585,35 +1585,100 @@
             const straightEnd =
                 nearHeel[last];
 
-            const lineOffset = {
-                x: 38,
-                y: -38
+            /*
+             * Offset the dimension line perpendicular to the straight.
+             * Both ends are projected directly from the tangent seam and
+             * the outlet edge, so the dimension terminates at the end face
+             * instead of drifting past it as the elbow angle changes.
+             */
+            const straightDx =
+                straightEnd.x -
+                straightStart.x;
+
+            const straightDy =
+                straightEnd.y -
+                straightStart.y;
+
+            const straightLength =
+                Math.hypot(
+                    straightDx,
+                    straightDy
+                ) || 1;
+
+            const normal = {
+                x:
+                    -straightDy /
+                    straightLength,
+                y:
+                    straightDx /
+                    straightLength
             };
+
+            /*
+             * Keep the annotation on the outside/left side of the elbow.
+             */
+            const preferredNormal =
+                normal.x <= 0
+                    ? normal
+                    : {
+                        x: -normal.x,
+                        y: -normal.y
+                    };
+
+            const dimensionOffset = 34;
 
             const dimensionStart = {
                 x:
                     straightStart.x +
-                    lineOffset.x,
+                    preferredNormal.x *
+                    dimensionOffset,
                 y:
                     straightStart.y +
-                    lineOffset.y
+                    preferredNormal.y *
+                    dimensionOffset
             };
 
             const dimensionEnd = {
                 x:
                     straightEnd.x +
-                    lineOffset.x,
+                    preferredNormal.x *
+                    dimensionOffset,
                 y:
                     straightEnd.y +
-                    lineOffset.y
+                    preferredNormal.y *
+                    dimensionOffset
             };
+
+            /*
+             * Extension lines tie the dimension exactly to the tangent seam
+             * and the final outlet edge.
+             */
+            dimensionGroup.appendChild(
+                svg("line", {
+                    x1: straightStart.x,
+                    y1: straightStart.y,
+                    x2: dimensionStart.x,
+                    y2: dimensionStart.y,
+                    class:
+                        "offset-iso-extension-line"
+                })
+            );
+
+            dimensionGroup.appendChild(
+                svg("line", {
+                    x1: straightEnd.x,
+                    y1: straightEnd.y,
+                    x2: dimensionEnd.x,
+                    y2: dimensionEnd.y,
+                    class:
+                        "offset-iso-extension-line"
+                })
+            );
 
             const straightLabelAngle =
                 Math.atan2(
-                    dimensionEnd.y -
-                    dimensionStart.y,
-                    dimensionEnd.x -
-                    dimensionStart.x
+                    straightDy,
+                    straightDx
                 ) *
                 180 /
                 Math.PI;
@@ -1622,13 +1687,13 @@
                 dimensionGroup,
                 dimensionStart,
                 dimensionEnd,
-                `Straight / Elbow: ${
+                `Straight: ${
                     formatMeasurement(
                         model.straightPerElbow
                     )
                 }`,
                 {
-                    dy: -15,
+                    dy: -14,
                     rotate:
                         straightLabelAngle
                 }
