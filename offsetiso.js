@@ -916,23 +916,33 @@
         const defs =
             svg("defs");
 
+        /*
+         * Compact open arrowheads.
+         * The marker reference point is placed at the arrow tip so the
+         * arrow ends exactly on the dimension line instead of extending
+         * beyond it.
+         */
         const arrow =
             svg("marker", {
                 id: "singleElbowArrow",
-                markerWidth: 8,
-                markerHeight: 8,
-                refX: 4,
-                refY: 4,
+                markerWidth: 5,
+                markerHeight: 5,
+                refX: 5,
+                refY: 2.5,
                 orient: "auto-start-reverse",
-                markerUnits: "strokeWidth"
+                markerUnits: "strokeWidth",
+                viewBox: "0 0 5 5",
+                overflow: "visible"
             });
 
         arrow.appendChild(
             svg("path", {
-                d: "M 0 0 L 8 4 L 0 8",
+                d: "M 0 0 L 5 2.5 L 0 5",
                 fill: "none",
                 stroke: "#f4b942",
-                "stroke-width": 1.4
+                "stroke-width": 1.15,
+                "stroke-linecap": "round",
+                "stroke-linejoin": "round"
             })
         );
 
