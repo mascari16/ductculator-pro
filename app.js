@@ -654,65 +654,151 @@ function greatestCommonDivisor(a, b) {
 
 function solveOffsetAngle(offset, overallLength, radius) {
 
-    function calculatedLength(angleDegrees) {
-
-        const angleRadians =
-            angleDegrees * Math.PI / 180;
-
-        const centerlineRise =
-            radius * Math.tan(angleRadians / 2);
-
-        return (
-            offset / Math.tan(angleRadians) +
-            2 * centerlineRise
-        );
-
-    }
-
-    let lowestAngle = 0.1;
-    let highestAngle = 89.9;
-
-    const lowestLength =
-        calculatedLength(lowestAngle);
-
-    const highestLength =
-        calculatedLength(highestAngle);
-
     /*
-        The requested length must fall within the range
-        the two elbows can physically produce.
-    */
+     * Offset geometry:
+     *
+     * overallLength =
+     * offset / tan(angle) +
+     * 2 * radius * tan(angle / 2)
+     *
+     * Substituting t = tan(angle / 2) gives:
+     *
+     * (4R - O)t² - 2Lt + O = 0
+     */
 
-    if (
-        overallLength > lowestLength ||
-        overallLength < highestLength
-    ) {
+    const coefficientA =
+        4 * radius - offset;
 
-        return NaN;
+    const coefficientB =
+        -2 * overallLength;
 
-    }
+    const coefficientC =
+        offset;
 
-    for (let i = 0; i < 100; i++) {
+    const candidates = [];
 
-        const middleAngle =
-            (lowestAngle + highestAngle) / 2;
+    if (Math.abs(coefficientA) < 0.000001) {
 
-        const middleLength =
-            calculatedLength(middleAngle);
+        const t =
+            -coefficientC /
+            coefficientB;
 
-        if (middleLength > overallLength) {
+        if (t > 0) {
 
-            lowestAngle = middleAngle;
+            candidates.push(t);
 
-        } else {
+        }
 
-            highestAngle = middleAngle;
+    } else {
+
+        const discriminant =
+            Math.pow(coefficientB, 2) -
+            4 *
+            coefficientA *
+            coefficientC;
+
+        if (discriminant < -0.000001) {
+
+            return NaN;
+
+        }
+
+        const safeDiscriminant =
+            Math.max(0, discriminant);
+
+        const squareRoot =
+            Math.sqrt(safeDiscriminant);
+
+        const firstT =
+            (
+                -coefficientB +
+                squareRoot
+            ) /
+            (2 * coefficientA);
+
+        const secondT =
+            (
+                -coefficientB -
+                squareRoot
+            ) /
+            (2 * coefficientA);
+
+        if (firstT > 0) {
+
+            candidates.push(firstT);
+
+        }
+
+        if (
+            secondT > 0 &&
+            Math.abs(secondT - firstT) > 0.000001
+        ) {
+
+            candidates.push(secondT);
 
         }
 
     }
 
-    return (lowestAngle + highestAngle) / 2;
+    const validAngles =
+        candidates
+            .map((t) => {
+
+                return (
+                    2 *
+                    Math.atan(t) *
+                    180 /
+                    Math.PI
+                );
+
+            })
+            .filter((angle) => {
+
+                if (
+                    angle <= 0 ||
+                    angle >= 90
+                ) {
+
+                    return false;
+
+                }
+
+                const angleRadians =
+                    angle *
+                    Math.PI /
+                    180;
+
+                const centerlineRise =
+                    radius *
+                    Math.tan(
+                        angleRadians / 2
+                    );
+
+                const centerlineTravel =
+                    offset /
+                    Math.sin(
+                        angleRadians
+                    );
+
+                const straightBetweenElbows =
+                    centerlineTravel -
+                    2 * centerlineRise;
+
+                return straightBetweenElbows >= -0.001;
+
+            });
+
+    if (!validAngles.length) {
+
+        return NaN;
+
+    }
+
+    /*
+     * Use the steeper valid solution because it gives
+     * the shorter, more practical straight section.
+     */
+    return Math.max(...validAngles);
 
 }
 
@@ -823,21 +909,88 @@ calculateOffsetBtn.addEventListener("click", () => {
 
         if (clrMultiplier.value === "auto") {
 
-            centerlineRadius =
+            /*
+             * AUTO CLR RULES
+             *
+             * 1. Prefer a full 1.00× cheek-width CLR.
+             * 2. Reduce the CLR only when the requested
+             *    offset and overall length require it.
+             * 3. Never allow Auto CLR below 0.75×.
+             * 4. If 0.75× cannot fit, stop and show a
+             *    geometry error instead of creating a
+             *    low-CLR elbow.
+             */
+
+            const preferredAutoClr =
+                bendDimension;
+
+            const minimumAutoClr =
+                bendDimension * 0.75;
+
+            /*
+             * This is the largest radius that can fit
+             * when the straight between the two elbows
+             * reaches exactly zero.
+             */
+            const maximumFittingClr =
                 (
                     Math.pow(offset, 2) +
                     Math.pow(requestedOverallLength, 2)
                 ) /
                 (4 * offset);
 
+            if (
+                maximumFittingClr <
+                minimumAutoClr - 0.001
+            ) {
+
+                offsetResults.innerHTML = `
+                    <p class="error">
+                        This offset cannot be made with
+                        Auto CLR. The available geometry
+                        requires less than the minimum
+                        0.75× CLR. Increase the overall
+                        length, reduce the offset, or
+                        reduce the cheek width.
+                    </p>
+                `;
+
+                return;
+
+            }
+
+            /*
+             * Use 1.00× whenever it fits. Otherwise use
+             * the largest radius that physically fits,
+             * which will still be at least 0.75×.
+             */
+            centerlineRadius =
+                Math.min(
+                    preferredAutoClr,
+                    maximumFittingClr
+                );
+
             elbowAngle =
-                2 *
-                Math.atan(
-                    offset /
-                    requestedOverallLength
-                ) *
-                180 /
-                Math.PI;
+                solveOffsetAngle(
+                    offset,
+                    requestedOverallLength,
+                    centerlineRadius
+                );
+
+            if (!Number.isFinite(elbowAngle)) {
+
+                offsetResults.innerHTML = `
+                    <p class="error">
+                        Auto CLR could not produce a valid
+                        elbow for these dimensions. Increase
+                        the overall length or reduce the
+                        offset.
+                    </p>
+                `;
+
+                return;
+
+            }
 
         } else {
 
@@ -881,6 +1034,17 @@ calculateOffsetBtn.addEventListener("click", () => {
             `;
 
             return;
+
+        }
+
+        /*
+         * In Known Angle mode there is no overall-length
+         * limit, so Auto CLR uses the preferred 1.00× CLR.
+         */
+        if (clrMultiplier.value === "auto") {
+
+            centerlineRadius =
+                bendDimension;
 
         }
 
