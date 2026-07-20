@@ -1,1363 +1,767 @@
 /* =========================================================
-   LIVE ISOMETRIC RECTANGULAR DUCT OFFSET
+   LIVE ISOMETRIC TWO-ELBOW RECTANGULAR DUCT OFFSET
    File: offsetiso.js
+   Replace the entire old offsetiso.js with this file.
    ========================================================= */
 
 (function () {
     "use strict";
 
-    const SVG_NAMESPACE = "http://www.w3.org/2000/svg";
+    const NS = "http://www.w3.org/2000/svg";
 
-    const DEFAULT_OPTIONS = {
-        containerId: "offsetIsoContainer",
-
-        width: 24,
-        height: 12,
-        rise: 18,
-        run: 36,
-
-        showDimensions: true,
-        showCenterline: true,
-        showSizeLabels: true
+    const ids = {
+        container: "offsetIsoContainer",
+        mode: "offsetMode",
+        offset: "offsetInput",
+        overall: "overallLengthInput",
+        cheek: "cheekSizeInput",
+        clrMultiplier: "clrMultiplier",
+        customClr: "customClrInput",
+        angle: "elbowAngleInput"
     };
 
-    let currentOptions = {
-        ...DEFAULT_OPTIONS
-    };
+    function svg(tag, attrs = {}, text = "") {
+        const el = document.createElementNS(NS, tag);
 
-    function createSvgElement(tagName, attributes = {}) {
-        const element = document.createElementNS(
-            SVG_NAMESPACE,
-            tagName
-        );
+        Object.entries(attrs).forEach(([key, value]) => {
+            el.setAttribute(key, String(value));
+        });
 
-        Object.entries(attributes).forEach(
-            ([attributeName, attributeValue]) => {
-                element.setAttribute(
-                    attributeName,
-                    String(attributeValue)
-                );
-            }
-        );
-
-        return element;
-    }
-
-    function appendSvgElement(
-        parent,
-        tagName,
-        attributes = {}
-    ) {
-        const element = createSvgElement(
-            tagName,
-            attributes
-        );
-
-        parent.appendChild(element);
-
-        return element;
-    }
-
-    function formatNumber(value) {
-        if (!Number.isFinite(value)) {
-            return "0";
+        if (text) {
+            el.textContent = text;
         }
 
-        if (Math.abs(value - Math.round(value)) < 0.001) {
-            return String(Math.round(value));
+        return el;
+    }
+
+    function numberFromDimension(value, fallback = 0) {
+        const text = String(value ?? "")
+            .trim()
+            .replace(/["']/g, "")
+            .replace(/\s+/g, " ");
+
+        if (!text) {
+            return fallback;
+        }
+
+        if (/^-?\d+(\.\d+)?$/.test(text)) {
+            return Number(text);
+        }
+
+        const mixed = text.match(/^(-?\d+)\s+(\d+)\s*\/\s*(\d+)$/);
+
+        if (mixed) {
+            const whole = Number(mixed[1]);
+            const numerator = Number(mixed[2]);
+            const denominator = Number(mixed[3]);
+
+            if (denominator === 0) {
+                return fallback;
+            }
+
+            return whole < 0
+                ? whole - numerator / denominator
+                : whole + numerator / denominator;
+        }
+
+        const fraction = text.match(/^(-?\d+)\s*\/\s*(\d+)$/);
+
+        if (fraction) {
+            const numerator = Number(fraction[1]);
+            const denominator = Number(fraction[2]);
+
+            return denominator === 0
+                ? fallback
+                : numerator / denominator;
+        }
+
+        return fallback;
+    }
+
+    function format(value) {
+        if (!Number.isFinite(value)) {
+            return "--";
         }
 
         return value
             .toFixed(2)
-            .replace(/\.?0+$/, "");
+            .replace(/\.00$/, "")
+            .replace(/(\.\d)0$/, "$1");
     }
 
-    function pointList(points) {
-        return points
-            .map((point) => {
-                return `${point.x},${point.y}`;
-            })
-            .join(" ");
+    function getValue(id, fallback = 0) {
+        const element = document.getElementById(id);
+
+        return element
+            ? numberFromDimension(element.value, fallback)
+            : fallback;
     }
 
-    function shiftedPoint(point, xAmount, yAmount) {
-        return {
-            x: point.x + xAmount,
-            y: point.y + yAmount
-        };
-    }
+    function getClr(cheek) {
+        const select = document.getElementById(ids.clrMultiplier);
+        const selected = select ? select.value : "auto";
 
-    function midpoint(pointA, pointB) {
-        return {
-            x: (pointA.x + pointB.x) / 2,
-            y: (pointA.y + pointB.y) / 2
-        };
-    }
-
-    function clearContainer(container) {
-        while (container.firstChild) {
-            container.removeChild(
-                container.firstChild
+        if (selected === "custom") {
+            return Math.max(
+                1,
+                getValue(ids.customClr, cheek)
             );
         }
+
+        /*
+         * Visual centerline-radius choice:
+         * Auto uses one-half cheek size.
+         * The other selections multiply that base radius.
+         *
+         * This affects only the preview geometry.
+         */
+        const baseRadius = Math.max(1, cheek / 2);
+
+        if (selected === "1.5") {
+            return baseRadius * 1.5;
+        }
+
+        if (selected === "2") {
+            return baseRadius * 2;
+        }
+
+        return baseRadius;
     }
 
-    function createArrowMarkers(definitions) {
-        const startMarker = appendSvgElement(
-            definitions,
-            "marker",
-            {
-                id: "offsetIsoArrowStart",
-                markerWidth: 10,
-                markerHeight: 10,
-                refX: 5,
-                refY: 5,
-                orient: "auto",
-                markerUnits: "strokeWidth"
+    function solveStraight(run, rise, radius, angleDegrees) {
+        const angle = angleDegrees * Math.PI / 180;
+        const sin = Math.sin(angle);
+        const cos = Math.cos(angle);
+
+        const fromRun =
+            Math.abs(cos) > 0.0001
+                ? (run - 2 * radius * sin) / cos
+                : 0;
+
+        const fromRise =
+            Math.abs(sin) > 0.0001
+                ? (rise - 2 * radius * (1 - cos)) / sin
+                : 0;
+
+        const values = [fromRun, fromRise]
+            .filter(Number.isFinite);
+
+        return Math.max(
+            0,
+            values.length
+                ? values.reduce((sum, value) => sum + value, 0) / values.length
+                : 0
+        );
+    }
+
+    function geometryError(run, rise, radius, angle) {
+        const straight = solveStraight(
+            run,
+            rise,
+            radius,
+            angle
+        );
+
+        const radians = angle * Math.PI / 180;
+
+        const calculatedRun =
+            2 * radius * Math.sin(radians) +
+            straight * Math.cos(radians);
+
+        const calculatedRise =
+            2 * radius * (1 - Math.cos(radians)) +
+            straight * Math.sin(radians);
+
+        return Math.hypot(
+            calculatedRun - run,
+            calculatedRise - rise
+        );
+    }
+
+    function solveAngle(run, rise, radius) {
+        let bestAngle = 45;
+        let bestError = Infinity;
+
+        for (let angle = 5; angle <= 85; angle += 0.05) {
+            const error = geometryError(
+                run,
+                rise,
+                radius,
+                angle
+            );
+
+            if (error < bestError) {
+                bestError = error;
+                bestAngle = angle;
             }
-        );
+        }
 
-        appendSvgElement(
-            startMarker,
-            "path",
-            {
-                d: "M 9 1 L 1 5 L 9 9",
-                fill: "none",
-                stroke: "#f4b942",
-                "stroke-width": 1.5,
-                "stroke-linecap": "round",
-                "stroke-linejoin": "round"
-            }
-        );
-
-        const endMarker = appendSvgElement(
-            definitions,
-            "marker",
-            {
-                id: "offsetIsoArrowEnd",
-                markerWidth: 10,
-                markerHeight: 10,
-                refX: 5,
-                refY: 5,
-                orient: "auto",
-                markerUnits: "strokeWidth"
-            }
-        );
-
-        appendSvgElement(
-            endMarker,
-            "path",
-            {
-                d: "M 1 1 L 9 5 L 1 9",
-                fill: "none",
-                stroke: "#f4b942",
-                "stroke-width": 1.5,
-                "stroke-linecap": "round",
-                "stroke-linejoin": "round"
-            }
-        );
+        return bestAngle;
     }
 
-    function createLine(
-        parent,
-        pointA,
-        pointB,
-        className,
-        arrows = false
-    ) {
-        const attributes = {
-            x1: pointA.x,
-            y1: pointA.y,
-            x2: pointB.x,
-            y2: pointB.y,
-            class: className
-        };
+    function getModel() {
+        const rise = Math.max(0, getValue(ids.offset, 46.25));
+        const run = Math.max(1, getValue(ids.overall, 69));
+        const cheek = Math.max(1, getValue(ids.cheek, 34));
+        const radius = getClr(cheek);
 
-        if (arrows) {
-            attributes["marker-start"] =
-                "url(#offsetIsoArrowStart)";
+        const modeElement = document.getElementById(ids.mode);
+        const mode = modeElement ? modeElement.value : "solveAngle";
 
-            attributes["marker-end"] =
-                "url(#offsetIsoArrowEnd)";
-        }
+        let angle =
+            mode === "knownAngle"
+                ? Math.max(1, Math.min(89, getValue(ids.angle, 45)))
+                : solveAngle(run, rise, radius);
 
-        return appendSvgElement(
-            parent,
-            "line",
-            attributes
-        );
-    }
-
-    function createPolygon(
-        parent,
-        points,
-        className
-    ) {
-        return appendSvgElement(
-            parent,
-            "polygon",
-            {
-                points: pointList(points),
-                class: className
-            }
-        );
-    }
-
-    function createText(
-        parent,
-        position,
-        value,
-        className,
-        rotation = null
-    ) {
-        const attributes = {
-            x: position.x,
-            y: position.y,
-            class: className
-        };
-
-        if (rotation !== null) {
-            attributes.transform =
-                `rotate(${rotation} ${position.x} ${position.y})`;
-        }
-
-        const textElement = appendSvgElement(
-            parent,
-            "text",
-            attributes
+        const straight = solveStraight(
+            run,
+            rise,
+            radius,
+            angle
         );
 
-        textElement.textContent = value;
-
-        return textElement;
-    }
-
-    function normalizeOptions(options) {
-        const mergedOptions = {
-            ...currentOptions,
-            ...options
-        };
-
-        mergedOptions.width =
-            Number(mergedOptions.width);
-
-        mergedOptions.height =
-            Number(mergedOptions.height);
-
-        mergedOptions.rise =
-            Number(mergedOptions.rise);
-
-        mergedOptions.run =
-            Number(mergedOptions.run);
-
-        return mergedOptions;
-    }
-
-    function validateOptions(options) {
-        if (!Number.isFinite(options.width)) {
-            return "Duct width must be a number.";
-        }
-
-        if (!Number.isFinite(options.height)) {
-            return "Duct height must be a number.";
-        }
-
-        if (!Number.isFinite(options.rise)) {
-            return "Offset rise must be a number.";
-        }
-
-        if (!Number.isFinite(options.run)) {
-            return "Offset run must be a number.";
-        }
-
-        if (options.width <= 0) {
-            return "Duct width must be greater than zero.";
-        }
-
-        if (options.height <= 0) {
-            return "Duct height must be greater than zero.";
-        }
-
-        if (options.rise < 0) {
-            return "Offset rise cannot be negative.";
-        }
-
-        if (options.run <= 0) {
-            return "Offset run must be greater than zero.";
-        }
-
-        return null;
-    }
-
-    function showError(container, message) {
-        clearContainer(container);
-
-        const errorElement =
-            document.createElement("div");
-
-        errorElement.className =
-            "offset-iso-error is-visible";
-
-        errorElement.textContent = message;
-
-        container.appendChild(errorElement);
-    }
-
-    function calculateDrawingGeometry(options) {
-        const viewBoxWidth = 900;
-        const viewBoxHeight = 560;
-
-        const leftMargin = 110;
-        const rightMargin = 180;
-        const topMargin = 95;
-        const bottomMargin = 130;
-
-        const availableWidth =
-            viewBoxWidth -
-            leftMargin -
-            rightMargin;
-
-        const availableHeight =
-            viewBoxHeight -
-            topMargin -
-            bottomMargin;
-
-        const modelWidth =
-            options.run +
-            options.width;
-
-        const modelHeight =
-            options.rise +
-            options.height;
-
-        const calculatedScale = Math.min(
-            availableWidth / modelWidth,
-            availableHeight / modelHeight,
-            9
+        /*
+         * The calculator currently has one cheek dimension, not separate
+         * duct width and depth fields. The preview uses cheek as the visible
+         * face height and a restrained depth purely for isometric appearance.
+         */
+        const depth = Math.max(
+            8,
+            Math.min(cheek * 0.42, 18)
         );
-
-        const scale = Math.max(
-            calculatedScale,
-            1.25
-        );
-
-        const drawnWidth = Math.max(
-            options.width * scale,
-            52
-        );
-
-        const drawnHeight = Math.max(
-            options.height * scale,
-            36
-        );
-
-        const drawnRun = Math.max(
-            options.run * scale,
-            125
-        );
-
-        const drawnRise =
-            options.rise * scale;
-
-        const depthAmount = Math.max(
-            24,
-            Math.min(
-                drawnWidth * 0.28,
-                54
-            )
-        );
-
-        const depthX = depthAmount;
-        const depthY = -depthAmount * 0.62;
-
-        const startX = leftMargin;
-        const startBottomY =
-            viewBoxHeight -
-            bottomMargin;
-
-        const outletX =
-            startX +
-            drawnRun;
-
-        const outletBottomY =
-            startBottomY -
-            drawnRise;
 
         return {
-            viewBoxWidth,
-            viewBoxHeight,
-
-            drawnWidth,
-            drawnHeight,
-            drawnRun,
-            drawnRise,
-
-            depthX,
-            depthY,
-
-            startX,
-            startBottomY,
-
-            outletX,
-            outletBottomY
+            rise,
+            run,
+            cheek,
+            depth,
+            radius,
+            angle,
+            straight
         };
     }
 
-    function calculatePoints(geometry) {
-        const inletFrontTopLeft = {
-            x: geometry.startX,
-            y:
-                geometry.startBottomY -
-                geometry.drawnHeight
-        };
+    function centerlinePoints(model) {
+        const angle = model.angle * Math.PI / 180;
+        const r = model.radius;
+        const s = model.straight;
 
-        const inletFrontTopRight = {
-            x:
-                geometry.startX +
-                geometry.drawnWidth,
-            y:
-                geometry.startBottomY -
-                geometry.drawnHeight
-        };
-
-        const inletFrontBottomRight = {
-            x:
-                geometry.startX +
-                geometry.drawnWidth,
-            y: geometry.startBottomY
-        };
-
-        const inletFrontBottomLeft = {
-            x: geometry.startX,
-            y: geometry.startBottomY
-        };
-
-        const outletFrontTopLeft = {
-            x: geometry.outletX,
-            y:
-                geometry.outletBottomY -
-                geometry.drawnHeight
-        };
-
-        const outletFrontTopRight = {
-            x:
-                geometry.outletX +
-                geometry.drawnWidth,
-            y:
-                geometry.outletBottomY -
-                geometry.drawnHeight
-        };
-
-        const outletFrontBottomRight = {
-            x:
-                geometry.outletX +
-                geometry.drawnWidth,
-            y: geometry.outletBottomY
-        };
-
-        const outletFrontBottomLeft = {
-            x: geometry.outletX,
-            y: geometry.outletBottomY
-        };
-
-        const inletBackTopLeft = shiftedPoint(
-            inletFrontTopLeft,
-            geometry.depthX,
-            geometry.depthY
-        );
-
-        const inletBackTopRight = shiftedPoint(
-            inletFrontTopRight,
-            geometry.depthX,
-            geometry.depthY
-        );
-
-        const inletBackBottomRight = shiftedPoint(
-            inletFrontBottomRight,
-            geometry.depthX,
-            geometry.depthY
-        );
-
-        const inletBackBottomLeft = shiftedPoint(
-            inletFrontBottomLeft,
-            geometry.depthX,
-            geometry.depthY
-        );
-
-        const outletBackTopLeft = shiftedPoint(
-            outletFrontTopLeft,
-            geometry.depthX,
-            geometry.depthY
-        );
-
-        const outletBackTopRight = shiftedPoint(
-            outletFrontTopRight,
-            geometry.depthX,
-            geometry.depthY
-        );
-
-        const outletBackBottomRight = shiftedPoint(
-            outletFrontBottomRight,
-            geometry.depthX,
-            geometry.depthY
-        );
-
-        const outletBackBottomLeft = shiftedPoint(
-            outletFrontBottomLeft,
-            geometry.depthX,
-            geometry.depthY
-        );
-
-        const inletCenter = {
-            x:
-                geometry.startX +
-                geometry.drawnWidth / 2 +
-                geometry.depthX / 2,
-
-            y:
-                geometry.startBottomY -
-                geometry.drawnHeight / 2 +
-                geometry.depthY / 2
-        };
-
-        const outletCenter = {
-            x:
-                geometry.outletX +
-                geometry.drawnWidth / 2 +
-                geometry.depthX / 2,
-
-            y:
-                geometry.outletBottomY -
-                geometry.drawnHeight / 2 +
-                geometry.depthY / 2
-        };
-
-        return {
-            inletFrontTopLeft,
-            inletFrontTopRight,
-            inletFrontBottomRight,
-            inletFrontBottomLeft,
-
-            outletFrontTopLeft,
-            outletFrontTopRight,
-            outletFrontBottomRight,
-            outletFrontBottomLeft,
-
-            inletBackTopLeft,
-            inletBackTopRight,
-            inletBackBottomRight,
-            inletBackBottomLeft,
-
-            outletBackTopLeft,
-            outletBackTopRight,
-            outletBackBottomRight,
-            outletBackBottomLeft,
-
-            inletCenter,
-            outletCenter
-        };
-    }
-
-    function drawDuctPanels(group, points) {
-        /*
-         * Far side panel
-         */
-        createPolygon(
-            group,
-            [
-                points.inletBackTopRight,
-                points.inletBackBottomRight,
-                points.outletBackBottomRight,
-                points.outletBackTopRight
-            ],
-            "offset-iso-side-panel"
-        );
+        const arcSteps = 18;
+        const points = [];
 
         /*
-         * Bottom panel
+         * Start with a short inlet straight so the open end is visible.
          */
-        createPolygon(
-            group,
-            [
-                points.inletFrontBottomLeft,
-                points.inletBackBottomLeft,
-                points.outletBackBottomLeft,
-                points.outletFrontBottomLeft
-            ],
-            "offset-iso-bottom-panel"
+        const inletLead = Math.max(
+            model.cheek * 0.35,
+            model.run * 0.08,
+            7
         );
+
+        points.push({ x: -inletLead, y: 0 });
+        points.push({ x: 0, y: 0 });
 
         /*
-         * Top panel
+         * First elbow:
+         * tangent changes from horizontal to the selected offset angle.
          */
-        createPolygon(
-            group,
-            [
-                points.inletFrontTopLeft,
-                points.inletBackTopLeft,
-                points.outletBackTopLeft,
-                points.outletFrontTopLeft
-            ],
-            "offset-iso-top-panel"
-        );
+        for (let i = 1; i <= arcSteps; i += 1) {
+            const t = angle * i / arcSteps;
 
-        /*
-         * Near side panel
-         */
-        createPolygon(
-            group,
-            [
-                points.inletFrontTopLeft,
-                points.inletFrontBottomLeft,
-                points.outletFrontBottomLeft,
-                points.outletFrontTopLeft
-            ],
-            "offset-iso-side-panel"
-        );
-
-        /*
-         * Inlet end face
-         */
-        createPolygon(
-            group,
-            [
-                points.inletFrontTopLeft,
-                points.inletFrontTopRight,
-                points.inletFrontBottomRight,
-                points.inletFrontBottomLeft
-            ],
-            "offset-iso-end-face"
-        );
-
-        /*
-         * Inlet top depth face
-         */
-        createPolygon(
-            group,
-            [
-                points.inletFrontTopLeft,
-                points.inletFrontTopRight,
-                points.inletBackTopRight,
-                points.inletBackTopLeft
-            ],
-            "offset-iso-top-panel"
-        );
-
-        /*
-         * Inlet side depth face
-         */
-        createPolygon(
-            group,
-            [
-                points.inletFrontTopRight,
-                points.inletFrontBottomRight,
-                points.inletBackBottomRight,
-                points.inletBackTopRight
-            ],
-            "offset-iso-side-panel"
-        );
-
-        /*
-         * Outlet end face
-         */
-        createPolygon(
-            group,
-            [
-                points.outletFrontTopLeft,
-                points.outletFrontTopRight,
-                points.outletFrontBottomRight,
-                points.outletFrontBottomLeft
-            ],
-            "offset-iso-end-face"
-        );
-
-        /*
-         * Outlet top depth face
-         */
-        createPolygon(
-            group,
-            [
-                points.outletFrontTopLeft,
-                points.outletFrontTopRight,
-                points.outletBackTopRight,
-                points.outletBackTopLeft
-            ],
-            "offset-iso-top-panel"
-        );
-
-        /*
-         * Outlet side depth face
-         */
-        createPolygon(
-            group,
-            [
-                points.outletFrontTopRight,
-                points.outletFrontBottomRight,
-                points.outletBackBottomRight,
-                points.outletBackTopRight
-            ],
-            "offset-iso-side-panel"
-        );
-    }
-
-    function drawHiddenLines(group, points) {
-        createLine(
-            group,
-            points.inletBackTopLeft,
-            points.inletBackTopRight,
-            "offset-iso-hidden-line"
-        );
-
-        createLine(
-            group,
-            points.inletBackTopRight,
-            points.outletBackTopRight,
-            "offset-iso-hidden-line"
-        );
-
-        createLine(
-            group,
-            points.outletBackTopLeft,
-            points.outletBackTopRight,
-            "offset-iso-hidden-line"
-        );
-    }
-
-    function drawCenterline(group, points) {
-        createLine(
-            group,
-            points.inletCenter,
-            points.outletCenter,
-            "offset-iso-center-line"
-        );
-    }
-
-    function drawRunDimension(
-        group,
-        points,
-        geometry,
-        options
-    ) {
-        const dimensionY =
-            geometry.viewBoxHeight -
-            60;
-
-        const startPoint = {
-            x: points.inletCenter.x,
-            y: dimensionY
-        };
-
-        const endPoint = {
-            x: points.outletCenter.x,
-            y: dimensionY
-        };
-
-        createLine(
-            group,
-            {
-                x: points.inletCenter.x,
-                y: points.inletCenter.y + 12
-            },
-            {
-                x: points.inletCenter.x,
-                y: dimensionY + 12
-            },
-            "offset-iso-extension-line"
-        );
-
-        createLine(
-            group,
-            {
-                x: points.outletCenter.x,
-                y: points.outletCenter.y + 12
-            },
-            {
-                x: points.outletCenter.x,
-                y: dimensionY + 12
-            },
-            "offset-iso-extension-line"
-        );
-
-        createLine(
-            group,
-            startPoint,
-            endPoint,
-            "offset-iso-dimension-line",
-            true
-        );
-
-        createText(
-            group,
-            {
-                x:
-                    (
-                        startPoint.x +
-                        endPoint.x
-                    ) / 2,
-
-                y: dimensionY - 18
-            },
-            `Run: ${formatNumber(options.run)}"`,
-            "offset-iso-dimension-text"
-        );
-    }
-
-    function drawRiseDimension(
-        group,
-        points,
-        geometry,
-        options
-    ) {
-        const dimensionX =
-            Math.min(
-                geometry.viewBoxWidth - 60,
-                points.outletFrontTopRight.x +
-                    geometry.depthX +
-                    85
-            );
-
-        const lowerPoint = {
-            x: dimensionX,
-            y: points.inletCenter.y
-        };
-
-        const upperPoint = {
-            x: dimensionX,
-            y: points.outletCenter.y
-        };
-
-        createLine(
-            group,
-            points.inletCenter,
-            {
-                x: dimensionX + 12,
-                y: points.inletCenter.y
-            },
-            "offset-iso-extension-line"
-        );
-
-        createLine(
-            group,
-            points.outletCenter,
-            {
-                x: dimensionX + 12,
-                y: points.outletCenter.y
-            },
-            "offset-iso-extension-line"
-        );
-
-        createLine(
-            group,
-            lowerPoint,
-            upperPoint,
-            "offset-iso-dimension-line",
-            true
-        );
-
-        const riseTextPosition = {
-            x: dimensionX + 28,
-            y:
-                (
-                    lowerPoint.y +
-                    upperPoint.y
-                ) / 2
-        };
-
-        createText(
-            group,
-            riseTextPosition,
-            `Offset: ${formatNumber(options.rise)}"`,
-            "offset-iso-dimension-text",
-            -90
-        );
-    }
-
-    function drawLengthDimension(
-        group,
-        points,
-        options
-    ) {
-        const trueLength = Math.sqrt(
-            Math.pow(options.run, 2) +
-            Math.pow(options.rise, 2)
-        );
-
-        const vectorX =
-            points.outletCenter.x -
-            points.inletCenter.x;
-
-        const vectorY =
-            points.outletCenter.y -
-            points.inletCenter.y;
-
-        const vectorLength = Math.sqrt(
-            vectorX * vectorX +
-            vectorY * vectorY
-        );
-
-        if (vectorLength === 0) {
-            return;
+            points.push({
+                x: r * Math.sin(t),
+                y: r * (1 - Math.cos(t))
+            });
         }
 
-        const perpendicularX =
-            -vectorY / vectorLength;
+        const firstEnd = points[points.length - 1];
 
-        const perpendicularY =
-            vectorX / vectorLength;
-
-        const spacing = 48;
-
-        const dimensionStart = {
-            x:
-                points.inletCenter.x +
-                perpendicularX * spacing,
-
-            y:
-                points.inletCenter.y +
-                perpendicularY * spacing
+        /*
+         * Middle straight only appears when the geometry calls for it.
+         */
+        const secondStart = {
+            x: firstEnd.x + s * Math.cos(angle),
+            y: firstEnd.y + s * Math.sin(angle)
         };
 
-        const dimensionEnd = {
-            x:
-                points.outletCenter.x +
-                perpendicularX * spacing,
-
-            y:
-                points.outletCenter.y +
-                perpendicularY * spacing
-        };
-
-        createLine(
-            group,
-            points.inletCenter,
-            {
-                x:
-                    dimensionStart.x +
-                    perpendicularX * 10,
-
-                y:
-                    dimensionStart.y +
-                    perpendicularY * 10
-            },
-            "offset-iso-extension-line"
-        );
-
-        createLine(
-            group,
-            points.outletCenter,
-            {
-                x:
-                    dimensionEnd.x +
-                    perpendicularX * 10,
-
-                y:
-                    dimensionEnd.y +
-                    perpendicularY * 10
-            },
-            "offset-iso-extension-line"
-        );
-
-        createLine(
-            group,
-            dimensionStart,
-            dimensionEnd,
-            "offset-iso-dimension-line",
-            true
-        );
-
-        const textPosition = midpoint(
-            dimensionStart,
-            dimensionEnd
-        );
-
-        const lineAngle =
-            Math.atan2(
-                vectorY,
-                vectorX
-            ) *
-            180 /
-            Math.PI;
-
-        createText(
-            group,
-            {
-                x:
-                    textPosition.x +
-                    perpendicularX * 18,
-
-                y:
-                    textPosition.y +
-                    perpendicularY * 18
-            },
-            `Length: ${formatNumber(trueLength)}"`,
-            "offset-iso-dimension-text",
-            lineAngle
-        );
-    }
-
-    function drawSizeLabels(
-        group,
-        points,
-        geometry,
-        options
-    ) {
-        const sizeText =
-            `${formatNumber(options.width)}" × ` +
-            `${formatNumber(options.height)}"`;
-
-        createText(
-            group,
-            {
-                x:
-                    geometry.startX +
-                    geometry.drawnWidth / 2,
-
-                y:
-                    geometry.startBottomY +
-                    40
-            },
-            sizeText,
-            "offset-iso-size-text"
-        );
-
-        createText(
-            group,
-            {
-                x:
-                    geometry.outletX +
-                    geometry.drawnWidth / 2,
-
-                y:
-                    geometry.outletBottomY +
-                    40
-            },
-            sizeText,
-            "offset-iso-size-text"
-        );
-
-        createText(
-            group,
-            {
-                x:
-                    geometry.startX +
-                    geometry.drawnWidth / 2,
-
-                y:
-                    geometry.startBottomY +
-                    62
-            },
-            "INLET",
-            "offset-iso-title-text"
-        );
-
-        createText(
-            group,
-            {
-                x:
-                    geometry.outletX +
-                    geometry.drawnWidth / 2,
-
-                y:
-                    geometry.outletBottomY +
-                    62
-            },
-            "OUTLET",
-            "offset-iso-title-text"
-        );
-    }
-
-    function render(options = {}) {
-        const normalizedOptions =
-            normalizeOptions(options);
-
-        const container =
-            document.getElementById(
-                normalizedOptions.containerId
-            );
-
-        if (!container) {
-            console.warn(
-                `OffsetIso: Could not find container #${normalizedOptions.containerId}`
-            );
-
-            return;
+        if (s > 0.05) {
+            points.push(secondStart);
         }
 
-        const validationError =
-            validateOptions(normalizedOptions);
+        /*
+         * Second elbow:
+         * tangent changes from the offset angle back to horizontal.
+         */
+        for (let i = 1; i <= arcSteps; i += 1) {
+            const u = angle * i / arcSteps;
 
-        if (validationError) {
-            showError(
-                container,
-                validationError
-            );
-
-            return;
-        }
-
-        currentOptions = {
-            ...normalizedOptions
-        };
-
-        clearContainer(container);
-
-        const geometry =
-            calculateDrawingGeometry(
-                normalizedOptions
-            );
-
-        const points =
-            calculatePoints(geometry);
-
-        const svg = createSvgElement(
-            "svg",
-            {
-                class: "offset-iso-svg",
-
-                viewBox:
-                    `0 0 ` +
-                    `${geometry.viewBoxWidth} ` +
-                    `${geometry.viewBoxHeight}`,
-
-                preserveAspectRatio:
-                    "xMidYMid meet",
-
-                role: "img",
-
-                "aria-label":
-                    "Live isometric rectangular duct offset drawing"
-            }
-        );
-
-        const title =
-            createSvgElement("title");
-
-        title.textContent =
-            `${formatNumber(normalizedOptions.width)} by ` +
-            `${formatNumber(normalizedOptions.height)} inch duct, ` +
-            `${formatNumber(normalizedOptions.rise)} inch offset, ` +
-            `${formatNumber(normalizedOptions.run)} inch run.`;
-
-        svg.appendChild(title);
-
-        const definitions =
-            appendSvgElement(
-                svg,
-                "defs"
-            );
-
-        createArrowMarkers(definitions);
-
-        const hiddenLineGroup =
-            appendSvgElement(
-                svg,
-                "g",
-                {
-                    id: "offsetIsoHiddenLines"
-                }
-            );
-
-        const ductGroup =
-            appendSvgElement(
-                svg,
-                "g",
-                {
-                    id: "offsetIsoDuct"
-                }
-            );
-
-        const centerlineGroup =
-            appendSvgElement(
-                svg,
-                "g",
-                {
-                    id: "offsetIsoCenterline"
-                }
-            );
-
-        const dimensionGroup =
-            appendSvgElement(
-                svg,
-                "g",
-                {
-                    id: "offsetIsoDimensions"
-                }
-            );
-
-        const labelGroup =
-            appendSvgElement(
-                svg,
-                "g",
-                {
-                    id: "offsetIsoLabels"
-                }
-            );
-
-        drawHiddenLines(
-            hiddenLineGroup,
-            points
-        );
-
-        drawDuctPanels(
-            ductGroup,
-            points
-        );
-
-        if (normalizedOptions.showCenterline) {
-            drawCenterline(
-                centerlineGroup,
-                points
-            );
-        }
-
-        if (normalizedOptions.showDimensions) {
-            drawRunDimension(
-                dimensionGroup,
-                points,
-                geometry,
-                normalizedOptions
-            );
-
-            if (normalizedOptions.rise > 0) {
-                drawRiseDimension(
-                    dimensionGroup,
-                    points,
-                    geometry,
-                    normalizedOptions
-                );
-            }
-
-            drawLengthDimension(
-                dimensionGroup,
-                points,
-                normalizedOptions
-            );
-        }
-
-        if (normalizedOptions.showSizeLabels) {
-            drawSizeLabels(
-                labelGroup,
-                points,
-                geometry,
-                normalizedOptions
-            );
-        }
-
-        container.appendChild(svg);
-    }
-
-    function getNumericInputValue(
-        elementId,
-        fallbackValue
-    ) {
-        const element =
-            document.getElementById(elementId);
-
-        if (!element) {
-            return fallbackValue;
-        }
-
-        const parsedValue =
-            Number(element.value);
-
-        if (!Number.isFinite(parsedValue)) {
-            return fallbackValue;
-        }
-
-        return parsedValue;
-    }
-
-    function bindInputs(config = {}) {
-        const inputConfiguration = {
-            widthInputId:
-                config.widthInputId ||
-                "offsetDuctWidth",
-
-            heightInputId:
-                config.heightInputId ||
-                "offsetDuctHeight",
-
-            riseInputId:
-                config.riseInputId ||
-                "offsetRise",
-
-            runInputId:
-                config.runInputId ||
-                "offsetRun",
-
-            containerId:
-                config.containerId ||
-                currentOptions.containerId
-        };
-
-        const inputIds = [
-            inputConfiguration.widthInputId,
-            inputConfiguration.heightInputId,
-            inputConfiguration.riseInputId,
-            inputConfiguration.runInputId
-        ];
-
-        function updateFromInputs() {
-            render({
-                containerId:
-                    inputConfiguration.containerId,
-
-                width:
-                    getNumericInputValue(
-                        inputConfiguration.widthInputId,
-                        currentOptions.width
+            points.push({
+                x:
+                    secondStart.x +
+                    r * (
+                        Math.sin(angle) -
+                        Math.sin(angle - u)
                     ),
 
-                height:
-                    getNumericInputValue(
-                        inputConfiguration.heightInputId,
-                        currentOptions.height
-                    ),
-
-                rise:
-                    getNumericInputValue(
-                        inputConfiguration.riseInputId,
-                        currentOptions.rise
-                    ),
-
-                run:
-                    getNumericInputValue(
-                        inputConfiguration.runInputId,
-                        currentOptions.run
+                y:
+                    secondStart.y +
+                    r * (
+                        Math.cos(angle - u) -
+                        Math.cos(angle)
                     )
             });
         }
 
-        inputIds.forEach((inputId) => {
-            const inputElement =
-                document.getElementById(inputId);
+        const outletStart = points[points.length - 1];
+        const outletLead = inletLead;
 
-            if (!inputElement) {
-                console.warn(
-                    `OffsetIso: Could not find input #${inputId}`
-                );
+        points.push({
+            x: outletStart.x + outletLead,
+            y: outletStart.y
+        });
 
+        return {
+            points,
+            inletLead,
+            outletLead,
+            firstEnd,
+            secondStart,
+            outletStart
+        };
+    }
+
+    function offsetPolyline(points, distance) {
+        const output = [];
+
+        for (let i = 0; i < points.length; i += 1) {
+            const previous = points[Math.max(0, i - 1)];
+            const next = points[Math.min(points.length - 1, i + 1)];
+
+            const dx = next.x - previous.x;
+            const dy = next.y - previous.y;
+            const length = Math.hypot(dx, dy) || 1;
+
+            const nx = -dy / length;
+            const ny = dx / length;
+
+            output.push({
+                x: points[i].x + nx * distance,
+                y: points[i].y + ny * distance
+            });
+        }
+
+        return output;
+    }
+
+    function pathFromPoints(points, close = false) {
+        if (!points.length) {
+            return "";
+        }
+
+        const body = points
+            .map((point, index) =>
+                `${index === 0 ? "M" : "L"} ${point.x} ${point.y}`
+            )
+            .join(" ");
+
+        return close ? `${body} Z` : body;
+    }
+
+    function transformPoints(points, transform) {
+        return points.map((point) => transform(point));
+    }
+
+    function fitTransform(allPoints, width, height) {
+        const xs = allPoints.map((point) => point.x);
+        const ys = allPoints.map((point) => point.y);
+
+        const minX = Math.min(...xs);
+        const maxX = Math.max(...xs);
+        const minY = Math.min(...ys);
+        const maxY = Math.max(...ys);
+
+        const margin = 85;
+
+        const scale = Math.min(
+            (width - margin * 2) / Math.max(1, maxX - minX),
+            (height - margin * 2) / Math.max(1, maxY - minY)
+        );
+
+        return function (point) {
+            return {
+                x:
+                    margin +
+                    (point.x - minX) * scale,
+
+                y:
+                    height -
+                    margin -
+                    (point.y - minY) * scale
+            };
+        };
+    }
+
+    function addArrowMarkers(defs) {
+        const marker = svg("marker", {
+            id: "offsetIsoArrow",
+            markerWidth: 8,
+            markerHeight: 8,
+            refX: 4,
+            refY: 4,
+            orient: "auto-start-reverse",
+            markerUnits: "strokeWidth"
+        });
+
+        marker.appendChild(svg("path", {
+            d: "M 0 0 L 8 4 L 0 8",
+            fill: "none",
+            stroke: "#f4b942",
+            "stroke-width": 1.4
+        }));
+
+        defs.appendChild(marker);
+    }
+
+    function drawDimension(group, a, b, label, textOffset = 0) {
+        const line = svg("line", {
+            x1: a.x,
+            y1: a.y,
+            x2: b.x,
+            y2: b.y,
+            class: "offset-iso-dimension-line",
+            "marker-start": "url(#offsetIsoArrow)",
+            "marker-end": "url(#offsetIsoArrow)"
+        });
+
+        group.appendChild(line);
+
+        const mx = (a.x + b.x) / 2;
+        const my = (a.y + b.y) / 2;
+
+        group.appendChild(svg("text", {
+            x: mx,
+            y: my + textOffset,
+            class: "offset-iso-dimension-text"
+        }, label));
+    }
+
+    function render() {
+        const container = document.getElementById(ids.container);
+
+        if (!container) {
+            return;
+        }
+
+        const model = getModel();
+        const center = centerlinePoints(model);
+
+        const half = model.cheek / 2;
+
+        const lower = offsetPolyline(center.points, -half);
+        const upper = offsetPolyline(center.points, half);
+
+        /*
+         * Isometric depth shift. This creates the 3D view while preserving
+         * the accurate two-elbow side profile.
+         */
+        const isoDepth = {
+            x: model.depth * 0.9,
+            y: model.depth * 0.55
+        };
+
+        const backLower = lower.map((point) => ({
+            x: point.x + isoDepth.x,
+            y: point.y + isoDepth.y
+        }));
+
+        const backUpper = upper.map((point) => ({
+            x: point.x + isoDepth.x,
+            y: point.y + isoDepth.y
+        }));
+
+        const allModelPoints = [
+            ...lower,
+            ...upper,
+            ...backLower,
+            ...backUpper
+        ];
+
+        const viewWidth = 1000;
+        const viewHeight = 610;
+        const transform = fitTransform(
+            allModelPoints,
+            viewWidth,
+            viewHeight
+        );
+
+        const L = transformPoints(lower, transform);
+        const U = transformPoints(upper, transform);
+        const BL = transformPoints(backLower, transform);
+        const BU = transformPoints(backUpper, transform);
+        const C = transformPoints(center.points, transform);
+
+        container.replaceChildren();
+
+        const drawing = svg("svg", {
+            class: "offset-iso-svg",
+            viewBox: `0 0 ${viewWidth} ${viewHeight}`,
+            preserveAspectRatio: "xMidYMid meet",
+            role: "img",
+            "aria-label": "Isometric two-elbow rectangular duct offset"
+        });
+
+        const defs = svg("defs");
+        addArrowMarkers(defs);
+        drawing.appendChild(defs);
+
+        /*
+         * Far side face.
+         */
+        drawing.appendChild(svg("path", {
+            d: pathFromPoints([
+                ...BU,
+                ...BL.slice().reverse()
+            ], true),
+            class: "offset-iso-back-panel"
+        }));
+
+        /*
+         * Upper/top surface.
+         */
+        drawing.appendChild(svg("path", {
+            d: pathFromPoints([
+                ...U,
+                ...BU.slice().reverse()
+            ], true),
+            class: "offset-iso-top-panel"
+        }));
+
+        /*
+         * Lower surface.
+         */
+        drawing.appendChild(svg("path", {
+            d: pathFromPoints([
+                ...L,
+                ...BL.slice().reverse()
+            ], true),
+            class: "offset-iso-bottom-panel"
+        }));
+
+        /*
+         * Near side profile: the key S-shaped fitting face.
+         */
+        drawing.appendChild(svg("path", {
+            d: pathFromPoints([
+                ...U,
+                ...L.slice().reverse()
+            ], true),
+            class: "offset-iso-side-panel"
+        }));
+
+        /*
+         * Inlet and outlet end faces.
+         */
+        drawing.appendChild(svg("polygon", {
+            points: [
+                U[0],
+                BU[0],
+                BL[0],
+                L[0]
+            ].map((point) => `${point.x},${point.y}`).join(" "),
+            class: "offset-iso-end-face"
+        }));
+
+        const last = U.length - 1;
+
+        drawing.appendChild(svg("polygon", {
+            points: [
+                U[last],
+                BU[last],
+                BL[last],
+                L[last]
+            ].map((point) => `${point.x},${point.y}`).join(" "),
+            class: "offset-iso-end-face"
+        }));
+
+        /*
+         * Centerline.
+         */
+        drawing.appendChild(svg("path", {
+            d: pathFromPoints(C),
+            class: "offset-iso-center-line"
+        }));
+
+        /*
+         * Joint lines at the tangent points. When straight is zero, the two
+         * tangent lines meet, matching the user's original two-elbow picture.
+         */
+        const jointIndexes = [];
+        const arcSteps = 18;
+
+        jointIndexes.push(2 + arcSteps);
+
+        if (model.straight > 0.05) {
+            jointIndexes.push(3 + arcSteps);
+        }
+
+        jointIndexes.forEach((index) => {
+            if (!U[index] || !L[index]) {
                 return;
             }
 
-            inputElement.addEventListener(
-                "input",
-                updateFromInputs
-            );
+            drawing.appendChild(svg("line", {
+                x1: U[index].x,
+                y1: U[index].y,
+                x2: L[index].x,
+                y2: L[index].y,
+                class: "offset-iso-joint-line"
+            }));
 
-            inputElement.addEventListener(
-                "change",
-                updateFromInputs
-            );
+            if (BU[index] && BL[index]) {
+                drawing.appendChild(svg("line", {
+                    x1: BU[index].x,
+                    y1: BU[index].y,
+                    x2: BL[index].x,
+                    y2: BL[index].y,
+                    class: "offset-iso-joint-line offset-iso-joint-back"
+                }));
+            }
         });
 
-        updateFromInputs();
+        /*
+         * Dimensions.
+         */
+        const dimensionGroup = svg("g");
 
-        return updateFromInputs;
+        const startCenter = C[1];
+        const endCenter = C[C.length - 2];
+
+        const runY = viewHeight - 42;
+
+        dimensionGroup.appendChild(svg("line", {
+            x1: startCenter.x,
+            y1: startCenter.y,
+            x2: startCenter.x,
+            y2: runY,
+            class: "offset-iso-extension-line"
+        }));
+
+        dimensionGroup.appendChild(svg("line", {
+            x1: endCenter.x,
+            y1: endCenter.y,
+            x2: endCenter.x,
+            y2: runY,
+            class: "offset-iso-extension-line"
+        }));
+
+        drawDimension(
+            dimensionGroup,
+            { x: startCenter.x, y: runY },
+            { x: endCenter.x, y: runY },
+            `Overall Length: ${format(model.run)}"`,
+            -16
+        );
+
+        const riseX = viewWidth - 44;
+
+        dimensionGroup.appendChild(svg("line", {
+            x1: startCenter.x,
+            y1: startCenter.y,
+            x2: riseX,
+            y2: startCenter.y,
+            class: "offset-iso-extension-line"
+        }));
+
+        dimensionGroup.appendChild(svg("line", {
+            x1: endCenter.x,
+            y1: endCenter.y,
+            x2: riseX,
+            y2: endCenter.y,
+            class: "offset-iso-extension-line"
+        }));
+
+        drawDimension(
+            dimensionGroup,
+            { x: riseX, y: startCenter.y },
+            { x: riseX, y: endCenter.y },
+            `Offset: ${format(model.rise)}"`,
+            28
+        );
+
+        drawing.appendChild(dimensionGroup);
+
+        /*
+         * Labels.
+         */
+        drawing.appendChild(svg("text", {
+            x: 112,
+            y: viewHeight - 85,
+            class: "offset-iso-size-text"
+        }, `Cheek: ${format(model.cheek)}"`));
+
+        drawing.appendChild(svg("text", {
+            x: viewWidth / 2,
+            y: 42,
+            class: "offset-iso-size-text"
+        }, `${format(model.angle)}° elbows`));
+
+        drawing.appendChild(svg("text", {
+            x: viewWidth / 2,
+            y: 68,
+            class: "offset-iso-title-text"
+        }, model.straight > 0.05
+            ? `Middle straight: ${format(model.straight)}"`
+            : "Elbows meet — no middle straight"
+        ));
+
+        drawing.appendChild(svg("text", {
+            x: viewWidth - 150,
+            y: 42,
+            class: "offset-iso-title-text"
+        }, `CLR: ${format(model.radius)}"`));
+
+        container.appendChild(drawing);
     }
 
-    window.OffsetIso = {
-        render,
-        bindInputs
-    };
+    function bind() {
+        const watchedIds = [
+            ids.mode,
+            ids.offset,
+            ids.overall,
+            ids.cheek,
+            ids.clrMultiplier,
+            ids.customClr,
+            ids.angle
+        ];
+
+        watchedIds.forEach((id) => {
+            const element = document.getElementById(id);
+
+            if (!element) {
+                return;
+            }
+
+            element.addEventListener("input", render);
+            element.addEventListener("change", render);
+        });
+
+        /*
+         * Keep compatibility with manual calls from the page.
+         */
+        window.OffsetIso = {
+            render,
+            bindInputs: bind
+        };
+
+        render();
+    }
+
+    if (document.readyState === "loading") {
+        document.addEventListener(
+            "DOMContentLoaded",
+            bind
+        );
+    } else {
+        bind();
+    }
 })();
