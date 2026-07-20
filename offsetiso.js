@@ -182,6 +182,19 @@
 
             }
 
+
+            @media (max-width:700px){
+
+                .offset-iso-svg-mobile{
+                    display:block;
+                    width:100%;
+                    max-width:none;
+                    margin:0;
+                    border-radius:0;
+                }
+
+            }
+
             @media (
                 prefers-reduced-motion:
                 reduce
@@ -1357,7 +1370,7 @@
     ) {
 
         const panel = panelLayout || {
-            x: 920,
+            x: 1100,
             y: 50,
             width: 400,
             height: 560
@@ -1671,17 +1684,17 @@
             ).matches;
 
         const viewWidth =
-            isMobile ? 520 : 1240;
+            isMobile ? 500 : 1240;
 
         const viewHeight =
-            isMobile ? 1080 : 660;
+            isMobile ? 1030 : 660;
 
         const drawingArea =
             isMobile
                 ? {
-                    x: 20,
-                    y: 20,
-                    width: 480,
+                    x: 8,
+                    y: 8,
+                    width: 484,
                     height: 500
                 }
                 : {
@@ -1694,13 +1707,13 @@
         const dataPanelLayout =
             isMobile
                 ? {
-                    x: 20,
-                    y: 555,
-                    width: 480,
-                    height: 500
+                    x: 8,
+                    y: 600,
+                    width: 484,
+                    height: 430
                 }
                 : {
-                    x: 920,
+                    x: 1100,
                     y: 50,
                     width: 400,
                     height: 560
@@ -1752,7 +1765,10 @@
 
         const drawing =
             svg("svg", {
-                class: "offset-iso-svg",
+                class:
+                    isMobile
+                        ? "offset-iso-svg offset-iso-svg-mobile"
+                        : "offset-iso-svg",
                 width: "100%",
                 height: "auto",
                 viewBox:
@@ -1821,7 +1837,7 @@
                 ], true),
                 class:
                     "offset-iso-bottom-panel",
-                fill: "#20385f",
+                fill: "#162946",
                 stroke: "#78a7ff",
                 "stroke-width": 2
             })
@@ -1867,7 +1883,7 @@
                     .join(" "),
                 class:
                     "offset-iso-end-face",
-                fill: "#243b68",
+                fill: "#13243d",
                 stroke: "#78a7ff",
                 "stroke-width": 2
             })
@@ -1888,7 +1904,7 @@
                     .join(" "),
                 class:
                     "offset-iso-end-face",
-                fill: "#243b68",
+                fill: "#13243d",
                 stroke: "#78a7ff",
                 "stroke-width": 2
             })
