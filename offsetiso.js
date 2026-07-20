@@ -56,62 +56,112 @@
             "offsetIsoClrWarningStyles";
 
         style.textContent = `
+            #offsetIsoContainer{
+                position:relative;
+            }
+
             .offset-iso-clr-warning{
-                display:flex;
-                align-items:flex-start;
-                gap:12px;
+                position:absolute;
+                top:14px;
+                right:14px;
+                z-index:10;
 
-                margin:0 0 18px;
-                padding:14px 16px;
+                display:inline-flex;
+                align-items:center;
+                gap:8px;
 
-                border:2px solid #ff4d4d;
-                border-radius:10px;
+                max-width:240px;
+                padding:9px 12px;
+
+                border:1px solid #ff5a5a;
+                border-radius:999px;
 
                 background:
-                    rgba(92, 14, 14, .96);
+                    rgba(89, 13, 13, .94);
 
                 color:#fff;
-                font-size:14px;
-                line-height:1.45;
-                font-weight:600;
+                font-size:12px;
+                line-height:1.2;
+                font-weight:700;
+                letter-spacing:.02em;
+
+                cursor:help;
 
                 box-shadow:
                     0 0 0 rgba(255, 77, 77, 0);
 
                 animation:
                     offsetIsoClrWarningPulse
-                    1.2s
+                    1.4s
                     ease-in-out
                     infinite;
             }
 
             .offset-iso-clr-warning-icon{
                 flex:0 0 auto;
-                font-size:20px;
+                font-size:15px;
                 line-height:1;
-                margin-top:1px;
             }
 
-            .offset-iso-clr-warning strong{
-                display:block;
-                margin-bottom:2px;
-                letter-spacing:.04em;
+            .offset-iso-clr-warning-value{
+                color:#ffb0b0;
+                white-space:nowrap;
+            }
+
+            .offset-iso-clr-warning-tooltip{
+                position:absolute;
+                top:calc(100% + 9px);
+                right:0;
+
+                width:285px;
+                padding:12px 14px;
+
+                border:1px solid #ff5a5a;
+                border-radius:9px;
+
+                background:
+                    rgba(45, 7, 7, .98);
+
+                color:#fff;
+                font-size:12px;
+                line-height:1.45;
+                font-weight:500;
+                letter-spacing:0;
+
+                opacity:0;
+                visibility:hidden;
+                transform:translateY(-4px);
+                transition:
+                    opacity .16s ease,
+                    transform .16s ease,
+                    visibility .16s ease;
+
+                pointer-events:none;
+            }
+
+            .offset-iso-clr-warning:hover
+            .offset-iso-clr-warning-tooltip,
+            .offset-iso-clr-warning:focus
+            .offset-iso-clr-warning-tooltip{
+                opacity:1;
+                visibility:visible;
+                transform:translateY(0);
             }
 
             @keyframes offsetIsoClrWarningPulse{
 
                 0%,
                 100%{
-                    border-color:#ff4d4d;
+                    border-color:#ff5a5a;
                     box-shadow:
                         0 0 0 rgba(255, 77, 77, 0);
                 }
 
                 50%{
-                    border-color:#ff8a8a;
+                    border-color:#ff9090;
                     box-shadow:
-                        0 0 18px
-                        rgba(255, 77, 77, .42);
+                        0 0 14px
+                        rgba(255, 77, 77, .38);
                 }
 
             }
@@ -162,6 +212,16 @@
         warning.className =
             "offset-iso-clr-warning";
 
+        warning.setAttribute(
+            "tabindex",
+            "0"
+        );
+
+        warning.setAttribute(
+            "role",
+            "status"
+        );
+
         warning.innerHTML = `
             <span
                 class="
@@ -172,18 +232,30 @@
                 ⚠
             </span>
 
-            <div>
-                <strong>
-                    LOW EQUIVALENT CLR
-                </strong>
+            <span>
+                LOW CLR
+            </span>
 
+            <span
+                class="
+                    offset-iso-clr-warning-value
+                "
+            >
+                ${equivalentClr.toFixed(2)}×
+            </span>
+
+            <span
+                class="
+                    offset-iso-clr-warning-tooltip
+                "
+            >
                 Equivalent CLR is
                 ${equivalentClr.toFixed(2)}× CLR,
                 which is below the recommended
                 0.75× minimum. The throat radius
                 may be too small for practical
                 fabrication.
-            </div>
+            </span>
         `;
 
         container.appendChild(
