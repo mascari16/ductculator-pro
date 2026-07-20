@@ -1357,7 +1357,7 @@
     ) {
 
         const panel = panelLayout || {
-            x: 925,
+            x: 1000,
             y: 50,
             width: 400,
             height: 560
@@ -1700,7 +1700,7 @@
                     height: 540
                 }
                 : {
-                    x: 925,
+                    x: 1000,
                     y: 50,
                     width: 400,
                     height: 560
