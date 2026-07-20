@@ -998,16 +998,6 @@ calculateOffsetBtn.addEventListener("click", () => {
 
         <div class="result-row">
 
-            <span>Depth</span>
-
-            <strong>
-                ${formatSheetMetalMeasurement(elbowDepth)}
-            </strong>
-
-        </div>
-
-        <div class="result-row">
-
             <span>Offset</span>
 
             <strong>

@@ -1160,7 +1160,7 @@
                 }°`
             ],
             [
-                "CLR",
+                "Equivalent CLR",
                 formatMeasurement(
                     model.centerlineRadius
                 )
@@ -1170,10 +1170,6 @@
                 formatMeasurement(
                     model.throatRadius
                 )
-            ],
-            [
-                "Quantity",
-                "2 elbows"
             ],
             [
                 "Straight",
@@ -1186,6 +1182,10 @@
                 formatMeasurement(
                     model.offset
                 )
+            ],
+            [
+                "Quantity",
+                "2 Elbows"
             ]
         ];
 
@@ -1893,17 +1893,6 @@
 
         drawing.appendChild(
             dimensionGroup
-        );
-
-        drawing.appendChild(
-            svg("text", {
-                x: 92,
-                y: 36,
-                class:
-                    "offset-iso-size-text"
-            }, `${formatDecimal(
-                model.elbowAngle
-            )}° RADIUS ELBOW`)
         );
 
 
