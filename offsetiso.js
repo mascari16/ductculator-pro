@@ -1161,9 +1161,10 @@
             ],
             [
                 "Equivalent CLR",
-                formatMeasurement(
-                    model.centerlineRadius
-                )
+                `${(
+                model.centerlineRadius /
+                model.ductWidth
+                ).toFixed(2)}× CLR`
             ],
             [
                 "Throat Radius",
