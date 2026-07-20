@@ -62,7 +62,7 @@
 
             .offset-iso-clr-warning{
                 position:absolute;
-                top:14px;
+                top:5px;
                 right:14px;
                 z-index:10;
 
@@ -73,11 +73,11 @@
                 max-width:240px;
                 padding:9px 12px;
 
-                border:1px solid #ff5a5a;
+                border:1px solid #ff6b6b;
                 border-radius:999px;
 
                 background:
-                    rgba(89, 13, 13, .94);
+                    rgba(125, 14, 14, .97);
 
                 color:#fff;
                 font-size:12px;
@@ -88,7 +88,8 @@
                 cursor:help;
 
                 box-shadow:
-                    0 0 0 rgba(255, 77, 77, 0);
+                    0 0 8px rgba(255, 70, 70, .40),
+                    0 0 18px rgba(255, 45, 45, .18);
 
                 animation:
                     offsetIsoClrWarningPulse
@@ -160,16 +161,23 @@
 
                 0%,
                 100%{
-                    border-color:#ff5a5a;
+                    border-color:#ff6b6b;
+                    background:
+                        rgba(125, 14, 14, .97);
                     box-shadow:
-                        0 0 0 rgba(255, 77, 77, 0);
+                        0 0 8px rgba(255, 70, 70, .40),
+                        0 0 18px rgba(255, 45, 45, .18);
+                    filter:brightness(1);
                 }
 
                 50%{
-                    border-color:#ff9090;
+                    border-color:#ffd0d0;
+                    background:
+                        rgba(170, 22, 22, .99);
                     box-shadow:
-                        0 0 14px
-                        rgba(255, 77, 77, .38);
+                        0 0 18px rgba(255, 90, 90, .95),
+                        0 0 38px rgba(255, 45, 45, .62);
+                    filter:brightness(1.18);
                 }
 
             }
@@ -1348,7 +1356,7 @@
     ) {
 
         const panel = {
-            x: 790,
+            x: 815,
             y: 50,
             width: 400,
             height: 560
