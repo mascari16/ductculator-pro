@@ -1172,9 +1172,9 @@
                 )
             ],
             [
-                "Depth",
+                "Offset",
                 formatMeasurement(
-                    model.ductDepth
+                    model.offset
                 )
             ]
         ];
@@ -1701,6 +1701,186 @@
 
         }
 
+
+        /*
+         * WIDTH (CHEEK)
+         * Dimensioned directly under the near inlet cheek.
+         * It always spans the visible cheek width and stays centered.
+         */
+        const widthLeft =
+            nearThroat[0];
+
+        const widthRight =
+            nearHeel[0];
+
+        const widthDimensionY =
+            Math.max(
+                widthLeft.y,
+                widthRight.y
+            ) + 34;
+
+        const widthStart = {
+            x: widthLeft.x,
+            y: widthDimensionY
+        };
+
+        const widthEnd = {
+            x: widthRight.x,
+            y: widthDimensionY
+        };
+
+        dimensionGroup.appendChild(
+            svg("line", {
+                x1: widthLeft.x,
+                y1: widthLeft.y,
+                x2: widthStart.x,
+                y2: widthStart.y,
+                class:
+                    "offset-iso-extension-line"
+            })
+        );
+
+        dimensionGroup.appendChild(
+            svg("line", {
+                x1: widthRight.x,
+                y1: widthRight.y,
+                x2: widthEnd.x,
+                y2: widthEnd.y,
+                class:
+                    "offset-iso-extension-line"
+            })
+        );
+
+        addDimension(
+            dimensionGroup,
+            widthStart,
+            widthEnd,
+            `Width: ${
+                formatMeasurement(
+                    model.ductWidth
+                )
+            }`,
+            {
+                dy: 18
+            }
+        );
+
+        /*
+         * DEPTH
+         * Dimensioned along the isometric extrusion under the throat.
+         * It always starts at the near throat corner and ends at the
+         * matching far throat corner.
+         */
+        const depthNear =
+            nearThroat[0];
+
+        const depthFar =
+            farThroatT[0];
+
+        const depthDx =
+            depthFar.x -
+            depthNear.x;
+
+        const depthDy =
+            depthFar.y -
+            depthNear.y;
+
+        const depthLength =
+            Math.hypot(
+                depthDx,
+                depthDy
+            ) || 1;
+
+        const depthNormal = {
+            x:
+                -depthDy /
+                depthLength,
+            y:
+                depthDx /
+                depthLength
+        };
+
+        /*
+         * Put the depth annotation below the throat.
+         */
+        const chosenDepthNormal =
+            depthNormal.y >= 0
+                ? depthNormal
+                : {
+                    x: -depthNormal.x,
+                    y: -depthNormal.y
+                };
+
+        const depthOffset = 38;
+
+        const depthStart = {
+            x:
+                depthNear.x +
+                chosenDepthNormal.x *
+                depthOffset,
+            y:
+                depthNear.y +
+                chosenDepthNormal.y *
+                depthOffset
+        };
+
+        const depthEnd = {
+            x:
+                depthFar.x +
+                chosenDepthNormal.x *
+                depthOffset,
+            y:
+                depthFar.y +
+                chosenDepthNormal.y *
+                depthOffset
+        };
+
+        dimensionGroup.appendChild(
+            svg("line", {
+                x1: depthNear.x,
+                y1: depthNear.y,
+                x2: depthStart.x,
+                y2: depthStart.y,
+                class:
+                    "offset-iso-extension-line"
+            })
+        );
+
+        dimensionGroup.appendChild(
+            svg("line", {
+                x1: depthFar.x,
+                y1: depthFar.y,
+                x2: depthEnd.x,
+                y2: depthEnd.y,
+                class:
+                    "offset-iso-extension-line"
+            })
+        );
+
+        const depthLabelAngle =
+            Math.atan2(
+                depthDy,
+                depthDx
+            ) *
+            180 /
+            Math.PI;
+
+        addDimension(
+            dimensionGroup,
+            depthStart,
+            depthEnd,
+            `Depth: ${
+                formatMeasurement(
+                    model.ductDepth
+                )
+            }`,
+            {
+                dy: 17,
+                rotate:
+                    depthLabelAngle
+            }
+        );
+
         drawing.appendChild(
             dimensionGroup
         );
@@ -1716,26 +1896,7 @@
             )}° RADIUS ELBOW`)
         );
 
-        drawing.appendChild(
-            svg("text", {
-                x: 92,
-                y: 620,
-                class:
-                    "offset-iso-title-text"
-            }, `Duct: ${
-                formatMeasurement(
-                    model.ductWidth
-                )
-            } × ${
-                formatMeasurement(
-                    model.ductDepth
-                )
-            }  •  CLR: ${
-                formatMeasurement(
-                    model.centerlineRadius
-                )
-            }`)
-        );
+
 
         addDataPanel(
             drawing,
