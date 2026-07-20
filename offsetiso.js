@@ -543,9 +543,24 @@
         const centerRadius =
             model.centerlineRadius;
 
+        /*
+         * Use a small visual-only minimum radius when the calculated
+         * throat radius is zero or extremely small. This prevents the
+         * SVG throat from looking like a sharp square corner while the
+         * fabrication data continues to show the true calculated radius.
+         */
+        const minimumVisualThroatRadius =
+            Math.min(
+                4,
+                Math.max(
+                    0.75,
+                    model.bendDimension * 0.03
+                )
+            );
+
         const throatRadius =
             Math.max(
-                0.05,
+                minimumVisualThroatRadius,
                 model.throatRadius
             );
 
@@ -1162,8 +1177,8 @@
             [
                 "Equivalent CLR",
                 `${(
-                model.centerlineRadius /
-                model.ductWidth
+                    model.centerlineRadius /
+                    model.ductWidth
                 ).toFixed(2)}× CLR`
             ],
             [
