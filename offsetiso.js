@@ -1908,23 +1908,10 @@ drawing.appendChild(
             })
         );
 
-        drawing.appendChild(
-            svg("polygon", {
-                points: [
-                    nearHeel[last],
-                    farHeelT[last],
-                    farThroatT[last],
-                    nearThroat[last]
-                ]
-                    .map(
-                        point =>
-                            `${point.x},${point.y}`
-                    )
-                    .join(" "),
-                class:
-                    "offset-iso-end-face"
-            })
-        );
+        /*
+         * The outlet face is drawn after the tangent/seam lines below so
+         * it visually owns the outlet corner and masks crossing geometry.
+         */
 
         /*
          * Subtle near centerline only.
@@ -1947,6 +1934,14 @@ drawing.appendChild(
         const tangentEndIndex =
             nearHeel.length - 2;
 
+        /*
+         * Draw both visible near-side tangent seams.
+         *
+         * On the far side, draw only the inlet tangent seam. The far
+         * outlet tangent seam used to cross the top outlet face and created
+         * the small triangular/X-shaped intersection that made the elbow
+         * appear to flip orientation for a moment.
+         */
         [
             tangentStartIndex,
             tangentEndIndex
@@ -1963,18 +1958,54 @@ drawing.appendChild(
                 })
             );
 
-            drawing.appendChild(
-                svg("line", {
-                    x1: farHeelT[index].x,
-                    y1: farHeelT[index].y,
-                    x2: farThroatT[index].x,
-                    y2: farThroatT[index].y,
-                    class:
-                        "offset-iso-joint-line offset-iso-joint-back"
-                })
-            );
-
         });
+
+        drawing.appendChild(
+            svg("line", {
+                x1:
+                    farHeelT[
+                        tangentStartIndex
+                    ].x,
+                y1:
+                    farHeelT[
+                        tangentStartIndex
+                    ].y,
+                x2:
+                    farThroatT[
+                        tangentStartIndex
+                    ].x,
+                y2:
+                    farThroatT[
+                        tangentStartIndex
+                    ].y,
+                class:
+                    "offset-iso-joint-line offset-iso-joint-back"
+            })
+        );
+
+        /*
+         * Redraw the outlet face last so it owns the outlet corner and
+         * cleanly masks any underlying panel edges. This removes the
+         * ambiguous pointed wedge without altering the calculated fitting
+         * geometry or fabrication dimensions.
+         */
+        drawing.appendChild(
+            svg("polygon", {
+                points: [
+                    nearHeel[last],
+                    farHeelT[last],
+                    farThroatT[last],
+                    nearThroat[last]
+                ]
+                    .map(
+                        point =>
+                            `${point.x},${point.y}`
+                    )
+                    .join(" "),
+                class:
+                    "offset-iso-end-face"
+            })
+        );
 
         /*
          * Dimensions.
