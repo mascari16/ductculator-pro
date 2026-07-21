@@ -1802,20 +1802,24 @@
          * Far side face.
          */
         drawing.appendChild(
-            svg("path", {
-                d: path([
-                    ...farHeelT,
-                    ...farThroatT
-                        .slice()
-                        .reverse()
-                ], true),
-                class:
-                    "offset-iso-back-panel",
-                fill: "#31518a",
-                stroke: "#78a7ff",
-                "stroke-width": 2
-            })
-        );
+    svg("path", {
+        d: path([
+            ...farHeelT,
+            ...farThroatT
+                .slice()
+                .reverse()
+        ], true),
+        class:
+            "offset-iso-back-panel",
+
+        // Samsung Internet makes this face appear washed out.
+        // Darken only on mobile.
+        fill: isMobile ? "#20385f" : "#31518a",
+
+        stroke: "#78a7ff",
+        "stroke-width": 2
+    })
+);
 
         /*
          * Heel surface.
