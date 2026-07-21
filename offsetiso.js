@@ -1810,17 +1810,15 @@
                         .reverse()
                 ], true),
                 class:
-                    "offset-iso-back-panel"
+                    "offset-iso-back-panel",
+                stroke: "none"
             })
         );
 
 
 
         /*
- * Heel surface fill.
- *
- * The closed polygon is fill-only. Its far-side outline is hidden behind
- * the metal and must not be drawn as a solid visible edge.
+ * Heel surface.
  */
 drawing.appendChild(
     svg("path", {
@@ -1838,10 +1836,7 @@ drawing.appendChild(
 );
 
 /*
- * Throat surface fill.
- *
- * Like the heel surface, this is fill-only so hidden far-side edges are
- * not accidentally shown as solid lines through the fitting.
+ * Throat surface.
  */
 drawing.appendChild(
     svg("path", {
@@ -1870,24 +1865,15 @@ drawing.appendChild(
                         .reverse()
                 ], true),
                 class:
-                    "offset-iso-side-panel"
+                    "offset-iso-side-panel",
+                stroke: "none"
             })
         );
 
         /*
-         * Controlled edge visibility.
-         *
-         * Near edges are visible metal edges, so they stay solid.
-         * Far edges sit behind the sheet-metal faces, so only the useful
-         * middle portions are shown and they are dashed.
+         * Explicit visible linework only.
+         * These two near-side edges are the edges actually facing the viewer.
          */
-        const hiddenEdgeStart = 10;
-        const hiddenEdgeEnd =
-            Math.max(
-                hiddenEdgeStart + 2,
-                farHeelT.length - 10
-            );
-
         drawing.appendChild(
             svg("path", {
                 d: path(nearHeel),
@@ -1910,21 +1896,32 @@ drawing.appendChild(
             })
         );
 
+        /*
+         * Hidden far-side edges.
+         * Draw only the middle curved portions as dashed lines. The ends are
+         * omitted because the inlet and outlet faces already define them.
+         */
+        const hiddenStart = 12;
+        const hiddenEnd =
+            Math.max(
+                hiddenStart + 2,
+                farHeelT.length - 12
+            );
+
         drawing.appendChild(
             svg("path", {
                 d: path(
                     farHeelT.slice(
-                        hiddenEdgeStart,
-                        hiddenEdgeEnd
+                        hiddenStart,
+                        hiddenEnd
                     )
                 ),
                 fill: "none",
-                stroke: "#aabbd5",
-                "stroke-width": 1.1,
-                "stroke-dasharray": "6 8",
+                stroke: "#9fb0ca",
+                "stroke-width": 1.15,
+                "stroke-dasharray": "5 8",
                 "stroke-linecap": "round",
-                "stroke-linejoin": "round",
-                opacity: 0.42
+                opacity: 0.34
             })
         );
 
@@ -1932,17 +1929,16 @@ drawing.appendChild(
             svg("path", {
                 d: path(
                     farThroatT.slice(
-                        hiddenEdgeStart,
-                        hiddenEdgeEnd
+                        hiddenStart,
+                        hiddenEnd
                     )
                 ),
                 fill: "none",
-                stroke: "#aabbd5",
-                "stroke-width": 1.1,
-                "stroke-dasharray": "6 8",
+                stroke: "#9fb0ca",
+                "stroke-width": 1.15,
+                "stroke-dasharray": "5 8",
                 "stroke-linecap": "round",
-                "stroke-linejoin": "round",
-                opacity: 0.42
+                opacity: 0.34
             })
         );
 
@@ -2003,10 +1999,7 @@ drawing.appendChild(
         );
 
         /*
-         * Tangent/seam lines on the visible near cheek only.
-         *
-         * The matching seams on the far cheek are behind the fitting and
-         * are omitted instead of being shown as solid lines through metal.
+         * Tangent/seam lines where the radius begins and ends.
          */
         const tangentStartIndex = 1;
         const tangentEndIndex =
@@ -2027,6 +2020,7 @@ drawing.appendChild(
                         "offset-iso-joint-line"
                 })
             );
+
 
         });
 
