@@ -11,6 +11,8 @@
 
 :root{
 
+    color-scheme: dark;
+
     --bg:#0b1220;
     --bg2:#121b2e;
 
@@ -31,6 +33,16 @@
 
     --white:#f8fafc;
     --gray:#94a3b8;
+
+}
+
+.offset-iso-svg,
+.offset-iso-svg path,
+.offset-iso-svg polygon,
+.offset-iso-svg line,
+.offset-iso-svg text{
+
+    forced-color-adjust: none;
 
 }
 

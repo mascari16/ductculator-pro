@@ -62,8 +62,8 @@
 
             .offset-iso-clr-warning{
                 position:absolute;
-                top:10px;
-                right:10px;
+                top:5px;
+                right:14px;
                 z-index:10;
 
                 display:inline-flex;
@@ -183,24 +183,6 @@
             }
 
 
-
-            .offset-iso-dimension-line{
-                stroke:#f4b942 !important;
-                stroke-width:1.6 !important;
-                vector-effect:non-scaling-stroke;
-                shape-rendering:geometricPrecision;
-            }
-
-            .offset-iso-dimension-text{
-                fill:#ffd166 !important;
-                stroke:#08111f !important;
-                stroke-width:3px !important;
-                paint-order:stroke fill;
-                stroke-linejoin:round;
-                font-weight:800 !important;
-                shape-rendering:geometricPrecision;
-            }
-
             @media (max-width:700px){
 
                 .offset-iso-svg-mobile{
@@ -212,20 +194,6 @@
                     border:0;
                     border-radius:0;
                     background:transparent;
-                    shape-rendering:geometricPrecision;
-                    text-rendering:geometricPrecision;
-                }
-
-                .offset-iso-svg-mobile
-                .offset-iso-dimension-text{
-                    font-size:13px !important;
-                    stroke-width:2.5px !important;
-                    letter-spacing:.01em;
-                }
-
-                .offset-iso-svg-mobile
-                .offset-iso-dimension-line{
-                    stroke-width:1.35 !important;
                 }
 
                 .offset-iso-clr-warning{
@@ -1248,23 +1216,22 @@
         const arrow =
             svg("marker", {
                 id: "singleElbowArrow",
-                markerWidth: 7,
-                markerHeight: 7,
-                refX: 6.5,
-                refY: 3.5,
+                markerWidth: 5,
+                markerHeight: 5,
+                refX: 5,
+                refY: 2.5,
                 orient: "auto-start-reverse",
-                markerUnits: "userSpaceOnUse",
-                viewBox: "0 0 7 7",
+                markerUnits: "strokeWidth",
+                viewBox: "0 0 5 5",
                 overflow: "visible"
             });
 
         arrow.appendChild(
             svg("path", {
-                d: "M 0.5 0.5 L 6.5 3.5 L 0.5 6.5",
+                d: "M 0 0 L 5 2.5 L 0 5",
                 fill: "none",
                 stroke: "#f4b942",
-                "stroke-width": 1.25,
-                "vector-effect": "non-scaling-stroke",
+                "stroke-width": 1.15,
                 "stroke-linecap": "round",
                 "stroke-linejoin": "round"
             })
@@ -1316,12 +1283,6 @@
                 y2: end.y,
                 class:
                     "offset-iso-dimension-line",
-                stroke: "#f4b942",
-                "stroke-width": 1.35,
-                "vector-effect":
-                    "non-scaling-stroke",
-                "shape-rendering":
-                    "geometricPrecision",
                 "marker-start":
                     "url(#singleElbowArrow)",
                 "marker-end":
@@ -1830,8 +1791,6 @@
                     }`,
                 preserveAspectRatio:
                     "xMidYMid meet",
-                "color-interpolation": "sRGB",
-                "color-rendering": "optimizeQuality",
                 role: "img",
                 "aria-label":
                     "Isometric rectangular radius elbow fabrication preview"
@@ -1851,12 +1810,7 @@
                         .reverse()
                 ], true),
                 class:
-                    "offset-iso-back-panel",
-                fill: "#31518a",
-                style: isMobile ? "fill:#20385f !important;fill-opacity:1;opacity:1;mix-blend-mode:normal;" : "fill:#31518a !important;fill-opacity:1;opacity:1;mix-blend-mode:normal;",
-                stroke: "#78a7ff",
-                "stroke-width": 2,
-                "shape-rendering": "geometricPrecision"
+                    "offset-iso-back-panel"
             })
         );
 
@@ -1872,12 +1826,7 @@
                         .reverse()
                 ], true),
                 class:
-                    "offset-iso-top-panel",
-                fill: "#31518a",
-                style: "fill:#31518a !important;fill-opacity:1;opacity:1;mix-blend-mode:normal;",
-                stroke: "#78a7ff",
-                "stroke-width": 2,
-                "shape-rendering": "geometricPrecision"
+                    "offset-iso-top-panel"
             })
         );
 
@@ -1893,12 +1842,7 @@
                         .reverse()
                 ], true),
                 class:
-                    "offset-iso-bottom-panel",
-                fill: "#31518a",
-                style: "fill:#31518a !important;fill-opacity:1;opacity:1;mix-blend-mode:normal;",
-                stroke: "#78a7ff",
-                "stroke-width": 2,
-                "shape-rendering": "geometricPrecision"
+                    "offset-iso-bottom-panel"
             })
         );
 
@@ -1914,12 +1858,7 @@
                         .reverse()
                 ], true),
                 class:
-                    "offset-iso-side-panel",
-                fill: "#31518a",
-                style: "fill:#31518a !important;fill-opacity:1;opacity:1;mix-blend-mode:normal;",
-                stroke: "#78a7ff",
-                "stroke-width": 2,
-                "shape-rendering": "geometricPrecision"
+                    "offset-iso-side-panel"
             })
         );
 
@@ -1943,12 +1882,7 @@
                     )
                     .join(" "),
                 class:
-                    "offset-iso-end-face",
-                fill: "#31518a",
-                style: "fill:#31518a !important;fill-opacity:1;opacity:1;mix-blend-mode:normal;",
-                stroke: "#78a7ff",
-                "stroke-width": 2,
-                "shape-rendering": "geometricPrecision"
+                    "offset-iso-end-face"
             })
         );
 
@@ -1966,12 +1900,7 @@
                     )
                     .join(" "),
                 class:
-                    "offset-iso-end-face",
-                fill: "#31518a",
-                style: "fill:#31518a !important;fill-opacity:1;opacity:1;mix-blend-mode:normal;",
-                stroke: "#78a7ff",
-                "stroke-width": 2,
-                "shape-rendering": "geometricPrecision"
+                    "offset-iso-end-face"
             })
         );
 
