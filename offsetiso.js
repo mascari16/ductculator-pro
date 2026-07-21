@@ -218,14 +218,14 @@
 
                 .offset-iso-svg-mobile
                 .offset-iso-dimension-text{
-                    font-size:15px !important;
-                    stroke-width:3.5px !important;
+                    font-size:13px !important;
+                    stroke-width:2.5px !important;
                     letter-spacing:.01em;
                 }
 
                 .offset-iso-svg-mobile
                 .offset-iso-dimension-line{
-                    stroke-width:1.8 !important;
+                    stroke-width:1.35 !important;
                 }
 
                 .offset-iso-clr-warning{
@@ -1248,22 +1248,23 @@
         const arrow =
             svg("marker", {
                 id: "singleElbowArrow",
-                markerWidth: 5,
-                markerHeight: 5,
-                refX: 5,
-                refY: 2.5,
+                markerWidth: 7,
+                markerHeight: 7,
+                refX: 6.5,
+                refY: 3.5,
                 orient: "auto-start-reverse",
-                markerUnits: "strokeWidth",
-                viewBox: "0 0 5 5",
+                markerUnits: "userSpaceOnUse",
+                viewBox: "0 0 7 7",
                 overflow: "visible"
             });
 
         arrow.appendChild(
             svg("path", {
-                d: "M 0 0 L 5 2.5 L 0 5",
+                d: "M 0.5 0.5 L 6.5 3.5 L 0.5 6.5",
                 fill: "none",
                 stroke: "#f4b942",
-                "stroke-width": 1.15,
+                "stroke-width": 1.25,
+                "vector-effect": "non-scaling-stroke",
                 "stroke-linecap": "round",
                 "stroke-linejoin": "round"
             })
@@ -1316,7 +1317,7 @@
                 class:
                     "offset-iso-dimension-line",
                 stroke: "#f4b942",
-                "stroke-width": 1.6,
+                "stroke-width": 1.35,
                 "vector-effect":
                     "non-scaling-stroke",
                 "shape-rendering":
@@ -1829,6 +1830,8 @@
                     }`,
                 preserveAspectRatio:
                     "xMidYMid meet",
+                "color-interpolation": "sRGB",
+                "color-rendering": "optimizeQuality",
                 role: "img",
                 "aria-label":
                     "Isometric rectangular radius elbow fabrication preview"
@@ -1850,6 +1853,7 @@
                 class:
                     "offset-iso-back-panel",
                 fill: "#31518a",
+                style: isMobile ? "fill:#20385f !important;fill-opacity:1;opacity:1;mix-blend-mode:normal;" : "fill:#31518a !important;fill-opacity:1;opacity:1;mix-blend-mode:normal;",
                 stroke: "#78a7ff",
                 "stroke-width": 2,
                 "shape-rendering": "geometricPrecision"
@@ -1870,6 +1874,7 @@
                 class:
                     "offset-iso-top-panel",
                 fill: "#31518a",
+                style: "fill:#31518a !important;fill-opacity:1;opacity:1;mix-blend-mode:normal;",
                 stroke: "#78a7ff",
                 "stroke-width": 2,
                 "shape-rendering": "geometricPrecision"
@@ -1890,6 +1895,7 @@
                 class:
                     "offset-iso-bottom-panel",
                 fill: "#31518a",
+                style: "fill:#31518a !important;fill-opacity:1;opacity:1;mix-blend-mode:normal;",
                 stroke: "#78a7ff",
                 "stroke-width": 2,
                 "shape-rendering": "geometricPrecision"
@@ -1910,6 +1916,7 @@
                 class:
                     "offset-iso-side-panel",
                 fill: "#31518a",
+                style: "fill:#31518a !important;fill-opacity:1;opacity:1;mix-blend-mode:normal;",
                 stroke: "#78a7ff",
                 "stroke-width": 2,
                 "shape-rendering": "geometricPrecision"
@@ -1938,6 +1945,7 @@
                 class:
                     "offset-iso-end-face",
                 fill: "#31518a",
+                style: "fill:#31518a !important;fill-opacity:1;opacity:1;mix-blend-mode:normal;",
                 stroke: "#78a7ff",
                 "stroke-width": 2,
                 "shape-rendering": "geometricPrecision"
@@ -1960,6 +1968,7 @@
                 class:
                     "offset-iso-end-face",
                 fill: "#31518a",
+                style: "fill:#31518a !important;fill-opacity:1;opacity:1;mix-blend-mode:normal;",
                 stroke: "#78a7ff",
                 "stroke-width": 2,
                 "shape-rendering": "geometricPrecision"
