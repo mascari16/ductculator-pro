@@ -1911,21 +1911,27 @@ drawing.appendChild(
         );
 
         /*
-         * Centerlines on near and far cheek.
+         * Hidden centerline treatment.
+         *
+         * The near centerline was removed because it visually competed
+         * with the solid throat profile and could make the elbow appear
+         * to be facing the opposite direction.
+         *
+         * Keep only the far/hidden centerline and render it lighter so
+         * it reads as hidden construction geometry rather than a visible
+         * edge of the fitting.
          */
-        drawing.appendChild(
-            svg("path", {
-                d: path(center),
-                class:
-                    "offset-iso-center-line"
-            })
-        );
-
         drawing.appendChild(
             svg("path", {
                 d: path(farCenterT),
                 class:
-                    "offset-iso-center-line offset-iso-center-line-back"
+                    "offset-iso-center-line offset-iso-center-line-back",
+                fill: "none",
+                stroke: "#9aacc8",
+                "stroke-width": 1.15,
+                "stroke-dasharray": "6 8",
+                "stroke-linecap": "round",
+                opacity: 0.48
             })
         );
 
