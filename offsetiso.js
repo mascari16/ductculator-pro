@@ -14,6 +14,7 @@
    - Straight added per elbow
    - Isometric depth based on the duct depth
    - Readable calculated-data panel
+   - Subtle near centerline plus actual hidden throat edge
    ========================================================= */
 
 (function () {
@@ -1815,6 +1816,29 @@
         );
 
         /*
+         * Hidden throat edge.
+         *
+         * This is actual hidden fitting geometry rather than a second
+         * centerline. It is drawn before the visible heel, throat, cheek,
+         * and end faces so those surfaces naturally mask any portion that
+         * should not be seen.
+         */
+        drawing.appendChild(
+            svg("path", {
+                d: path(farThroatT),
+                class:
+                    "offset-iso-hidden-throat-edge",
+                fill: "none",
+                stroke: "#aabbd5",
+                "stroke-width": 1.25,
+                "stroke-dasharray": "6 8",
+                "stroke-linecap": "round",
+                "stroke-linejoin": "round",
+                opacity: 0.5
+            })
+        );
+
+        /*
  * Heel surface.
  */
 drawing.appendChild(
@@ -1911,27 +1935,25 @@ drawing.appendChild(
         );
 
         /*
-         * Hidden centerline treatment.
+         * Near cheek centerline.
          *
-         * The near centerline was removed because it visually competed
-         * with the solid throat profile and could make the elbow appear
-         * to be facing the opposite direction.
-         *
-         * Keep only the far/hidden centerline and render it lighter so
-         * it reads as hidden construction geometry rather than a visible
-         * edge of the fitting.
+         * Keep one very subtle construction centerline so the elbow angle
+         * and flow path remain easy to understand without competing with
+         * the visible throat and heel edges. The far centerline is omitted;
+         * the dashed far-throat edge above now communicates hidden depth.
          */
         drawing.appendChild(
             svg("path", {
-                d: path(farCenterT),
+                d: path(center),
                 class:
-                    "offset-iso-center-line offset-iso-center-line-back",
+                    "offset-iso-center-line",
                 fill: "none",
-                stroke: "#9aacc8",
-                "stroke-width": 1.15,
-                "stroke-dasharray": "6 8",
+                stroke: "#9fb7dc",
+                "stroke-width": 1.05,
+                "stroke-dasharray": "10 5 2 5",
                 "stroke-linecap": "round",
-                opacity: 0.48
+                "stroke-linejoin": "round",
+                opacity: 0.28
             })
         );
 
