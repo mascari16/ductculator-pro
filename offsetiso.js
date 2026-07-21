@@ -1814,29 +1814,13 @@
             })
         );
 
-        /*
-         * Hidden throat edge (starts above the floor to improve depth perception).
-         */
-        drawing.appendChild(
-            svg("path", {
-                d: path(farThroatT.slice(18, farThroatT.length-6)),
-                fill:"none",
-                stroke:"#aabbd5",
-                "stroke-width":1.15,
-                "stroke-dasharray":"6 8",
-                "stroke-linecap":"round",
-                opacity:0.42
-            })
-        );
 
 
         /*
- * Heel surface.
- */
-/*
- * Draw the heel/top surface fill without outlining the entire closed
- * polygon. The projected near and far heel edges cross close to the
- * outlet on some elbow angles, which creates the optical flip.
+ * Heel surface fill.
+ *
+ * The closed polygon is fill-only. Its far-side outline is hidden behind
+ * the metal and must not be drawn as a solid visible edge.
  */
 drawing.appendChild(
     svg("path", {
@@ -1854,83 +1838,10 @@ drawing.appendChild(
 );
 
 /*
- * Clean top-surface linework.
+ * Throat surface fill.
  *
- * Keep the complete near heel edge, the inlet depth edge, and the outlet
- * depth edge. Stop the far heel outline shortly before the projected
- * crossing so the two outlines no longer form the confusing X/wedge.
- */
-const topFarTrim =
-    Math.max(
-        2,
-        farHeelT.length - 18
-    );
-
-drawing.appendChild(
-    svg("path", {
-        d: path(nearHeel),
-        fill: "none",
-        stroke: "#78a7ff",
-        "stroke-width": 2,
-        "stroke-linecap": "round",
-        "stroke-linejoin": "round"
-    })
-);
-
-drawing.appendChild(
-    svg("path", {
-        d: path(
-            farHeelT.slice(
-                0,
-                topFarTrim
-            )
-        ),
-        fill: "none",
-        stroke: "#78a7ff",
-        "stroke-width": 2,
-        "stroke-linecap": "round",
-        "stroke-linejoin": "round"
-    })
-);
-
-drawing.appendChild(
-    svg("line", {
-        x1: nearHeel[0].x,
-        y1: nearHeel[0].y,
-        x2: farHeelT[0].x,
-        y2: farHeelT[0].y,
-        stroke: "#78a7ff",
-        "stroke-width": 2,
-        "stroke-linecap": "round"
-    })
-);
-
-drawing.appendChild(
-    svg("line", {
-        x1:
-            nearHeel[
-                nearHeel.length - 1
-            ].x,
-        y1:
-            nearHeel[
-                nearHeel.length - 1
-            ].y,
-        x2:
-            farHeelT[
-                farHeelT.length - 1
-            ].x,
-        y2:
-            farHeelT[
-                farHeelT.length - 1
-            ].y,
-        stroke: "#78a7ff",
-        "stroke-width": 2,
-        "stroke-linecap": "round"
-    })
-);
-
-/*
- * Throat surface.
+ * Like the heel surface, this is fill-only so hidden far-side edges are
+ * not accidentally shown as solid lines through the fitting.
  */
 drawing.appendChild(
     svg("path", {
@@ -1943,8 +1854,7 @@ drawing.appendChild(
         class:
             "offset-iso-bottom-panel",
         fill: "#274474",
-        stroke: "#78a7ff",
-        "stroke-width": 2
+        stroke: "none"
     })
 );
 
@@ -1961,6 +1871,78 @@ drawing.appendChild(
                 ], true),
                 class:
                     "offset-iso-side-panel"
+            })
+        );
+
+        /*
+         * Controlled edge visibility.
+         *
+         * Near edges are visible metal edges, so they stay solid.
+         * Far edges sit behind the sheet-metal faces, so only the useful
+         * middle portions are shown and they are dashed.
+         */
+        const hiddenEdgeStart = 10;
+        const hiddenEdgeEnd =
+            Math.max(
+                hiddenEdgeStart + 2,
+                farHeelT.length - 10
+            );
+
+        drawing.appendChild(
+            svg("path", {
+                d: path(nearHeel),
+                fill: "none",
+                stroke: "#78a7ff",
+                "stroke-width": 2,
+                "stroke-linecap": "round",
+                "stroke-linejoin": "round"
+            })
+        );
+
+        drawing.appendChild(
+            svg("path", {
+                d: path(nearThroat),
+                fill: "none",
+                stroke: "#78a7ff",
+                "stroke-width": 2,
+                "stroke-linecap": "round",
+                "stroke-linejoin": "round"
+            })
+        );
+
+        drawing.appendChild(
+            svg("path", {
+                d: path(
+                    farHeelT.slice(
+                        hiddenEdgeStart,
+                        hiddenEdgeEnd
+                    )
+                ),
+                fill: "none",
+                stroke: "#aabbd5",
+                "stroke-width": 1.1,
+                "stroke-dasharray": "6 8",
+                "stroke-linecap": "round",
+                "stroke-linejoin": "round",
+                opacity: 0.42
+            })
+        );
+
+        drawing.appendChild(
+            svg("path", {
+                d: path(
+                    farThroatT.slice(
+                        hiddenEdgeStart,
+                        hiddenEdgeEnd
+                    )
+                ),
+                fill: "none",
+                stroke: "#aabbd5",
+                "stroke-width": 1.1,
+                "stroke-dasharray": "6 8",
+                "stroke-linecap": "round",
+                "stroke-linejoin": "round",
+                opacity: 0.42
             })
         );
 
@@ -2021,7 +2003,10 @@ drawing.appendChild(
         );
 
         /*
-         * Tangent/seam lines where the radius begins and ends.
+         * Tangent/seam lines on the visible near cheek only.
+         *
+         * The matching seams on the far cheek are behind the fitting and
+         * are omitted instead of being shown as solid lines through metal.
          */
         const tangentStartIndex = 1;
         const tangentEndIndex =
@@ -2040,17 +2025,6 @@ drawing.appendChild(
                     y2: nearThroat[index].y,
                     class:
                         "offset-iso-joint-line"
-                })
-            );
-
-            drawing.appendChild(
-                svg("line", {
-                    x1: farHeelT[index].x,
-                    y1: farHeelT[index].y,
-                    x2: farThroatT[index].x,
-                    y2: farThroatT[index].y,
-                    class:
-                        "offset-iso-joint-line offset-iso-joint-back"
                 })
             );
 
