@@ -1815,36 +1815,42 @@
         );
 
         /*
-         * Heel surface.
-         */
-        drawing.appendChild(
-            svg("path", {
-                d: path([
-                    ...nearHeel,
-                    ...farHeelT
-                        .slice()
-                        .reverse()
-                ], true),
-                class:
-                    "offset-iso-top-panel"
-            })
-        );
+ * Heel surface.
+ */
+drawing.appendChild(
+    svg("path", {
+        d: path([
+            ...nearHeel,
+            ...farHeelT
+                .slice()
+                .reverse()
+        ], true),
+        class:
+            "offset-iso-top-panel",
+        fill: "#31518a",
+        stroke: "#78a7ff",
+        "stroke-width": 2
+    })
+);
 
-        /*
-         * Throat surface.
-         */
-        drawing.appendChild(
-            svg("path", {
-                d: path([
-                    ...nearThroat,
-                    ...farThroatT
-                        .slice()
-                        .reverse()
-                ], true),
-                class:
-                    "offset-iso-bottom-panel"
-            })
-        );
+/*
+ * Throat surface.
+ */
+drawing.appendChild(
+    svg("path", {
+        d: path([
+            ...nearThroat,
+            ...farThroatT
+                .slice()
+                .reverse()
+        ], true),
+        class:
+            "offset-iso-bottom-panel",
+        fill: "#31518a",
+        stroke: "#78a7ff",
+        "stroke-width": 2
+    })
+);
 
         /*
          * Near cheek/side profile.
