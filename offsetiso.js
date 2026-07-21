@@ -183,6 +183,24 @@
             }
 
 
+
+            .offset-iso-dimension-line{
+                stroke:#f4b942 !important;
+                stroke-width:1.6 !important;
+                vector-effect:non-scaling-stroke;
+                shape-rendering:geometricPrecision;
+            }
+
+            .offset-iso-dimension-text{
+                fill:#ffd166 !important;
+                stroke:#08111f !important;
+                stroke-width:3px !important;
+                paint-order:stroke fill;
+                stroke-linejoin:round;
+                font-weight:800 !important;
+                shape-rendering:geometricPrecision;
+            }
+
             @media (max-width:700px){
 
                 .offset-iso-svg-mobile{
@@ -194,6 +212,20 @@
                     border:0;
                     border-radius:0;
                     background:transparent;
+                    shape-rendering:geometricPrecision;
+                    text-rendering:geometricPrecision;
+                }
+
+                .offset-iso-svg-mobile
+                .offset-iso-dimension-text{
+                    font-size:15px !important;
+                    stroke-width:3.5px !important;
+                    letter-spacing:.01em;
+                }
+
+                .offset-iso-svg-mobile
+                .offset-iso-dimension-line{
+                    stroke-width:1.8 !important;
                 }
 
                 .offset-iso-clr-warning{
@@ -1283,6 +1315,12 @@
                 y2: end.y,
                 class:
                     "offset-iso-dimension-line",
+                stroke: "#f4b942",
+                "stroke-width": 1.6,
+                "vector-effect":
+                    "non-scaling-stroke",
+                "shape-rendering":
+                    "geometricPrecision",
                 "marker-start":
                     "url(#singleElbowArrow)",
                 "marker-end":
@@ -1699,7 +1737,7 @@
             isMobile ? 500 : 1540;
 
         const viewHeight =
-            isMobile ? 1180 : 660;
+            isMobile ? 1215 : 660;
 
         const drawingArea =
             isMobile
@@ -1720,7 +1758,7 @@
             isMobile
                 ? {
                     x: 15,
-                    y: 620,
+                    y: 650,
                     width: 470,
                     height: 530
                 }
@@ -1802,24 +1840,21 @@
          * Far side face.
          */
         drawing.appendChild(
-    svg("path", {
-        d: path([
-            ...farHeelT,
-            ...farThroatT
-                .slice()
-                .reverse()
-        ], true),
-        class:
-            "offset-iso-back-panel",
-
-        // Samsung Internet makes this face appear washed out.
-        // Darken only on mobile.
-        fill: isMobile ? "#20385f" : "#31518a",
-
-        stroke: "#78a7ff",
-        "stroke-width": 2
-    })
-);
+            svg("path", {
+                d: path([
+                    ...farHeelT,
+                    ...farThroatT
+                        .slice()
+                        .reverse()
+                ], true),
+                class:
+                    "offset-iso-back-panel",
+                fill: "#31518a",
+                stroke: "#78a7ff",
+                "stroke-width": 2,
+                "shape-rendering": "geometricPrecision"
+            })
+        );
 
         /*
          * Heel surface.
@@ -1836,7 +1871,8 @@
                     "offset-iso-top-panel",
                 fill: "#31518a",
                 stroke: "#78a7ff",
-                "stroke-width": 2
+                "stroke-width": 2,
+                "shape-rendering": "geometricPrecision"
             })
         );
 
@@ -1855,7 +1891,8 @@
                     "offset-iso-bottom-panel",
                 fill: "#31518a",
                 stroke: "#78a7ff",
-                "stroke-width": 2
+                "stroke-width": 2,
+                "shape-rendering": "geometricPrecision"
             })
         );
 
@@ -1874,7 +1911,8 @@
                     "offset-iso-side-panel",
                 fill: "#31518a",
                 stroke: "#78a7ff",
-                "stroke-width": 2
+                "stroke-width": 2,
+                "shape-rendering": "geometricPrecision"
             })
         );
 
@@ -1901,7 +1939,8 @@
                     "offset-iso-end-face",
                 fill: "#31518a",
                 stroke: "#78a7ff",
-                "stroke-width": 2
+                "stroke-width": 2,
+                "shape-rendering": "geometricPrecision"
             })
         );
 
@@ -1922,7 +1961,8 @@
                     "offset-iso-end-face",
                 fill: "#31518a",
                 stroke: "#78a7ff",
-                "stroke-width": 2
+                "stroke-width": 2,
+                "shape-rendering": "geometricPrecision"
             })
         );
 
