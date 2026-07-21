@@ -19,6 +19,10 @@
 (function () {
     "use strict";
 
+    console.info(
+        "offsetiso.js loaded: hidden-line patch v4"
+    );
+
     const NS =
         "http://www.w3.org/2000/svg";
 
@@ -1696,7 +1700,7 @@
             ).matches;
 
         const viewWidth =
-            isMobile ? 500 : 1540;
+            isMobile ? 500 : 1690;
 
         const viewHeight =
             isMobile ? 1215 : 660;
@@ -1811,10 +1815,10 @@
                 ], true),
                 class:
                     "offset-iso-back-panel",
-                stroke: "none"
+                style:
+                    "stroke:none !important;"
             })
         );
-
 
 
         /*
@@ -1831,7 +1835,9 @@ drawing.appendChild(
         class:
             "offset-iso-top-panel",
         fill: "#31518a",
-        stroke: "none"
+        stroke: "none",
+        style:
+            "stroke:none !important;"
     })
 );
 
@@ -1849,7 +1855,9 @@ drawing.appendChild(
         class:
             "offset-iso-bottom-panel",
         fill: "#274474",
-        stroke: "none"
+        stroke: "none",
+        style:
+            "stroke:none !important;"
     })
 );
 
@@ -1866,13 +1874,15 @@ drawing.appendChild(
                 ], true),
                 class:
                     "offset-iso-side-panel",
-                stroke: "none"
+                style:
+                    "stroke:none !important;"
             })
         );
 
         /*
-         * Explicit visible linework only.
-         * These two near-side edges are the edges actually facing the viewer.
+         * Draw only the two truly visible near-side profile edges.
+         * No far heel outline is drawn at all, preventing the solid line
+         * from appearing through the metal and crossing near the outlet.
          */
         drawing.appendChild(
             svg("path", {
@@ -1881,7 +1891,9 @@ drawing.appendChild(
                 stroke: "#78a7ff",
                 "stroke-width": 2,
                 "stroke-linecap": "round",
-                "stroke-linejoin": "round"
+                "stroke-linejoin": "round",
+                style:
+                    "fill:none !important; stroke:#78a7ff !important;"
             })
         );
 
@@ -1892,53 +1904,9 @@ drawing.appendChild(
                 stroke: "#78a7ff",
                 "stroke-width": 2,
                 "stroke-linecap": "round",
-                "stroke-linejoin": "round"
-            })
-        );
-
-        /*
-         * Hidden far-side edges.
-         * Draw only the middle curved portions as dashed lines. The ends are
-         * omitted because the inlet and outlet faces already define them.
-         */
-        const hiddenStart = 12;
-        const hiddenEnd =
-            Math.max(
-                hiddenStart + 2,
-                farHeelT.length - 12
-            );
-
-        drawing.appendChild(
-            svg("path", {
-                d: path(
-                    farHeelT.slice(
-                        hiddenStart,
-                        hiddenEnd
-                    )
-                ),
-                fill: "none",
-                stroke: "#9fb0ca",
-                "stroke-width": 1.15,
-                "stroke-dasharray": "5 8",
-                "stroke-linecap": "round",
-                opacity: 0.34
-            })
-        );
-
-        drawing.appendChild(
-            svg("path", {
-                d: path(
-                    farThroatT.slice(
-                        hiddenStart,
-                        hiddenEnd
-                    )
-                ),
-                fill: "none",
-                stroke: "#9fb0ca",
-                "stroke-width": 1.15,
-                "stroke-dasharray": "5 8",
-                "stroke-linecap": "round",
-                opacity: 0.34
+                "stroke-linejoin": "round",
+                style:
+                    "fill:none !important; stroke:#78a7ff !important;"
             })
         );
 
