@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="color-scheme" content="dark">
+
+    <title>Ductculator Pro</title>
+
+    <link rel="stylesheet" href="style.css?v=20260728-1">
+
+    <link rel="stylesheet" href="offsetiso.css?v=20260728-1">
+
+</head>
+
+<body>
+
+<!-- ===================================================
+     DASHBOARD
+=================================================== -->
+
+<div id="dashboard" class="page active">
+
+    <header class="hero">
+
+        <h1>DUCTCULATOR PRO</h1>
+
+        <p>Professional HVAC Design Toolkit</p>
+
+    </header>
+
+    <main class="dashboard">
+
+        <h2>Design Tools</h2>
+
+        <div class="tool-grid">
+
+            <div class="tool-card" id="openAirflow">
+
+                <div class="tool-icon">💨</div>
+
+                <h3>Airflow Calculator</h3>
+
+                <p>
+
+                    Equal Friction<br>
+                    Constant Velocity<br>
+                    Static Regain
+
+                </p>
+
+                <button>
+
+                    Open Calculator →
+
+                </button>
+
+            </div>
+
+            <div class="tool-card disabled">
+
+                <div class="tool-icon">📏</div>
+
+                <h3>Pressure Loss</h3>
+
+                <p>
+
+                    Straight Duct<br>
+                    Fittings<br>
+                    Total Pressure
+
+                </p>
+
+                <span>Coming Soon</span>
+
+            </div>
+
+            <div class="tool-card" id="openEquivalent">
+
+    <div class="tool-icon">⭕</div>
+
+    <h3>Equivalent Sizes</h3>
+
+    <p>
+
+        Round<br>
+        Rectangle<br>
+        Flat Oval
+
+    </p>
+
+    <button>
+
+        Open Calculator →
+
+    </button>
+
+</div>
+
+<div class="tool-card" id="openSheetMetal">
+
+    <div class="tool-icon">📐</div>
+
+    <h3>Sheet Metal Calculator</h3>
+
+    <p>
+
+        Two-Elbow Offsets<br>
+        Feet-Inch Math<br>
+        Layout Tools
+
+    </p>
+
+    <button>
+
+        Open Calculator →
+
+    </button>
+
+</div>
+
+            <div class="tool-card disabled">
+
+                <div class="tool-icon">🔄</div>
+
+                <h3>Reverse Calculator</h3>
+
+                <p>
+
+                    Existing Duct<br>
+                    Velocity<br>
+                    Airflow
+
+                </p>
+
+                <span>Coming Soon</span>
+
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
+<!-- ===================================================
+     AIRFLOW WORKSPACE
+=================================================== -->
+
+<div id="airflowWorkspace" class="workspace">
+
+    <button
+    id="mobileMenuBtn"
+    class="mobile-menu-btn"
+    type="button">
+
+    ☰
+
+</button>
+
+<div
+    id="mobileOverlay"
+    class="mobile-overlay">
+
+</div>
+
+    <!-- Sidebar -->
+
+    <aside class="sidebar">
+
+        <div class="sidebar-top">
+
+            <button id="toggleSidebar" class="toggle-btn">
+
+                ☰
+
+            </button>
+
+            <h2>Ductculator</h2>
+
+        </div>
+
+        <button id="goHome">
+
+    <span class="icon">🏠</span>
+
+    <span class="text">Dashboard</span>
+
+</button>
+
+<hr>
+
+<button class="active">
+
+    <span class="icon">💨</span>
+
+    <span class="text">Airflow</span>
+
+</button>
+
+<button disabled>
+
+    <span class="icon">📏</span>
+
+    <span class="text">Pressure Loss</span>
+
+</button>
+
+<button id="airflowOpenEquivalent">
+
+    <span class="icon">⭕</span>
+
+    <span class="text">Equivalent Sizes</span>
+
+</button>
+
+<button id="airflowOpenSheetMetal">
+
+    <span class="icon">🧮</span>
+
+    <span class="text">Sheet Metal</span>
+
+</button>
+
+<button disabled>
+
+    <span class="icon">🔄</span>
+
+    <span class="text">Reverse Calculator</span>
+
+</button>
+
+<hr>
+
+<button disabled>
+
+    <span class="icon">⚙</span>
+
+    <span class="text">Settings</span>
+
+</button>
+
+</aside>
+
+    <!-- Main Content -->
+
+    <section class="content">
+
+        <header>
+
+            <h1>Airflow Calculator</h1>
+
+            <p>
+
+                Industry Standard HVAC Duct Sizing
+
+            </p>
+
+        </header>
+
+        <div class="calculator">
+
+            <!-- =======================
+                 INPUTS
+            ======================== -->
+
+            <div class="panel">
+
+                <h3>Inputs</h3>
+
+                <label for="cfmInput">
+
+                    Airflow (CFM)
+
+                </label>
+
+                <input
+                    id="cfmInput"
+                    type="number"
+                    placeholder="2000"
+                    value="2000">
+
+                <label for="methodSelect">
+
+                    Calculation Method
+
+                </label>
+
+                <select id="methodSelect">
+
+                    <option value="constantVelocity" selected>
+
+                        Constant Velocity
+
+                    </option>
+
+                    <option value="equalFriction">
+
+                        Equal Friction
+
+                    </option>
+
+                    <option value="staticRegain">
+
+                        Static Regain
+
+                    </option>
+
+                </select>
+
+                <!-- Constant Velocity -->
+
+                <div id="velocityGroup">
+
+                    <label for="velocityInput">
+
+                        Velocity (FPM)
+
+                    </label>
+
+                    <input
+                        id="velocityInput"
+                        type="number"
+                        value="1200">
+
+                </div>
+
+                <!-- Equal Friction -->
+
+                <div id="frictionGroup" style="display:none;">
+
+                    <label for="frictionInput">
+
+                        Friction Rate (in. w.g./100 ft)
+
+                    </label>
+
+                    <input
+                        id="frictionInput"
+                        type="number"
+                        min="0.001"
+                        step="0.01"
+                        value="0.08">
+
+                    <p class="input-help">
+                        Sizes duct so the selected standard round does not
+                        exceed the target friction rate.
+                    </p>
+
+                </div>
+
+                <!-- Static Regain -->
+
+                <div id="staticRegainGroup" style="display:none;">
+
+                    <label for="enteringVelocityInput">
+
+                        Entering Velocity (FPM)
+
+                    </label>
+
+                    <input
+                        id="enteringVelocityInput"
+                        type="number"
+                        min="1"
+                        step="25"
+                        value="1800">
+
+                    <label for="staticRegainInput">
+
+                        Desired Static Regain (in. w.g.)
+
+                    </label>
+
+                    <input
+                        id="staticRegainInput"
+                        type="number"
+                        min="0.001"
+                        step="0.01"
+                        value="0.05">
+
+                    <label for="regainEfficiencyInput">
+
+                        Regain Efficiency (%)
+
+                    </label>
+
+                    <input
+                        id="regainEfficiencyInput"
+                        type="number"
+                        min="1"
+                        max="100"
+                        step="1"
+                        value="75">
+
+                    <p class="input-help">
+                        Single-step sizing at standard-air density. Final
+                        systems should still be checked section by section.
+                    </p>
+
+                </div>
+
+            </div>
+
+            <!-- =======================
+                 RESULTS
+            ======================== -->
+
+            <div class="panel">
+
+                <h3>Results</h3>
+
+                <div id="results" class="results">
+
+                    Enter values and press Calculate.
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+</div>
+
+<!-- ===================================================
+     EQUIVALENT SIZES WORKSPACE
+=================================================== -->
+
+<div id="equivalentWorkspace" class="workspace">
+
+    <!-- Mobile Menu Button -->
+
+    <button
+        id="equivalentMobileMenuBtn"
+        class="mobile-menu-btn"
+        type="button">
+
+        ☰
+
+    </button>
+
+    <div
+        id="equivalentMobileOverlay"
+        class="mobile-overlay">
+
+    </div>
+
+    <!-- Sidebar -->
+
+    <aside class="sidebar equivalent-sidebar">
+
+        <div class="sidebar-top">
+
+            <button
+                id="toggleEquivalentSidebar"
+                class="toggle-btn"
+                type="button">
+
+                ☰
+
+            </button>
+
+            <h2>Ductculator</h2>
+
+        </div>
+
+        <button id="equivalentGoHome">
+
+            <span class="icon">🏠</span>
+
+            <span class="text">Dashboard</span>
+
+        </button>
+
+        <hr>
+
+        <button id="equivalentOpenAirflow">
+
+            <span class="icon">💨</span>
+
+            <span class="text">Airflow</span>
+
+        </button>
+
+        <button disabled>
+
+            <span class="icon">📏</span>
+
+            <span class="text">Pressure Loss</span>
+
+        </button>
+
+        <button class="active">
+
+            <span class="icon">⭕</span>
+
+            <span class="text">Equivalent Sizes</span>
+
+        </button>
+
+        <button id="equivalentOpenSheetMetal">
+
+        <span class="icon">🧮</span>
+
+        <span class="text">Sheet Metal</span>
+
+        </button>
+
+        <button disabled>
+
+            <span class="icon">🔄</span>
+
+            <span class="text">Reverse Calculator</span>
+
+        </button>
+
+        <hr>
+
+        <button disabled>
+
+            <span class="icon">⚙</span>
+
+            <span class="text">Settings</span>
+
+        </button>
+
+    </aside>
+
+    <!-- Main Content -->
+
+    <section class="content">
+
+        <header>
+
+            <h1>Equivalent Sizes</h1>
+
+            <p>
+
+                Convert round duct to rectangle and flat oval sizes
+
+            </p>
+
+        </header>
+
+        <div class="calculator">
+
+            <!-- Inputs -->
+
+            <div class="panel">
+
+                <h3>Known Duct</h3>
+
+                <label for="equivalentShape">
+
+    Known Shape
+
+</label>
+
+<select id="equivalentShape">
+
+    <option value="round" selected>
+
+        Round
+
+    </option>
+
+    <option value="rectangle">
+
+        Rectangle
+
+    </option>
+
+    <option value="flatOval">
+
+        Flat Oval
+
+    </option>
+
+</select>
+
+<!-- =========================
+     ROUND INPUT
+========================= -->
+
+<div id="equivalentRoundGroup">
+
+    <label for="equivalentRoundInput">
+
+        Round Diameter (inches)
+
+    </label>
+
+    <input
+        id="equivalentRoundInput"
+        type="number"
+        min="1"
+        step="0.01"
+        value="12"
+        placeholder="12">
+
+</div>
+
+<!-- =========================
+     RECTANGLE INPUTS
+========================= -->
+
+<div
+    id="equivalentRectangleGroup"
+    style="display:none;">
+
+    <label for="equivalentRectangleWidth">
+
+        Rectangle Width (inches)
+
+    </label>
+
+    <input
+        id="equivalentRectangleWidth"
+        type="number"
+        min="1"
+        step="0.01"
+        value="24"
+        placeholder="24">
+
+    <label for="equivalentRectangleHeight">
+
+        Rectangle Height (inches)
+
+    </label>
+
+    <input
+        id="equivalentRectangleHeight"
+        type="number"
+        min="1"
+        step="0.01"
+        value="14"
+        placeholder="14">
+
+</div>
+
+<!-- =========================
+     FLAT OVAL INPUTS
+========================= -->
+
+<div
+    id="equivalentOvalGroup"
+    style="display:none;">
+
+    <label for="equivalentOvalWidth">
+
+        Flat Oval Width (inches)
+
+    </label>
+
+    <input
+        id="equivalentOvalWidth"
+        type="number"
+        min="1"
+        step="0.01"
+        value="36"
+        placeholder="36">
+
+    <label for="equivalentOvalHeight">
+
+        Flat Oval Height (inches)
+
+    </label>
+
+    <input
+        id="equivalentOvalHeight"
+        type="number"
+        min="1"
+        step="0.01"
+        value="10"
+        placeholder="10">
+
+</div>
+
+                <div class="equivalent-source-details">
+
+    <h4>Source Details</h4>
+
+    <div class="equivalent-source-summary">
+
+        <span>Source Duct</span>
+
+        <strong id="equivalentSourceSize">
+
+            12" Round
+
+        </strong>
+
+    </div>
+
+    <div class="equivalent-source-summary">
+
+        <span>Target Area</span>
+
+        <strong id="equivalentSourceArea">
+
+            0.785 ft²
+
+        </strong>
+
+    </div>
+
+</div>
+
+            </div>
+
+            <!-- Results -->
+
+            <div class="panel">
+
+                <h3>Equivalent Options</h3>
+
+                <div id="equivalentResults">
+
+                    <div class="options-grid equivalent-options-grid">
+
+                        <!-- Rectangle Results -->
+
+                        <div class="options-card">
+
+                            <h3 id="equivalentResultOneTitle">
+
+                                ▭ Rectangle
+
+                            </h3>
+
+                            <table class="options-table">
+
+                                <thead>
+
+                                 <tr>
+
+    <th>Size</th>
+
+    <th>Flow Match</th>
+
+    <th>Area Match</th>
+
+    <th>Area</th>
+
+</tr>
+
+                                </thead>
+
+                                <tbody id="equivalentResultOneRows">
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                        <!-- Flat Oval Results -->
+
+                        <div class="options-card">
+
+                            <h3 id="equivalentResultTwoTitle">
+
+                                ⬭ Flat Oval
+
+                            </h3>
+
+                            <table class="options-table">
+
+                                <thead>
+
+                                    <tr>
+
+    <th>Size</th>
+
+    <th>Flow Match</th>
+
+    <th>Area Match</th>
+
+    <th>Area</th>
+
+</tr>
+
+                                </thead>
+
+                                <tbody id="equivalentResultTwoRows">
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+</div>
+
+<!-- ===================================================
+     SHEET METAL WORKSPACE
+=================================================== -->
+
+<div id="sheetMetalWorkspace" class="workspace">
+
+    <button
+        id="sheetMetalMobileMenuBtn"
+        class="mobile-menu-btn"
+        type="button">
+
+        ☰
+
+    </button>
+
+    <div
+        id="sheetMetalMobileOverlay"
+        class="mobile-overlay">
+
+    </div>
+
+    <aside class="sidebar sheet-metal-sidebar">
+
+        <div class="sidebar-top">
+
+            <button
+                id="toggleSheetMetalSidebar"
+                class="toggle-btn"
+                type="button">
+
+                ☰
+
+            </button>
+
+            <h2>Ductculator</h2>
+
+        </div>
+
+        <button id="sheetMetalGoHome" type="button">
+
+            <span class="icon">🏠</span>
+
+            <span class="text">Dashboard</span>
+
+        </button>
+
+        <hr>
+
+        <button id="sheetMetalOpenAirflow" type="button">
+
+            <span class="icon">💨</span>
+
+            <span class="text">Airflow</span>
+
+        </button>
+
+        <button disabled>
+
+            <span class="icon">📏</span>
+
+            <span class="text">Pressure Loss</span>
+
+        </button>
+
+        <button id="sheetMetalOpenEquivalent" type="button">
+
+            <span class="icon">⭕</span>
+
+            <span class="text">Equivalent Sizes</span>
+
+        </button>
+
+        <button class="active" type="button">
+
+            <span class="icon">🧮</span>
+
+            <span class="text">Sheet Metal</span>
+
+        </button>
+
+        <button disabled>
+
+            <span class="icon">🔄</span>
+
+            <span class="text">Reverse Calculator</span>
+
+        </button>
+
+        <hr>
+
+        <button disabled>
+
+            <span class="icon">⚙</span>
+
+            <span class="text">Settings</span>
+
+        </button>
+
+    </aside>
+
+    <section class="content">
+
+        <header>
+
+            <h1>Sheet Metal Calculator</h1>
+
+            <p>Two-Elbow Offset Calculator</p>
+
+        </header>
+
+        <div class="calculator">
+
+    <div class="panel">
+
+        <h3>Offset Inputs</h3>
+
+        <label for="offsetMode">
+
+            Calculation Mode
+
+        </label>
+
+        <select id="offsetMode">
+
+            <option value="solveAngle" selected>
+
+                Solve Elbow Angle
+
+            </option>
+
+            <option value="knownAngle">
+
+                Known Elbow Angle
+
+            </option>
+
+        </select>
+
+        <label for="offsetInput">
+    Offset
+</label>
+
+<input
+    id="offsetInput"
+    type="text"
+    inputmode="decimal"
+    value="46 1/4">
+
+<label for="overallLengthInput">
+    Overall Length
+</label>
+
+<input
+    id="overallLengthInput"
+    type="text"
+    inputmode="decimal"
+    value="69">
+
+<label for="ductWidthInput">
+    Width (Cheek)
+</label>
+
+<input
+    id="ductWidthInput"
+    type="text"
+    inputmode="decimal"
+    value="60">
+
+<label for="ductDepthInput">
+    Depth
+</label>
+
+<input
+    id="ductDepthInput"
+    type="text"
+    inputmode="decimal"
+    value="24">    
+
+        <label for="clrMultiplier">
+
+            CLR Multiplier
+
+        </label>
+
+        <select id="clrMultiplier">
+
+    <option value="auto" selected>
+
+        Auto CLR
+
+    </option>
+
+    <option value="1">
+
+        1× CLR
+
+    </option>
+
+    <option value="1.5">
+
+        1.5× CLR
+
+    </option>
+
+    <option value="2">
+
+        2× CLR
+
+    </option>
+
+    <option value="custom">
+
+        Custom CLR
+
+    </option>
+
+</select>
+
+        <div
+            id="customClrGroup"
+            style="display:none;">
+
+            <label for="customClrInput">
+
+                Custom Centerline Radius
+
+            </label>
+
+            <input
+                id="customClrInput"
+                type="text"
+                inputmode="decimal"
+                placeholder="34">
+
+        </div>
+
+        <div
+            id="knownAngleGroup"
+            style="display:none;">
+
+            <label for="elbowAngleInput">
+
+                Elbow Angle
+
+            </label>
+
+            <input
+                id="elbowAngleInput"
+                type="number"
+                min="1"
+                max="90"
+                step="0.01"
+                placeholder="45">
+
+        </div>
+
+        <button
+            id="calculateOffsetBtn"
+            type="button">
+
+            Calculate Offset
+
+        </button>
+
+    </div>
+
+    <div class="panel">
+
+    <h3>Offset Results</h3>
+
+    <div
+        id="offsetResults"
+        class="results">
+
+        Enter the offset dimensions and press Calculate Offset.
+
+    </div>
+
+    <div class="offset-iso-card">
+
+    <div class="offset-iso-header">
+
+        <h3>Live Isometric Preview</h3>
+
+        <p class="offset-iso-note">
+            Preview updates as dimensions change.
+        </p>
+
+    </div>
+
+    <div
+        id="offsetIsoContainer"
+        class="offset-iso-container">
+    </div>
+
+</div>
+
+</div>
+
+</div>
+
+    </section>
+
+</div>
+
+<!-- ===================================================
+     JAVASCRIPT
+=================================================== -->
+
+<script src="js/formulas.js?v=20260728-1"></script>
+<script src="js/rectangle.js?v=20260728-1"></script>
+<script src="js/flatOval.js?v=20260728-1"></script>
+<script src="js/equivalentSizes.js?v=20260728-1"></script>
+<script src="js/airflow.js?v=20260728-1"></script>
+<script src="app.js?v=20260728-1"></script>
+<script src="offsetiso.js?v=20260728-1"></script>
+<script src="js/equivalentUI.js?v=20260728-1"></script>
+
+</body>
+
+</html>
