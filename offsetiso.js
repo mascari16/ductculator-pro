@@ -1362,8 +1362,8 @@
         const arrow =
             svg("marker", {
                 id: "singleElbowArrow",
-                markerWidth: 5,
-                markerHeight: 5,
+                markerWidth: 6,
+                markerHeight: 6,
                 refX: 5,
                 refY: 2.5,
                 orient: "auto-start-reverse",
@@ -1377,7 +1377,7 @@
                 d: "M 0 0 L 5 2.5 L 0 5",
                 fill: "none",
                 stroke: "#f4b942",
-                "stroke-width": 1.15,
+                "stroke-width": 1.35,
                 "stroke-linecap": "round",
                 "stroke-linejoin": "round"
             })
@@ -1483,16 +1483,37 @@
         y,
         width,
         label,
-        value
+        value,
+        metrics = {}
     ) {
+
+        const cardHeight =
+            metrics.cardHeight || 70;
+
+        const labelSize =
+            metrics.labelSize || 12;
+
+        const valueSize =
+            metrics.valueSize || 18;
+
+        const horizontalPadding =
+            metrics.horizontalPadding || 14;
+
+        const labelY =
+            y +
+            (metrics.labelOffsetY || 22);
+
+        const valueY =
+            y +
+            (metrics.valueOffsetY || 50);
 
         group.appendChild(
             svg("rect", {
                 x,
                 y,
                 width,
-                height: 70,
-                rx: 10,
+                height: cardHeight,
+                rx: metrics.cardRadius || 10,
                 fill: "#111d31",
                 stroke: "#2a3d5c",
                 "stroke-width": 1.1
@@ -1501,21 +1522,21 @@
 
         group.appendChild(
             svg("text", {
-                x: x + 14,
-                y: y + 22,
+                x: x + horizontalPadding,
+                y: labelY,
                 fill: "#8fa6c9",
-                "font-size": 12,
-                "font-weight": 650
+                "font-size": labelSize,
+                "font-weight": 700
             }, label.toUpperCase())
         );
 
         group.appendChild(
             svg("text", {
-                x: x + 14,
-                y: y + 50,
+                x: x + horizontalPadding,
+                y: valueY,
                 fill: "#f4f7ff",
-                "font-size": 18,
-                "font-weight": 750
+                "font-size": valueSize,
+                "font-weight": 780
             }, value)
         );
 
@@ -1529,10 +1550,62 @@
 
         const panel = panelLayout || {
             x: 1250,
-            y: 50,
-            width: 400,
-            height: 560
+            y: 35,
+            width: 420,
+            height: 590,
+            mobile: false
         };
+
+        const isMobilePanel =
+            panel.mobile === true;
+
+        const metrics = isMobilePanel
+            ? {
+                padding: 20,
+                gap: 12,
+                titleSize: 25,
+                titleOffsetY: 39,
+                subtitleSize: 14,
+                subtitleOffsetY: 66,
+                cardsStartY: 94,
+                cardHeight: 82,
+                rowStep: 94,
+                cardRadius: 11,
+                labelSize: 13.5,
+                valueSize: 21,
+                horizontalPadding: 14,
+                labelOffsetY: 25,
+                valueOffsetY: 58,
+                quantityGap: 13,
+                quantityHeight: 56,
+                quantityLabelSize: 13.5,
+                quantityValueSize: 20,
+                noteGap: 15,
+                noteSize: 14
+            }
+            : {
+                padding: 24,
+                gap: 12,
+                titleSize: 23,
+                titleOffsetY: 38,
+                subtitleSize: 14,
+                subtitleOffsetY: 63,
+                cardsStartY: 91,
+                cardHeight: 76,
+                rowStep: 88,
+                cardRadius: 10,
+                labelSize: 13,
+                valueSize: 20,
+                horizontalPadding: 14,
+                labelOffsetY: 24,
+                valueOffsetY: 54,
+                quantityGap: 13,
+                quantityHeight: 54,
+                quantityLabelSize: 13,
+                quantityValueSize: 20,
+                noteGap: 15,
+                noteSize: 14
+            };
 
         const group =
             svg("g");
@@ -1543,30 +1616,41 @@
                 y: panel.y,
                 width: panel.width,
                 height: panel.height,
-                rx: 18,
+                rx: isMobilePanel ? 20 : 18,
                 fill:
                     "url(#singleElbowDataGradient)",
                 stroke: "#2a3d5c",
-                "stroke-width": 1.4
+                "stroke-width": 1.5
             })
         );
 
         group.appendChild(
             svg("text", {
-                x: panel.x + 24,
-                y: panel.y + 36,
+                x:
+                    panel.x +
+                    metrics.padding,
+                y:
+                    panel.y +
+                    metrics.titleOffsetY,
                 fill: "#f4f7ff",
-                "font-size": 21,
-                "font-weight": 760
+                "font-size":
+                    metrics.titleSize,
+                "font-weight": 780
             }, "One-Elbow Fabrication Data")
         );
 
         group.appendChild(
             svg("text", {
-                x: panel.x + 24,
-                y: panel.y + 59,
+                x:
+                    panel.x +
+                    metrics.padding,
+                y:
+                    panel.y +
+                    metrics.subtitleOffsetY,
                 fill: "#8097ba",
-                "font-size": 13
+                "font-size":
+                    metrics.subtitleSize,
+                "font-weight": 520
             }, "Two matching elbows are required for the offset.")
         );
 
@@ -1630,14 +1714,11 @@
             ]
         ];
 
-        const padding = 24;
-        const gap = 12;
-
         const cardWidth =
             (
                 panel.width -
-                padding * 2 -
-                gap
+                metrics.padding * 2 -
+                metrics.gap
             ) / 2;
 
         values.forEach(
@@ -1654,35 +1735,46 @@
                 addDataCard(
                     group,
                     panel.x +
-                        padding +
+                        metrics.padding +
                         column *
                         (
                             cardWidth +
-                            gap
+                            metrics.gap
                         ),
                     panel.y +
-                        86 +
+                        metrics.cardsStartY +
                         row *
-                        82,
+                        metrics.rowStep,
                     cardWidth,
                     entry[0],
-                    entry[1]
+                    entry[1],
+                    metrics
                 );
 
             }
         );
 
+        const cardsBottom =
+            panel.y +
+            metrics.cardsStartY +
+            3 * metrics.rowStep +
+            metrics.cardHeight;
+
         const quantityY =
-            panel.y + 414;
+            cardsBottom +
+            metrics.quantityGap;
 
         group.appendChild(
             svg("rect", {
-                x: panel.x + padding,
+                x:
+                    panel.x +
+                    metrics.padding,
                 y: quantityY,
                 width:
                     panel.width -
-                    padding * 2,
-                height: 48,
+                    metrics.padding * 2,
+                height:
+                    metrics.quantityHeight,
                 rx: 10,
                 fill: "#111d31",
                 stroke: "#2a3d5c",
@@ -1692,11 +1784,17 @@
 
         group.appendChild(
             svg("text", {
-                x: panel.x + padding + 14,
-                y: quantityY + 20,
+                x:
+                    panel.x +
+                    metrics.padding +
+                    14,
+                y:
+                    quantityY +
+                    22,
                 fill: "#8fa6c9",
-                "font-size": 12,
-                "font-weight": 650
+                "font-size":
+                    metrics.quantityLabelSize,
+                "font-weight": 700
             }, "QUANTITY")
         );
 
@@ -1705,29 +1803,34 @@
                 x:
                     panel.x +
                     panel.width -
-                    padding -
+                    metrics.padding -
                     14,
-                y: quantityY + 31,
+                y:
+                    quantityY +
+                    36,
                 fill: "#f4f7ff",
-                "font-size": 18,
-                "font-weight": 750,
+                "font-size":
+                    metrics.quantityValueSize,
+                "font-weight": 780,
                 "text-anchor": "end"
             }, "2 Elbows")
         );
 
         const noteY =
-            panel.y +
-            panel.height -
-            82;
+            quantityY +
+            metrics.quantityHeight +
+            metrics.noteGap;
 
         group.appendChild(
             svg("line", {
-                x1: panel.x + 24,
+                x1:
+                    panel.x +
+                    metrics.padding,
                 y1: noteY,
                 x2:
                     panel.x +
                     panel.width -
-                    24,
+                    metrics.padding,
                 y2: noteY,
                 stroke: "#2a3d5c",
                 "stroke-width": 1
@@ -1736,10 +1839,14 @@
 
         group.appendChild(
             svg("text", {
-                x: panel.x + 24,
-                y: noteY + 28,
-                fill: "#8fa6c9",
-                "font-size": 13
+                x:
+                    panel.x +
+                    metrics.padding,
+                y: noteY + 31,
+                fill: "#9aadd0",
+                "font-size":
+                    metrics.noteSize,
+                "font-weight": 520
             }, model.straightPerElbow > 0.01
                 ? `Add ${
                     formatMeasurement(
@@ -1752,11 +1859,15 @@
 
         group.appendChild(
             svg("text", {
-                x: panel.x + 24,
-                y: noteY + 52,
-                fill: "#8fa6c9",
-                "font-size": 13
-            }, `Use two matching elbows for this offset.`)
+                x:
+                    panel.x +
+                    metrics.padding,
+                y: noteY + 57,
+                fill: "#9aadd0",
+                "font-size":
+                    metrics.noteSize,
+                "font-weight": 520
+            }, "Use two matching elbows for this offset.")
         );
 
         drawing.appendChild(group);
@@ -1848,7 +1959,7 @@
             isMobile ? 500 : 1680;
 
         const viewHeight =
-            isMobile ? 1245 : 660;
+            isMobile ? 1310 : 660;
 
         const drawingArea =
             isMobile
@@ -1868,16 +1979,18 @@
         const dataPanelLayout =
             isMobile
                 ? {
-                    x: 10,
-                    y: 665,
-                    width: 480,
-                    height: 545
+                    x: 4,
+                    y: 635,
+                    width: 492,
+                    height: 640,
+                    mobile: true
                 }
                 : {
                     x: 1250,
-                    y: 50,
-                    width: 400,
-                    height: 560
+                    y: 35,
+                    width: 420,
+                    height: 590,
+                    mobile: false
                 };
 
         const transform =
