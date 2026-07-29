@@ -1777,7 +1777,7 @@
             ).matches;
 
         const viewWidth =
-            isMobile ? 500 : 1750;
+            isMobile ? 500 : 1680;
 
         const viewHeight =
             isMobile ? 1215 : 660;
@@ -1791,10 +1791,10 @@
                     height: 485
                 }
                 : {
-                    x: 65,
-                    y: 55,
-                    width: 655,
-                    height: 520
+                    x: 45,
+                    y: 20,
+                    width: 900,
+                    height: 550
                 };
 
         const dataPanelLayout =
