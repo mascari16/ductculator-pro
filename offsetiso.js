@@ -1426,7 +1426,7 @@
                 x,
                 y,
                 width,
-                height: 70,
+                height: 76,
                 rx: 10,
                 fill: "#111d31",
                 stroke: "#2a3d5c",
@@ -1437,9 +1437,9 @@
         group.appendChild(
             svg("text", {
                 x: x + 14,
-                y: y + 22,
+                y: y + 24,
                 fill: "#8fa6c9",
-                "font-size": 12,
+                "font-size": 13,
                 "font-weight": 650
             }, label.toUpperCase())
         );
@@ -1447,9 +1447,9 @@
         group.appendChild(
             svg("text", {
                 x: x + 14,
-                y: y + 50,
+                y: y + 55,
                 fill: "#f4f7ff",
-                "font-size": 18,
+                "font-size": 21,
                 "font-weight": 750
             }, value)
         );
@@ -1463,10 +1463,10 @@
     ) {
 
         const panel = panelLayout || {
-            x: 1250,
-            y: 50,
-            width: 400,
-            height: 560
+            x: 1050,
+            y: 70,
+            width: 500,
+            height: 600
         };
 
         const group =
@@ -1489,9 +1489,9 @@
         group.appendChild(
             svg("text", {
                 x: panel.x + 24,
-                y: panel.y + 36,
+                y: panel.y + 40,
                 fill: "#f4f7ff",
-                "font-size": 21,
+                "font-size": 25,
                 "font-weight": 760
             }, "One-Elbow Fabrication Data")
         );
@@ -1499,9 +1499,9 @@
         group.appendChild(
             svg("text", {
                 x: panel.x + 24,
-                y: panel.y + 59,
+                y: panel.y + 67,
                 fill: "#8097ba",
-                "font-size": 13
+                "font-size": 14
             }, "Two matching elbows are required for the offset.")
         );
 
@@ -1566,7 +1566,7 @@
         ];
 
         const padding = 24;
-        const gap = 12;
+        const gap = 14;
 
         const cardWidth =
             (
@@ -1596,9 +1596,9 @@
                             gap
                         ),
                     panel.y +
-                        86 +
+                        94 +
                         row *
-                        82,
+                        88,
                     cardWidth,
                     entry[0],
                     entry[1]
@@ -1608,7 +1608,7 @@
         );
 
         const quantityY =
-            panel.y + 414;
+            panel.y + 448;
 
         group.appendChild(
             svg("rect", {
@@ -1617,7 +1617,7 @@
                 width:
                     panel.width -
                     padding * 2,
-                height: 48,
+                height: 58,
                 rx: 10,
                 fill: "#111d31",
                 stroke: "#2a3d5c",
@@ -1628,9 +1628,9 @@
         group.appendChild(
             svg("text", {
                 x: panel.x + padding + 14,
-                y: quantityY + 20,
+                y: quantityY + 23,
                 fill: "#8fa6c9",
-                "font-size": 12,
+                "font-size": 13,
                 "font-weight": 650
             }, "QUANTITY")
         );
@@ -1642,18 +1642,16 @@
                     panel.width -
                     padding -
                     14,
-                y: quantityY + 31,
+                y: quantityY + 38,
                 fill: "#f4f7ff",
-                "font-size": 18,
+                "font-size": 21,
                 "font-weight": 750,
                 "text-anchor": "end"
             }, "2 Elbows")
         );
 
         const noteY =
-            panel.y +
-            panel.height -
-            82;
+            panel.y + 510;
 
         group.appendChild(
             svg("line", {
@@ -1674,7 +1672,7 @@
                 x: panel.x + 24,
                 y: noteY + 28,
                 fill: "#8fa6c9",
-                "font-size": 13
+                "font-size": 14
             }, model.straightPerElbow > 0.01
                 ? `Add ${
                     formatMeasurement(
@@ -1690,7 +1688,7 @@
                 x: panel.x + 24,
                 y: noteY + 52,
                 fill: "#8fa6c9",
-                "font-size": 13
+                "font-size": 14
             }, `Use two matching elbows for this offset.`)
         );
 
@@ -1777,10 +1775,10 @@
             ).matches;
 
         const viewWidth =
-            isMobile ? 500 : 1680;
+            isMobile ? 500 : 1580;
 
         const viewHeight =
-            isMobile ? 1215 : 660;
+            isMobile ? 1215 : 700;
 
         const drawingArea =
             isMobile
@@ -1791,10 +1789,10 @@
                     height: 485
                 }
                 : {
-                    x: 45,
+                    x: 20,
                     y: 20,
-                    width: 900,
-                    height: 550
+                    width: 1000,
+                    height: 620
                 };
 
         const dataPanelLayout =
@@ -1806,10 +1804,10 @@
                     height: 530
                 }
                 : {
-                    x: 1250,
-                    y: 50,
-                    width: 400,
-                    height: 560
+                    x: 1050,
+                    y: 70,
+                    width: 500,
+                    height: 600
                 };
 
         const transform =

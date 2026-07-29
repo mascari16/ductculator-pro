@@ -1164,12 +1164,12 @@ MOBILE
     }
 
     #sheetMetalWorkspace .calculator {
-    display: block;
-}
+        display: block;
+    }
 
-#sheetMetalWorkspace .calculator > .panel:first-child {
-    padding: 24px;
-}
+    #sheetMetalWorkspace .calculator > .panel:first-child {
+        padding: 24px;
+    }
 
     .panel{
 
@@ -1501,13 +1501,13 @@ DUCT OPTIONS
  * the same 360px width as the other calculators.
  */
 #sheetMetalWorkspace .calculator {
-    grid-template-columns: 290px minmax(0, 1fr);
-    gap: 18px;
+    grid-template-columns: 260px minmax(0, 1fr);
+    gap: 16px;
     align-items: start;
 }
 
 #sheetMetalWorkspace .calculator > .panel:first-child {
-    padding: 24px 22px;
+    padding: 22px 18px;
 }
 
 #sheetMetalWorkspace .calculator > .panel:first-child h3 {
@@ -1523,6 +1523,7 @@ DUCT OPTIONS
 #sheetMetalWorkspace .calculator > .panel:first-child select {
     padding: 12px;
 }
+
 
 #sheetMetalWorkspace .panel label {
     display: block;
