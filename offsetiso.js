@@ -35,6 +35,7 @@
     };
 
     let latestCalculatedData = null;
+    let activeOffsetError = window.__ductculatorOffsetError || null;
 
 
     function ensureClrWarningStyles() {
@@ -222,6 +223,70 @@
         document.head.appendChild(
             style
         );
+
+    }
+
+
+    function escapeHtml(value) {
+
+        return String(value ?? "")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+
+    }
+
+    function addOffsetProblemOverlay(
+        container,
+        problem
+    ) {
+
+        if (!problem) {
+            return;
+        }
+
+        container.classList.add(
+            "has-offset-error"
+        );
+
+        const overlay =
+            document.createElement("div");
+
+        overlay.className =
+            "offset-iso-problem-overlay";
+
+        overlay.setAttribute(
+            "role",
+            "alert"
+        );
+
+        const steps = Array.isArray(problem.steps)
+            ? problem.steps
+            : [];
+
+        overlay.innerHTML = `
+            <div class="offset-iso-problem-heading">
+                <span class="offset-iso-problem-icon" aria-hidden="true">!</span>
+                <h4 class="offset-iso-problem-title">
+                    ${escapeHtml(problem.title || "Geometry needs adjustment")}
+                </h4>
+            </div>
+
+            <p class="offset-iso-problem-message">
+                ${escapeHtml(problem.message || "The entered geometry cannot produce a valid offset.")}
+            </p>
+
+            ${steps.length ? `
+                <p class="offset-iso-problem-label">What to change</p>
+                <ol class="offset-iso-problem-steps">
+                    ${steps.map(step => `<li>${escapeHtml(step)}</li>`).join("")}
+                </ol>
+            ` : ""}
+        `;
+
+        container.appendChild(overlay);
 
     }
 
@@ -1426,7 +1491,7 @@
                 x,
                 y,
                 width,
-                height: 76,
+                height: 70,
                 rx: 10,
                 fill: "#111d31",
                 stroke: "#2a3d5c",
@@ -1437,9 +1502,9 @@
         group.appendChild(
             svg("text", {
                 x: x + 14,
-                y: y + 24,
+                y: y + 22,
                 fill: "#8fa6c9",
-                "font-size": 13,
+                "font-size": 12,
                 "font-weight": 650
             }, label.toUpperCase())
         );
@@ -1447,9 +1512,9 @@
         group.appendChild(
             svg("text", {
                 x: x + 14,
-                y: y + 55,
+                y: y + 50,
                 fill: "#f4f7ff",
-                "font-size": 21,
+                "font-size": 18,
                 "font-weight": 750
             }, value)
         );
@@ -1463,10 +1528,10 @@
     ) {
 
         const panel = panelLayout || {
-            x: 1050,
-            y: 70,
-            width: 500,
-            height: 600
+            x: 1250,
+            y: 50,
+            width: 400,
+            height: 560
         };
 
         const group =
@@ -1489,9 +1554,9 @@
         group.appendChild(
             svg("text", {
                 x: panel.x + 24,
-                y: panel.y + 40,
+                y: panel.y + 36,
                 fill: "#f4f7ff",
-                "font-size": 25,
+                "font-size": 21,
                 "font-weight": 760
             }, "One-Elbow Fabrication Data")
         );
@@ -1499,9 +1564,9 @@
         group.appendChild(
             svg("text", {
                 x: panel.x + 24,
-                y: panel.y + 67,
+                y: panel.y + 59,
                 fill: "#8097ba",
-                "font-size": 14
+                "font-size": 13
             }, "Two matching elbows are required for the offset.")
         );
 
@@ -1566,7 +1631,7 @@
         ];
 
         const padding = 24;
-        const gap = 14;
+        const gap = 12;
 
         const cardWidth =
             (
@@ -1596,9 +1661,9 @@
                             gap
                         ),
                     panel.y +
-                        94 +
+                        86 +
                         row *
-                        88,
+                        82,
                     cardWidth,
                     entry[0],
                     entry[1]
@@ -1608,7 +1673,7 @@
         );
 
         const quantityY =
-            panel.y + 448;
+            panel.y + 414;
 
         group.appendChild(
             svg("rect", {
@@ -1617,7 +1682,7 @@
                 width:
                     panel.width -
                     padding * 2,
-                height: 58,
+                height: 48,
                 rx: 10,
                 fill: "#111d31",
                 stroke: "#2a3d5c",
@@ -1628,9 +1693,9 @@
         group.appendChild(
             svg("text", {
                 x: panel.x + padding + 14,
-                y: quantityY + 23,
+                y: quantityY + 20,
                 fill: "#8fa6c9",
-                "font-size": 13,
+                "font-size": 12,
                 "font-weight": 650
             }, "QUANTITY")
         );
@@ -1642,16 +1707,18 @@
                     panel.width -
                     padding -
                     14,
-                y: quantityY + 38,
+                y: quantityY + 31,
                 fill: "#f4f7ff",
-                "font-size": 21,
+                "font-size": 18,
                 "font-weight": 750,
                 "text-anchor": "end"
             }, "2 Elbows")
         );
 
         const noteY =
-            panel.y + 510;
+            panel.y +
+            panel.height -
+            82;
 
         group.appendChild(
             svg("line", {
@@ -1672,7 +1739,7 @@
                 x: panel.x + 24,
                 y: noteY + 28,
                 fill: "#8fa6c9",
-                "font-size": 14
+                "font-size": 13
             }, model.straightPerElbow > 0.01
                 ? `Add ${
                     formatMeasurement(
@@ -1688,7 +1755,7 @@
                 x: panel.x + 24,
                 y: noteY + 52,
                 fill: "#8fa6c9",
-                "font-size": 14
+                "font-size": 13
             }, `Use two matching elbows for this offset.`)
         );
 
@@ -1710,6 +1777,9 @@
         }
 
         container.innerHTML = "";
+        container.classList.remove(
+            "has-offset-error"
+        );
 
         const model =
             getModel();
@@ -1775,39 +1845,39 @@
             ).matches;
 
         const viewWidth =
-            isMobile ? 500 : 1580;
+            isMobile ? 500 : 1680;
 
         const viewHeight =
-            isMobile ? 1215 : 700;
+            isMobile ? 1245 : 660;
 
         const drawingArea =
             isMobile
                 ? {
-                    x: 15,
-                    y: 55,
-                    width: 470,
-                    height: 485
+                    x: 8,
+                    y: 35,
+                    width: 484,
+                    height: 570
                 }
                 : {
-                    x: 20,
+                    x: 45,
                     y: 20,
-                    width: 1000,
-                    height: 620
+                    width: 900,
+                    height: 550
                 };
 
         const dataPanelLayout =
             isMobile
                 ? {
-                    x: 15,
-                    y: 650,
-                    width: 470,
-                    height: 530
+                    x: 10,
+                    y: 665,
+                    width: 480,
+                    height: 545
                 }
                 : {
-                    x: 1050,
-                    y: 70,
-                    width: 500,
-                    height: 600
+                    x: 1250,
+                    y: 50,
+                    width: 400,
+                    height: 560
                 };
 
         const transform =
@@ -2432,14 +2502,21 @@ drawing.appendChild(
             dataPanelLayout
         );
 
-        addClrWarning(
-            container,
-            model
-        );
-
         container.appendChild(
             drawing
         );
+
+        if (activeOffsetError) {
+            addOffsetProblemOverlay(
+                container,
+                activeOffsetError
+            );
+        } else {
+            addClrWarning(
+                container,
+                model
+            );
+        }
 
     }
 
@@ -2486,6 +2563,24 @@ drawing.appendChild(
                 latestCalculatedData =
                     event.detail;
 
+                activeOffsetError = null;
+                window.__ductculatorOffsetError = null;
+
+                render();
+
+            }
+        );
+
+        document.addEventListener(
+            "ductculator:offset-error",
+            event => {
+
+                activeOffsetError =
+                    event.detail || null;
+
+                window.__ductculatorOffsetError =
+                    activeOffsetError;
+
                 render();
 
             }
@@ -2493,7 +2588,12 @@ drawing.appendChild(
 
         window.OffsetIso = {
             render,
-            bindInputs: bind
+            bindInputs: bind,
+            showError(problem) {
+                activeOffsetError = problem || null;
+                window.__ductculatorOffsetError = activeOffsetError;
+                render();
+            }
         };
 
         render();

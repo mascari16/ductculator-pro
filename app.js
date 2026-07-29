@@ -816,6 +816,109 @@ function solveOffsetAngle(offset, overallLength, radius) {
 }
 
 
+
+
+function escapeOffsetHtml(value) {
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+function showOffsetProblem(
+    title,
+    message,
+    steps = []
+) {
+    const detail = {
+        title,
+        message,
+        steps
+    };
+
+    window.__ductculatorOffsetError = detail;
+
+    offsetResults.innerHTML = `
+        <p class="error">
+            <strong>${escapeOffsetHtml(title)}</strong>
+            ${escapeOffsetHtml(message)}
+            Correction steps are shown directly over the elbow preview.
+        </p>
+    `;
+
+    document.dispatchEvent(
+        new CustomEvent(
+            "ductculator:offset-error",
+            { detail }
+        )
+    );
+}
+
+function clearOffsetProblem() {
+    window.__ductculatorOffsetError = null;
+}
+
+function roundUpToQuarter(value) {
+    return Math.ceil((value - 1e-9) * 4) / 4;
+}
+
+function findSuggestedOverallLength(
+    offset,
+    currentLength,
+    bendDimension,
+    radius = null
+) {
+    const start = Math.max(
+        0.25,
+        currentLength + 0.25
+    );
+
+    const limit = start + 500;
+
+    for (
+        let length = start;
+        length <= limit;
+        length += 0.25
+    ) {
+        const valid = radius === null
+            ? findAutoClrForSolvedAngle(
+                offset,
+                length,
+                bendDimension
+            )
+            : Number.isFinite(
+                solveOffsetAngle(
+                    offset,
+                    length,
+                    radius
+                )
+            );
+
+        if (valid) {
+            return roundUpToQuarter(length);
+        }
+    }
+
+    return null;
+}
+
+function minimumOffsetForAngle(
+    angleDegrees,
+    radius
+) {
+    const radians =
+        angleDegrees * Math.PI / 180;
+
+    return (
+        2 * radius *
+        Math.tan(radians / 2) *
+        Math.sin(radians)
+    );
+}
+
+
 // -----------------------------------------------------
 // Calculate offset
 // -----------------------------------------------------
@@ -910,11 +1013,15 @@ calculateOffsetBtn.addEventListener("click", () => {
         offset <= 0
     ) {
 
-        offsetResults.innerHTML = `
-            <p class="error">
-                Enter a valid offset.
-            </p>
-        `;
+        showOffsetProblem(
+            "Enter the offset",
+            "Offset must be greater than zero.",
+            [
+                "Keep the duct width and depth as entered.",
+                "Enter the required vertical offset between the two duct centerlines.",
+                "Press Calculate Offset again."
+            ]
+        );
 
         return;
 
@@ -927,11 +1034,15 @@ calculateOffsetBtn.addEventListener("click", () => {
         ductDepth <= 0
     ) {
 
-        offsetResults.innerHTML = `
-            <p class="error">
-                Enter a valid width and depth.
-            </p>
-        `;
+        showOffsetProblem(
+            "Enter the duct size",
+            "Width (Cheek) and Depth must both be greater than zero.",
+            [
+                "Enter the duct Width (Cheek) you intend to fabricate.",
+                "Enter the duct Depth; this is the straight extrusion dimension.",
+                "Press Calculate Offset again."
+            ]
+        );
 
         return;
 
@@ -973,11 +1084,15 @@ calculateOffsetBtn.addEventListener("click", () => {
             requestedOverallLength <= 0
         ) {
 
-            offsetResults.innerHTML = `
-                <p class="error">
-                    Enter a valid overall length.
-                </p>
-            `;
+            showOffsetProblem(
+                "Enter the overall length",
+                "Overall Length must be greater than zero.",
+                [
+                    "Keep the entered duct size.",
+                    "Measure the available length from the start of the first elbow to the end of the second elbow.",
+                    "Enter that length and calculate again."
+                ]
+            );
 
             return;
 
@@ -998,14 +1113,24 @@ calculateOffsetBtn.addEventListener("click", () => {
                 );
 
             if (!autoSelection) {
-                offsetResults.innerHTML = `
-                    <p class="error">
-                        This offset cannot be made with Auto CLR at or
-                        above the minimum 0.60× setting. Increase the
-                        overall length, reduce the offset, or reduce the
-                        cheek width.
-                    </p>
-                `;
+                const suggestedLength =
+                    findSuggestedOverallLength(
+                        offset,
+                        requestedOverallLength,
+                        bendDimension
+                    );
+
+                showOffsetProblem(
+                    "More overall length is required",
+                    "The entered offset will not fit inside the entered overall length using Auto CLR from 1.00× through 0.60×.",
+                    [
+                        `Keep the ${formatSheetMetalMeasurement(ductWidth)} × ${formatSheetMetalMeasurement(ductDepth)} duct size.`,
+                        suggestedLength
+                            ? `Increase Overall Length to at least ${formatSheetMetalMeasurement(suggestedLength)} and calculate again.`
+                            : "Increase Overall Length and calculate again.",
+                        "If the available length cannot change, reduce the requested offset or manually select a smaller allowed CLR."
+                    ]
+                );
                 return;
             }
 
@@ -1023,12 +1148,25 @@ calculateOffsetBtn.addEventListener("click", () => {
 
             if (!Number.isFinite(elbowAngle)) {
 
-                offsetResults.innerHTML = `
-                    <p class="error">
-                        That offset and overall length cannot
-                        be made with the selected CLR.
-                    </p>
-                `;
+                const suggestedLength =
+                    findSuggestedOverallLength(
+                        offset,
+                        requestedOverallLength,
+                        bendDimension,
+                        centerlineRadius
+                    );
+
+                showOffsetProblem(
+                    "Selected CLR will not fit",
+                    "The entered offset and overall length do not produce a valid two-elbow layout with the selected CLR.",
+                    [
+                        `Keep the ${formatSheetMetalMeasurement(ductWidth)} × ${formatSheetMetalMeasurement(ductDepth)} duct size.`,
+                        suggestedLength
+                            ? `Increase Overall Length to about ${formatSheetMetalMeasurement(suggestedLength)} or more.`
+                            : "Increase Overall Length and calculate again.",
+                        "If the length is fixed, reduce the offset or choose a smaller CLR."
+                    ]
+                );
 
                 return;
 
@@ -1047,11 +1185,15 @@ calculateOffsetBtn.addEventListener("click", () => {
             elbowAngle >= 90
         ) {
 
-            offsetResults.innerHTML = `
-                <p class="error">
-                    Enter an elbow angle between 0° and 90°.
-                </p>
-            `;
+            showOffsetProblem(
+                "Enter a usable elbow angle",
+                "Elbow Angle must be greater than 0° and less than 90°.",
+                [
+                    "Keep the entered duct size.",
+                    "Enter the angle you intend to fabricate, such as 30°, 45°, or 60°.",
+                    "Calculate again."
+                ]
+            );
 
             return;
 
@@ -1066,13 +1208,23 @@ calculateOffsetBtn.addEventListener("click", () => {
                 );
 
             if (!autoSelection) {
-                offsetResults.innerHTML = `
-                    <p class="error">
-                        This offset and angle cannot be made with Auto CLR
-                        at or above the minimum 0.60× setting. Increase the
-                        offset, reduce the angle, or reduce the cheek width.
-                    </p>
-                `;
+                const minimumAutoOffset =
+                    roundUpToQuarter(
+                        minimumOffsetForAngle(
+                            elbowAngle,
+                            bendDimension * 0.60
+                        )
+                    );
+
+                showOffsetProblem(
+                    "Offset is too small for this angle",
+                    "The selected angle cannot fit the entered offset using Auto CLR from 1.00× through 0.60×.",
+                    [
+                        `Keep the ${formatSheetMetalMeasurement(ductWidth)} × ${formatSheetMetalMeasurement(ductDepth)} duct size.`,
+                        `Increase Offset to at least about ${formatSheetMetalMeasurement(minimumAutoOffset)}, or enter a smaller elbow angle.`,
+                        "If both values are fixed, use a smaller custom CLR only if your shop allows it and the throat radius remains valid."
+                    ]
+                );
                 return;
             }
 
@@ -1086,11 +1238,15 @@ calculateOffsetBtn.addEventListener("click", () => {
         centerlineRadius <= 0
     ) {
 
-        offsetResults.innerHTML = `
-            <p class="error">
-                Enter a valid centerline radius.
-            </p>
-        `;
+        showOffsetProblem(
+            "Enter a valid CLR",
+            "Centerline Radius must be greater than zero.",
+            [
+                "Keep the entered duct size.",
+                "Select Auto CLR, choose a listed multiplier, or enter a positive Custom CLR.",
+                "Calculate again."
+            ]
+        );
 
         return;
 
@@ -1106,12 +1262,15 @@ calculateOffsetBtn.addEventListener("click", () => {
 
     if (throatRadius < 0) {
 
-        offsetResults.innerHTML = `
-            <p class="error">
-                The selected CLR is too small for the
-                cheek width.
-            </p>
-        `;
+        showOffsetProblem(
+            "CLR is too small",
+            "The selected CLR places the centerline inside the duct cheek and creates a negative throat radius.",
+            [
+                `Keep the ${formatSheetMetalMeasurement(ductWidth)} × ${formatSheetMetalMeasurement(ductDepth)} duct size.`,
+                `Set CLR to at least ${formatSheetMetalMeasurement(bendDimension / 2)}.`,
+                "Auto CLR is the easiest option if the available geometry is not fixed."
+            ]
+        );
 
         return;
 
@@ -1139,13 +1298,32 @@ calculateOffsetBtn.addEventListener("click", () => {
 
     if (straightBetweenElbows < -0.001) {
 
-        offsetResults.innerHTML = `
-            <p class="error">
-                This layout causes the elbows to overlap.
-                Increase the overall length, reduce the CLR,
-                or use a steeper elbow angle.
-            </p>
-        `;
+        const minimumRequiredOffset =
+            roundUpToQuarter(
+                minimumOffsetForAngle(
+                    elbowAngle,
+                    centerlineRadius
+                )
+            );
+
+        const overlapSteps =
+            offsetMode.value === "solveAngle"
+                ? [
+                    `Keep the ${formatSheetMetalMeasurement(ductWidth)} × ${formatSheetMetalMeasurement(ductDepth)} duct size.`,
+                    "Increase Overall Length so there is room between the two elbows.",
+                    "If length is fixed, choose a smaller CLR or reduce the requested offset."
+                ]
+                : [
+                    `Keep the ${formatSheetMetalMeasurement(ductWidth)} × ${formatSheetMetalMeasurement(ductDepth)} duct size.`,
+                    `Increase Offset to at least about ${formatSheetMetalMeasurement(minimumRequiredOffset)}, or reduce the elbow angle.`,
+                    "A smaller CLR will also create more room between the elbows."
+                ];
+
+        showOffsetProblem(
+            "The two elbows overlap",
+            "There is not enough straight-line travel between the matching elbows for the entered geometry.",
+            overlapSteps
+        );
 
         return;
 
@@ -1156,6 +1334,8 @@ calculateOffsetBtn.addEventListener("click", () => {
 
     const straightPerElbow =
         usableStraight / 2;
+
+    clearOffsetProblem();
 
     offsetResults.innerHTML = `
 

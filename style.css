@@ -1491,6 +1491,20 @@ DUCT OPTIONS
 
 }
 
+
+
+/* Give the offset preview nearly the full phone width. */
+@media (max-width: 900px) {
+    #sheetMetalWorkspace .content {
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+
+    #sheetMetalWorkspace .calculator > .panel:nth-child(2) {
+        padding: 18px 10px;
+    }
+}
+
 /* ===================================================
    Sheet Metal Offset Calculator
 =================================================== */
@@ -1501,13 +1515,13 @@ DUCT OPTIONS
  * the same 360px width as the other calculators.
  */
 #sheetMetalWorkspace .calculator {
-    grid-template-columns: 260px minmax(0, 1fr);
-    gap: 16px;
+    grid-template-columns: 290px minmax(0, 1fr);
+    gap: 18px;
     align-items: start;
 }
 
 #sheetMetalWorkspace .calculator > .panel:first-child {
-    padding: 22px 18px;
+    padding: 24px 22px;
 }
 
 #sheetMetalWorkspace .calculator > .panel:first-child h3 {
@@ -1600,6 +1614,13 @@ DUCT OPTIONS
     background: rgba(201, 75, 94, 0.12);
     color: #ffb4bf;
     line-height: 1.5;
+}
+
+#offsetResults .error strong {
+    display: block;
+    margin-bottom: 4px;
+    color: #ffffff;
+    font-size: 16px;
 }
 
 @media (max-width: 600px) {
