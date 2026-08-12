@@ -10,9 +10,9 @@
 
     <title>Ductculator Pro</title>
 
-    <link rel="stylesheet" href="style.css?v=20260812-2">
+    <link rel="stylesheet" href="style.css?v=20260812-3">
 
-    <link rel="stylesheet" href="offsetiso.css?v=20260812-2">
+    <link rel="stylesheet" href="offsetiso.css?v=20260812-3">
 
 </head>
 
@@ -122,6 +122,22 @@
 
 </div>
 
+<div class="tool-card" id="openTransitionSplitter">
+
+    <div class="tool-icon">↔️</div>
+
+    <h3>Transition Splitter</h3>
+
+    <p>
+        Split Long Transitions<br>
+        Top & Side Views<br>
+        CAMduct Entry Dimensions
+    </p>
+
+    <button>Open Calculator →</button>
+
+</div>
+
             <div class="tool-card disabled">
 
                 <div class="tool-icon">🔄</div>
@@ -223,6 +239,11 @@
 
     <span class="text">Sheet Metal</span>
 
+</button>
+
+<button id="airflowOpenTransitionSplitter">
+    <span class="icon">↔️</span>
+    <span class="text">Transition Splitter</span>
 </button>
 
 <button disabled>
@@ -510,6 +531,11 @@
 
         <span class="text">Sheet Metal</span>
 
+        </button>
+
+        <button id="equivalentOpenTransitionSplitter">
+            <span class="icon">↔️</span>
+            <span class="text">Transition Splitter</span>
         </button>
 
         <button disabled>
@@ -888,6 +914,11 @@
 
         </button>
 
+        <button id="sheetMetalOpenTransitionSplitter" type="button">
+            <span class="icon">↔️</span>
+            <span class="text">Transition Splitter</span>
+        </button>
+
         <button disabled>
 
             <span class="icon">🔄</span>
@@ -1113,18 +1144,138 @@
 
 </div>
 
+
+<!-- ===================================================
+     TRANSITION SPLITTER WORKSPACE
+=================================================== -->
+
+<div id="transitionWorkspace" class="workspace">
+
+    <button id="transitionMobileMenuBtn" class="mobile-menu-btn" type="button">☰</button>
+    <div id="transitionMobileOverlay" class="mobile-overlay"></div>
+
+    <aside class="sidebar transition-sidebar">
+        <div class="sidebar-top">
+            <button id="toggleTransitionSidebar" class="toggle-btn" type="button">☰</button>
+            <h2>Ductculator</h2>
+        </div>
+
+        <button id="transitionGoHome" type="button"><span class="icon">🏠</span><span class="text">Dashboard</span></button>
+        <hr>
+        <button id="transitionOpenAirflow" type="button"><span class="icon">💨</span><span class="text">Airflow</span></button>
+        <button id="transitionOpenEquivalent" type="button"><span class="icon">⭕</span><span class="text">Equivalent Sizes</span></button>
+        <button id="transitionOpenSheetMetal" type="button"><span class="icon">🧮</span><span class="text">Sheet Metal</span></button>
+        <button class="active" type="button"><span class="icon">↔️</span><span class="text">Transition Splitter</span></button>
+        <hr>
+        <button disabled><span class="icon">⚙</span><span class="text">Settings</span></button>
+    </aside>
+
+    <section class="content transition-content">
+        <header>
+            <h1>Transition Splitter</h1>
+            <p>Break one long rectangular taper into 2, 3, or 4 CAMduct fittings.</p>
+        </header>
+
+        <div class="transition-splitter-layout">
+            <div class="transition-visual-column">
+                <div class="transition-view-grid">
+                    <section class="transition-view-card">
+                        <div class="transition-view-heading">
+                            <div><span class="transition-view-kicker">WIDTH</span><h3>Top View</h3></div>
+                            <span class="transition-view-help">Width change + left/right offset</span>
+                        </div>
+                        <div id="transitionTopView" class="transition-view-canvas"></div>
+                    </section>
+
+                    <section class="transition-view-card">
+                        <div class="transition-view-heading">
+                            <div><span class="transition-view-kicker">DEPTH</span><h3>Side View</h3></div>
+                            <span class="transition-view-help">Depth change + top/bottom offset</span>
+                        </div>
+                        <div id="transitionSideView" class="transition-view-canvas"></div>
+                    </section>
+                </div>
+
+                <div id="transitionSplitSummary" class="transition-summary-grid"></div>
+
+                <section class="transition-output-section">
+                    <div class="transition-output-heading">
+                        <div><span>SHOP ENTRY</span><h2>What To Type Into CAMduct</h2></div>
+                        <p>Each card is one separate taper. The outlet of one fitting becomes the inlet of the next.</p>
+                    </div>
+                    <div id="transitionFittingList" class="transition-fitting-list"></div>
+                </section>
+            </div>
+
+            <aside class="transition-input-panel">
+                <div class="transition-input-title">
+                    <span>ORIGINAL FITTING</span>
+                    <h2>Transition Inputs</h2>
+                    <p>Enter the transition exactly as it was sent over.</p>
+                </div>
+
+                <div class="transition-input-grid">
+                    <label for="transitionWidthIn">A) Width In</label><input id="transitionWidthIn" type="text" inputmode="decimal" value="30">
+                    <label for="transitionDepthIn">B) Depth In</label><input id="transitionDepthIn" type="text" inputmode="decimal" value="30">
+                    <label for="transitionWidthOut">C) Width Out</label><input id="transitionWidthOut" type="text" inputmode="decimal" value="12">
+                    <label for="transitionDepthOut">D) Depth Out</label><input id="transitionDepthOut" type="text" inputmode="decimal" value="8">
+                    <label for="transitionLength">E) Length</label><input id="transitionLength" type="text" inputmode="decimal" value="91">
+                </div>
+
+                <div class="transition-offset-section">
+                    <h3>Offset Width</h3>
+                    <div class="transition-offset-row">
+                        <input id="transitionOffsetWidth" type="text" inputmode="decimal" value="0" aria-label="Offset Width">
+                        <select id="transitionOffsetWidthMode" aria-label="Offset Width Direction">
+                            <option value="leftIn" selected>Left In</option>
+                            <option value="leftOut">Left Out</option>
+                            <option value="rightIn">Right In</option>
+                            <option value="rightOut">Right Out</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="transition-offset-section">
+                    <h3>Offset Depth</h3>
+                    <div class="transition-offset-row">
+                        <input id="transitionOffsetDepth" type="text" inputmode="decimal" value="0" aria-label="Offset Depth">
+                        <select id="transitionOffsetDepthMode" aria-label="Offset Depth Direction">
+                            <option value="topUp" selected>Top Up</option>
+                            <option value="topDown">Top Down</option>
+                            <option value="bottomUp">Bottom Up</option>
+                            <option value="bottomDown">Bottom Down</option>
+                        </select>
+                    </div>
+                </div>
+
+                <label class="transition-split-label" for="transitionSplitCount">Change To</label>
+                <select id="transitionSplitCount">
+                    <option value="2" selected>2 Fittings</option>
+                    <option value="3">3 Fittings</option>
+                    <option value="4">4 Fittings</option>
+                </select>
+
+                <button id="calculateTransitionSplit" class="transition-calculate-btn" type="button">Split Transition</button>
+
+                <div class="transition-input-note">The tool keeps the original inlet size, outlet size, total length, and offset path. Intermediate sizes are calculated at equal stations along the taper.</div>
+            </aside>
+        </div>
+    </section>
+</div>
+
 <!-- ===================================================
      JAVASCRIPT
 =================================================== -->
 
-<script src="js/formulas.js?v=20260812-2"></script>
-<script src="js/rectangle.js?v=20260812-2"></script>
-<script src="js/flatOval.js?v=20260812-2"></script>
-<script src="js/equivalentSizes.js?v=20260812-2"></script>
-<script src="js/airflow.js?v=20260812-2"></script>
-<script src="app.js?v=20260812-2"></script>
-<script src="offsetiso.js?v=20260812-2"></script>
-<script src="js/equivalentUI.js?v=20260812-2"></script>
+<script src="js/formulas.js?v=20260812-3"></script>
+<script src="js/rectangle.js?v=20260812-3"></script>
+<script src="js/flatOval.js?v=20260812-3"></script>
+<script src="js/equivalentSizes.js?v=20260812-3"></script>
+<script src="js/airflow.js?v=20260812-3"></script>
+<script src="app.js?v=20260812-3"></script>
+<script src="offsetiso.js?v=20260812-3"></script>
+<script src="js/equivalentUI.js?v=20260812-3"></script>
+<script src="js/transitionSplitter.js?v=20260812-3"></script>
 
 </body>
 
