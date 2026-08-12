@@ -2354,3 +2354,46 @@ DUCT OPTIONS
     font-size:9px;
     font-weight:650;
 }
+
+
+/* ===================================================
+   Transition Splitter Refinements · 2026-08-12
+=================================================== */
+
+/*
+ * Refined CAMduct card layout:
+ * A/B, C/D, then full-width Length, then the two merged offset entries.
+ */
+.transition-entry-grid-refined{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+}
+
+.transition-entry-grid-refined .transition-entry-length{
+    grid-column:1 / -1;
+    border-color:rgba(78,103,145,.48);
+    background:#111c31;
+}
+
+.transition-entry-grid-refined .transition-entry-offset{
+    min-height:68px;
+    border-color:rgba(79,140,255,.42);
+    background:rgba(79,140,255,.075);
+}
+
+.transition-entry-grid-refined .transition-entry-offset strong{
+    font-size:15px;
+}
+
+.transition-view-heading .transition-view-kicker{
+    font-size:11.5px;
+}
+
+@media(max-width:600px){
+    .transition-entry-grid-refined{
+        grid-template-columns:1fr;
+    }
+
+    .transition-entry-grid-refined .transition-entry-length{
+        grid-column:auto;
+    }
+}

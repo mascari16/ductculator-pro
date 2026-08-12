@@ -170,6 +170,17 @@
         return value.toFixed(3);
     }
 
+    function formatCamductCompact(value) {
+        if (!Number.isFinite(value)) {
+            return "—";
+        }
+
+        return value
+            .toFixed(3)
+            .replace(/\.000$/, "")
+            .replace(/(\.\d*[1-9])0+$/, "$1");
+    }
+
     function readInputs() {
         return {
             widthIn: parseMeasurement(byId(IDS.widthIn)?.value),
@@ -483,6 +494,26 @@
 
         addArrowDefs(drawing, options.prefix);
 
+        /*
+         * Make the viewing direction impossible to miss.
+         */
+        drawing.appendChild(svg("text", {
+            x: 18,
+            y: 25,
+            fill: "#8fb4ff",
+            "font-size": 12,
+            "font-weight": 850,
+            "letter-spacing": ".10em"
+        }, options.viewLabel));
+
+        drawing.appendChild(svg("text", {
+            x: 18,
+            y: 43,
+            fill: "#7f93b5",
+            "font-size": 10.5,
+            "font-weight": 650
+        }, options.viewDirection));
+
         const segmentPalette = [
             "rgba(79,140,255,.26)",
             "rgba(34,211,238,.16)",
@@ -536,6 +567,11 @@
             }, `Fitting ${fitting.number}`));
         });
 
+        /*
+         * End stations are solid.
+         * Intermediate split stations are yellow dashed lines with the
+         * complete W × D break size shown directly below the break label.
+         */
         result.stations.forEach((station, index) => {
             const low = coordinates.point(station, "low");
             const high = coordinates.point(station, "high");
@@ -553,23 +589,52 @@
 
             if (!isEnd) {
                 const middleX = (low.x + high.x) / 2;
+
+                const labelWidth = 118;
+                const labelHeight = 42;
+                const labelY = low.y - 51;
+
+                drawing.appendChild(svg("rect", {
+                    x: middleX - labelWidth / 2,
+                    y: labelY,
+                    width: labelWidth,
+                    height: labelHeight,
+                    rx: 8,
+                    fill: "rgba(11,18,32,.92)",
+                    stroke: "rgba(245,185,65,.55)",
+                    "stroke-width": 1
+                }));
+
                 drawing.appendChild(svg("text", {
                     x: middleX,
-                    y: low.y - 10,
+                    y: labelY + 16,
                     fill: "#f5b941",
-                    "font-size": 12,
-                    "font-weight": 700,
+                    "font-size": 11.5,
+                    "font-weight": 800,
                     "text-anchor": "middle"
                 }, `Break ${index}`));
+
+                drawing.appendChild(svg("text", {
+                    x: middleX,
+                    y: labelY + 33,
+                    fill: "#f8fafc",
+                    "font-size": 12.5,
+                    "font-weight": 800,
+                    "text-anchor": "middle"
+                }, `${formatMeasurement(station.width)} × ${formatMeasurement(station.depth)}`));
             }
         });
 
-        const inletLow = coordinates.point(result.stations[0], "low");
-        const inletHigh = coordinates.point(result.stations[0], "high");
+        const inletStation = result.stations[0];
+        const inletLow = coordinates.point(inletStation, "low");
+        const inletHigh = coordinates.point(inletStation, "high");
         const outletStation = result.stations[result.stations.length - 1];
         const outletLow = coordinates.point(outletStation, "low");
         const outletHigh = coordinates.point(outletStation, "high");
 
+        /*
+         * Inlet dimension.
+         */
         const dimY = Math.min(
             coordinates.viewHeight - 25,
             Math.max(inletLow.y, inletHigh.y) + 35
@@ -595,6 +660,9 @@
             "text-anchor": "middle"
         }, `${options.inletLabel}: ${formatMeasurement(result[options.inletValueKey])}`));
 
+        /*
+         * Outlet dimension.
+         */
         drawing.appendChild(svg("text", {
             x: (outletLow.x + outletHigh.x) / 2,
             y: Math.min(outletLow.y, outletHigh.y) - 17,
@@ -604,6 +672,9 @@
             "text-anchor": "middle"
         }, `${options.outletLabel}: ${formatMeasurement(result[options.outletValueKey])}`));
 
+        /*
+         * Overall length dimension.
+         */
         const leftMost = Math.min(
             ...result.stations.flatMap(station => {
                 const low = coordinates.point(station, "low");
@@ -613,7 +684,7 @@
         );
 
         const lengthX = Math.max(30, leftMost - 34);
-        const bottomY = coordinates.point(result.stations[0], "low").y;
+        const bottomY = coordinates.point(inletStation, "low").y;
         const topY = coordinates.point(outletStation, "low").y;
 
         drawing.appendChild(svg("line", {
@@ -642,8 +713,89 @@
         );
         drawing.appendChild(lengthText);
 
+        /*
+         * Offset dimension.
+         *
+         * CAMduct measures Left modes from the left/low edge and Right
+         * modes from the right/high edge. Top modes use the high edge;
+         * Bottom modes use the low edge.
+         */
+        const offsetValue = Math.abs(result[options.offsetValueKey]);
+
+        if (offsetValue > 0.0001) {
+            const mode = result[options.offsetModeKey];
+            let inletReference;
+            let outletReference;
+
+            if (options.offsetAxis === "width") {
+                const useHigh = mode === "rightIn" || mode === "rightOut";
+                inletReference = useHigh ? inletHigh : inletLow;
+                outletReference = useHigh ? outletHigh : outletLow;
+            } else {
+                const useHigh = mode === "topUp" || mode === "topDown";
+                inletReference = useHigh ? inletHigh : inletLow;
+                outletReference = useHigh ? outletHigh : outletLow;
+            }
+
+            /*
+             * Put the offset dimension near the middle of the view. The
+             * dashed projection lines make clear which inlet/outlet edges
+             * the CAMduct offset is measured between.
+             */
+            const offsetDimY = topY + (bottomY - topY) * 0.34;
+            const minX = Math.min(inletReference.x, outletReference.x);
+            const maxX = Math.max(inletReference.x, outletReference.x);
+
+            drawing.appendChild(svg("line", {
+                x1: inletReference.x,
+                y1: inletReference.y,
+                x2: inletReference.x,
+                y2: offsetDimY,
+                stroke: "#f5b941",
+                "stroke-width": 1,
+                "stroke-dasharray": "4 5",
+                opacity: .72
+            }));
+
+            drawing.appendChild(svg("line", {
+                x1: outletReference.x,
+                y1: outletReference.y,
+                x2: outletReference.x,
+                y2: offsetDimY,
+                stroke: "#f5b941",
+                "stroke-width": 1,
+                "stroke-dasharray": "4 5",
+                opacity: .72
+            }));
+
+            drawing.appendChild(svg("line", {
+                x1: minX,
+                y1: offsetDimY,
+                x2: maxX,
+                y2: offsetDimY,
+                stroke: "#f5b941",
+                "stroke-width": 1.8,
+                "marker-start": `url(#${options.prefix}Arrow)`,
+                "marker-end": `url(#${options.prefix}Arrow)`
+            }));
+
+            const offsetModeText = options.offsetAxis === "width"
+                ? widthModeLabel(mode)
+                : depthModeLabel(mode);
+
+            drawing.appendChild(svg("text", {
+                x: (minX + maxX) / 2,
+                y: offsetDimY - 11,
+                fill: "#f5b941",
+                "font-size": 12.5,
+                "font-weight": 800,
+                "text-anchor": "middle"
+            }, `${options.offsetLabel}: ${offsetModeText} ${formatMeasurement(offsetValue)}`));
+        }
+
         container.appendChild(drawing);
     }
+
 
     function renderSummary(result) {
         const summary = byId(IDS.summary);
@@ -699,34 +851,43 @@
             return;
         }
 
-        list.innerHTML = result.fittings.map(fitting => `
-            <article class="transition-fitting-card">
-                <div class="transition-fitting-heading">
-                    <div>
-                        <span>CAMDUCT ENTRY</span>
-                        <h3>Fitting ${fitting.number}</h3>
-                    </div>
-                    <div class="transition-fitting-size">
-                        ${formatMeasurement(fitting.widthIn)} × ${formatMeasurement(fitting.depthIn)}
-                        <b>→</b>
-                        ${formatMeasurement(fitting.widthOut)} × ${formatMeasurement(fitting.depthOut)}
-                    </div>
-                </div>
+        list.innerHTML = result.fittings.map(fitting => {
+            const widthOffsetText =
+                `${widthModeLabel(fitting.offsetWidthMode)} ` +
+                `${formatCamductCompact(fitting.offsetWidth)}"`;
 
-                <div class="transition-entry-grid">
-                    ${entry("A) Width In", fitting.widthIn, "", true)}
-                    ${entry("B) Depth In", fitting.depthIn, "", true)}
-                    ${entry("C) Width Out", fitting.widthOut, "", true)}
-                    ${entry("D) Depth Out", fitting.depthOut, "", true)}
-                    ${entry("E) Length", fitting.length, "transition-entry-emphasis", true)}
-                    ${entry("H) Offset Width", fitting.offsetWidth, "", true)}
-                    ${entry("Offset Width Mode", widthModeLabel(fitting.offsetWidthMode))}
-                    ${entry("I) Offset Depth", fitting.offsetDepth, "", true)}
-                    ${entry("Offset Depth Mode", depthModeLabel(fitting.offsetDepthMode))}
-                </div>
-            </article>
-        `).join("");
+            const depthOffsetText =
+                `${depthModeLabel(fitting.offsetDepthMode)} ` +
+                `${formatCamductCompact(fitting.offsetDepth)}"`;
+
+            return `
+                <article class="transition-fitting-card">
+                    <div class="transition-fitting-heading">
+                        <div>
+                            <span>CAMDUCT ENTRY</span>
+                            <h3>Fitting ${fitting.number}</h3>
+                        </div>
+                        <div class="transition-fitting-size">
+                            ${formatMeasurement(fitting.widthIn)} × ${formatMeasurement(fitting.depthIn)}
+                            <b>→</b>
+                            ${formatMeasurement(fitting.widthOut)} × ${formatMeasurement(fitting.depthOut)}
+                        </div>
+                    </div>
+
+                    <div class="transition-entry-grid transition-entry-grid-refined">
+                        ${entry("A) Width In", fitting.widthIn, "", true)}
+                        ${entry("B) Depth In", fitting.depthIn, "", true)}
+                        ${entry("C) Width Out", fitting.widthOut, "", true)}
+                        ${entry("D) Depth Out", fitting.depthOut, "", true)}
+                        ${entry("E) Length", fitting.length, "transition-entry-length", true)}
+                        ${entry("H) Offset Width", widthOffsetText, "transition-entry-offset")}
+                        ${entry("I) Offset Depth", depthOffsetText, "transition-entry-offset")}
+                    </div>
+                </article>
+            `;
+        }).join("");
     }
+
 
     function showError(message) {
         const summary = byId(IDS.summary);
@@ -772,23 +933,35 @@
         renderTransitionView(byId(IDS.topView), result, {
             dimensionKey: "width",
             positionKey: "left",
-            ariaLabel: "Top view of split rectangular transition",
+            ariaLabel: "Top view looking down at split rectangular transition",
             prefix: "transitionTop",
+            viewLabel: "TOP VIEW",
+            viewDirection: "LOOKING DOWN",
             inletLabel: "Width In",
             outletLabel: "Width Out",
             inletValueKey: "widthIn",
-            outletValueKey: "widthOut"
+            outletValueKey: "widthOut",
+            offsetValueKey: "offsetWidth",
+            offsetModeKey: "offsetWidthMode",
+            offsetAxis: "width",
+            offsetLabel: "Offset Width"
         });
 
         renderTransitionView(byId(IDS.sideView), result, {
             dimensionKey: "depth",
             positionKey: "bottom",
-            ariaLabel: "Side view of split rectangular transition",
-            prefix: "transitionSide",
+            ariaLabel: "Right view looking from the right side at split rectangular transition",
+            prefix: "transitionRight",
+            viewLabel: "RIGHT VIEW",
+            viewDirection: "LOOKING FROM RIGHT",
             inletLabel: "Depth In",
             outletLabel: "Depth Out",
             inletValueKey: "depthIn",
-            outletValueKey: "depthOut"
+            outletValueKey: "depthOut",
+            offsetValueKey: "offsetDepth",
+            offsetModeKey: "offsetDepthMode",
+            offsetAxis: "depth",
+            offsetLabel: "Offset Depth"
         });
 
         renderSummary(result);
@@ -912,6 +1085,21 @@
     }
 
     function initialize() {
+        const widthMode = byId(IDS.offsetWidthMode);
+        const depthMode = byId(IDS.offsetDepthMode);
+
+        /*
+         * Requested shop defaults. Do this once at initial page load so
+         * browser form restoration cannot change the starting directions.
+         */
+        if (widthMode) {
+            widthMode.value = "leftIn";
+        }
+
+        if (depthMode) {
+            depthMode.value = "topUp";
+        }
+
         bindNavigation();
         bindInputs();
         update();
