@@ -6,9 +6,14 @@
 
 
 // ------------------------------------
-// Rectangle Equivalent Diameter
+// Rectangle Friction-Equivalent Round Diameter
 // ------------------------------------
 
+/*
+ * Friction-equivalent round diameter for equal-friction comparison.
+ * This is intentionally different from hydraulic diameter (4A/P),
+ * which ASHRAE uses for many fitting-loss coefficient definitions.
+ */
 function rectangleEquivalentDiameter(width, height) {
 
     const areaSquareInches =
@@ -55,9 +60,14 @@ function flatOvalPerimeter(width, height) {
 
 
 // ------------------------------------
-// Flat Oval Equivalent Diameter
+// Flat Oval Friction-Equivalent Round Diameter
 // ------------------------------------
 
+/*
+ * Friction-equivalent round diameter for equal-friction comparison.
+ * Do not substitute this value for hydraulic diameter in fitting-loss
+ * coefficient calculations.
+ */
 function flatOvalEquivalentDiameter(width, height) {
 
     const area =
@@ -82,6 +92,50 @@ function flatOvalEquivalentDiameter(width, height) {
 
 
 // ------------------------------------
+// Friction Match Guardrail
+// ------------------------------------
+
+/*
+ * Equal-friction behavior is the primary equivalency criterion.
+ * For the same airflow, the round-duct approximation used by this
+ * project varies with D^-5.02. That lets us express a candidate's
+ * difference as an actual friction-rate percentage instead of merely
+ * showing its equivalent-diameter percentage.
+ *
+ * The ±25% cutoff is an application guardrail, not a SMACNA tolerance.
+ * It prevents the UI from presenting a wildly different size as an
+ * "equivalent" simply because it is the closest size in the configured
+ * library.
+ */
+const MAX_EQUIVALENT_FRICTION_DIFFERENCE = 25;
+
+function equivalentFrictionDifference(
+    targetDiameter,
+    candidateDiameter
+) {
+
+    if (
+        !Number.isFinite(targetDiameter) ||
+        !Number.isFinite(candidateDiameter) ||
+        targetDiameter <= 0 ||
+        candidateDiameter <= 0
+    ) {
+        return NaN;
+    }
+
+    return (
+        (
+            Math.pow(
+                targetDiameter / candidateDiameter,
+                5.02
+            ) - 1
+        ) * 100
+    );
+
+}
+
+
+// ------------------------------------
 // Ranking Score
 // Equivalent diameter receives the most weight because it is the
 // primary indicator of comparable friction behavior.
@@ -96,7 +150,7 @@ function equivalentOptionScore(option) {
         );
 
     return (
-        (Math.abs(option.equivalentDifference) * 7) +
+        (Math.abs(option.frictionDifference) * 7) +
         (Math.abs(option.areaDifference) * 2) +
         aspectPenalty
     );
@@ -110,7 +164,18 @@ function equivalentOptionScore(option) {
 
 function sortEquivalentOptions(options) {
 
-    options.sort((a, b) => {
+    const practicalOptions =
+        options.filter(option =>
+            Number.isFinite(
+                option.frictionDifference
+            ) &&
+            Math.abs(
+                option.frictionDifference
+            ) <=
+                MAX_EQUIVALENT_FRICTION_DIFFERENCE
+        );
+
+    practicalOptions.sort((a, b) => {
 
         const scoreDifference =
             equivalentOptionScore(a) -
@@ -132,7 +197,7 @@ function sortEquivalentOptions(options) {
 
     });
 
-    return options.slice(0, 5);
+    return practicalOptions.slice(0, 5);
 
 }
 
@@ -185,6 +250,12 @@ function getEquivalentRoundSizes(
                 diameter,
 
             equivalentDifference,
+
+            frictionDifference:
+                equivalentFrictionDifference(
+                    targetDiameter,
+                    diameter
+                ),
 
             aspectRatio: 1
 
@@ -287,6 +358,12 @@ function getEquivalentRectangleSizes(
 
             equivalentDifference,
 
+            frictionDifference:
+                equivalentFrictionDifference(
+                    targetDiameter,
+                    equivalentDiameter
+                ),
+
             aspectRatio
 
         });
@@ -384,6 +461,12 @@ function getEquivalentFlatOvalSizes(
             equivalentDiameter,
 
             equivalentDifference,
+
+            frictionDifference:
+                equivalentFrictionDifference(
+                    targetDiameter,
+                    equivalentDiameter
+                ),
 
             aspectRatio
 

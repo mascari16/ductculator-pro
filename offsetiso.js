@@ -359,10 +359,9 @@
                     LOW EQUIVALENT CLR
                 </strong>
 
-                Equivalent CLR is
-                ${equivalentClr.toFixed(2)}× CLR,
-                which is below the recommended
-                0.75× minimum. The throat radius
+                Equivalent CLR: ${equivalentClr.toFixed(2)}×.
+                This is below the app's 0.75×
+                low-CLR warning threshold. The throat radius
                 may become extremely small,
                 making the elbow difficult or
                 impractical to fabricate.
@@ -1686,7 +1685,7 @@
                 `${(
                     model.centerlineRadius /
                     model.ductWidth
-                ).toFixed(2)}× CLR`
+                ).toFixed(2)}×`
             ],
             [
                 "Throat Radius",
@@ -1956,7 +1955,7 @@
             ).matches;
 
         const viewWidth =
-            isMobile ? 500 : 1680;
+            isMobile ? 500 : 1740;
 
         const viewHeight =
             isMobile ? 1310 : 660;

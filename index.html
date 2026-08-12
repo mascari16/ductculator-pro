@@ -10,9 +10,9 @@
 
     <title>Ductculator Pro</title>
 
-    <link rel="stylesheet" href="style.css?v=20260729-4">
+    <link rel="stylesheet" href="style.css?v=20260812-1">
 
-    <link rel="stylesheet" href="offsetiso.css?v=20260729-5">
+    <link rel="stylesheet" href="offsetiso.css?v=20260812-1">
 
 </head>
 
@@ -48,7 +48,7 @@
 
                     Equal Friction<br>
                     Constant Velocity<br>
-                    Static Regain
+                    Static Regain — Single Step
 
                 </p>
 
@@ -305,7 +305,7 @@
 
                     <option value="staticRegain">
 
-                        Static Regain
+                        Static Regain — Single Step
 
                     </option>
 
@@ -384,20 +384,21 @@
 
                     <label for="regainEfficiencyInput">
 
-                        Regain Efficiency (%)
+                        Recovery Factor (%)
 
                     </label>
 
                     <input
                         id="regainEfficiencyInput"
                         type="number"
-                        min="1"
-                        max="100"
+                        min="70"
+                        max="90"
                         step="1"
                         value="75">
 
                     <p class="input-help">
-                        Single-step sizing at standard-air density. Final
+                        Single-step sizing at standard-air density. Recovery
+                        factor is limited to 70–90%; 75% is the default. Final
                         systems should still be checked section by section.
                     </p>
 
@@ -741,7 +742,7 @@
 
     <th>Size</th>
 
-    <th>Flow Match</th>
+    <th>Friction Match</th>
 
     <th>Area Match</th>
 
@@ -777,7 +778,7 @@
 
     <th>Size</th>
 
-    <th>Flow Match</th>
+    <th>Friction Match</th>
 
     <th>Area Match</th>
 
@@ -1116,14 +1117,14 @@
      JAVASCRIPT
 =================================================== -->
 
-<script src="js/formulas.js?v=20260729-4"></script>
-<script src="js/rectangle.js?v=20260729-4"></script>
-<script src="js/flatOval.js?v=20260729-4"></script>
-<script src="js/equivalentSizes.js?v=20260729-4"></script>
-<script src="js/airflow.js?v=20260729-4"></script>
-<script src="app.js?v=20260729-4"></script>
-<script src="offsetiso.js?v=20260729-5"></script>
-<script src="js/equivalentUI.js?v=20260729-4"></script>
+<script src="js/formulas.js?v=20260812-1"></script>
+<script src="js/rectangle.js?v=20260812-1"></script>
+<script src="js/flatOval.js?v=20260812-1"></script>
+<script src="js/equivalentSizes.js?v=20260812-1"></script>
+<script src="js/airflow.js?v=20260812-1"></script>
+<script src="app.js?v=20260812-1"></script>
+<script src="offsetiso.js?v=20260812-1"></script>
+<script src="js/equivalentUI.js?v=20260812-1"></script>
 
 </body>
 

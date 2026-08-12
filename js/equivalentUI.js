@@ -161,6 +161,17 @@ function formatEquivalentOptionSize(
 
 function buildEquivalentRows(options) {
 
+    if (!options.length) {
+        return `
+            <tr>
+                <td colspan="4">
+                    No practical match within ±25% friction
+                    in the configured size range.
+                </td>
+            </tr>
+        `;
+    }
+
     return options.map(option => `
 
         <tr>
@@ -175,12 +186,12 @@ function buildEquivalentRows(options) {
 
             <td class="${
                 getEquivalentDifferenceClass(
-                    option.equivalentDifference
+                    option.frictionDifference
                 )
             }">
 
                 ${formatEquivalentDifference(
-                    option.equivalentDifference
+                    option.frictionDifference
                 )}
 
             </td>

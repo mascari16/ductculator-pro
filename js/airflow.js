@@ -411,8 +411,8 @@ function calculateStaticRegain(
         cfm <= 0 ||
         enteringVelocity <= 0 ||
         desiredStaticRegain <= 0 ||
-        regainEfficiencyPercent <= 0 ||
-        regainEfficiencyPercent > 100
+        regainEfficiencyPercent < 70 ||
+        regainEfficiencyPercent > 90
     ) {
         return null;
     }
@@ -554,7 +554,7 @@ function buildStaticRegainResults(data) {
             <div class="analysis-grid">
                 <div class="analysis-item"><span>Entering Velocity</span><strong>${Math.round(data.enteringVelocity)} FPM</strong></div>
                 <div class="analysis-item"><span>Entering Velocity Pressure</span><strong>${data.enteringVelocityPressure.toFixed(3)} in.</strong></div>
-                <div class="analysis-item"><span>Regain Efficiency</span><strong>${data.regainEfficiencyPercent.toFixed(0)}%</strong></div>
+                <div class="analysis-item"><span>Recovery Factor</span><strong>${data.regainEfficiencyPercent.toFixed(0)}%</strong></div>
                 <div class="analysis-item"><span>Regain Difference</span><strong>${signedPercent(regainDifference)}</strong></div>
                 <div class="analysis-item"><span>Required Area</span><strong>${data.requiredArea.toFixed(3)} ft²</strong></div>
             </div>
@@ -568,7 +568,7 @@ function buildStaticRegainResults(data) {
             <details class="engineering-breakdown">
                 <summary>🧮 Engineering Breakdown</summary>
                 <div class="breakdown-content">
-                    <div class="breakdown-method"><span>Calculation Method</span><strong>Static Regain</strong></div>
+                    <div class="breakdown-method"><span>Calculation Method</span><strong>Static Regain — Single Step</strong></div>
                     <div class="breakdown-step">
                         <h4>1. Entering Velocity Pressure</h4>
                         <code>VP₁ = (Velocity ÷ 4005)²</code>
@@ -576,7 +576,7 @@ function buildStaticRegainResults(data) {
                     </div>
                     <div class="breakdown-step">
                         <h4>2. Required Velocity Reduction</h4>
-                        <code>Static Regain = Efficiency × (VP₁ − VP₂)</code>
+                        <code>Static Regain = Recovery Factor × (VP₁ − VP₂)</code>
                         <code>Target downstream velocity = ${Math.round(data.targetVelocity)} FPM</code>
                     </div>
                     <div class="breakdown-step">

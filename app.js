@@ -244,7 +244,7 @@ function updateCalculator() {
 
     if (!data) {
         showAirflowError(
-            "Enter valid static-regain values. Efficiency must be between 1% and 100%."
+            "Enter valid static-regain values. Recovery factor must be between 70% and 90%."
         );
         return;
     }
@@ -464,19 +464,40 @@ const diagThroat =
 // Input display controls
 // -----------------------------------------------------
 
-offsetMode.addEventListener("change", () => {
+const overallLengthLabel =
+    document.querySelector(
+        'label[for="overallLengthInput"]'
+    );
 
-    if (offsetMode.value === "knownAngle") {
+function updateOffsetModeFields() {
 
-        knownAngleGroup.style.display = "block";
+    const knownAngle =
+        offsetMode.value === "knownAngle";
 
-    } else {
+    knownAngleGroup.style.display =
+        knownAngle ? "block" : "none";
 
-        knownAngleGroup.style.display = "none";
-
+    /*
+     * Overall Length is an INPUT only when solving the elbow angle.
+     * In Known Elbow Angle mode it is calculated from the entered
+     * angle, offset, and CLR, so hide the unused input to avoid
+     * implying that it affects the result.
+     */
+    if (overallLengthLabel) {
+        overallLengthLabel.style.display =
+            knownAngle ? "none" : "block";
     }
 
-});
+    overallLengthInput.style.display =
+        knownAngle ? "none" : "block";
+}
+
+offsetMode.addEventListener(
+    "change",
+    updateOffsetModeFields
+);
+
+updateOffsetModeFields();
 
 
 clrMultiplier.addEventListener("change", () => {
@@ -1341,7 +1362,11 @@ calculateOffsetBtn.addEventListener("click", () => {
 
         <div class="result-main">
 
-            <span>Required Elbow Angle</span>
+            <span>${
+                offsetMode.value === "solveAngle"
+                    ? "Required Elbow Angle"
+                    : "Elbow Angle"
+            }</span>
 
             <strong>
                 ${elbowAngle.toFixed(2)}°
@@ -1434,7 +1459,7 @@ calculateOffsetBtn.addEventListener("click", () => {
             <span>Equivalent CLR</span>
 
             <strong>
-                ${(centerlineRadius / bendDimension).toFixed(2)}× CLR
+                ${(centerlineRadius / bendDimension).toFixed(2)}×
             </strong>
 
         </div>
