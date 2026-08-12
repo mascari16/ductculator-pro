@@ -589,25 +589,11 @@
 
             if (!isEnd) {
                 const middleX = (low.x + high.x) / 2;
-
-                const labelWidth = 118;
-                const labelHeight = 42;
-                const labelY = low.y - 51;
-
-                drawing.appendChild(svg("rect", {
-                    x: middleX - labelWidth / 2,
-                    y: labelY,
-                    width: labelWidth,
-                    height: labelHeight,
-                    rx: 8,
-                    fill: "rgba(11,18,32,.92)",
-                    stroke: "rgba(245,185,65,.55)",
-                    "stroke-width": 1
-                }));
+                const lineY = (low.y + high.y) / 2;
 
                 drawing.appendChild(svg("text", {
                     x: middleX,
-                    y: labelY + 16,
+                    y: lineY - 9,
                     fill: "#f5b941",
                     "font-size": 11.5,
                     "font-weight": 800,
@@ -616,7 +602,7 @@
 
                 drawing.appendChild(svg("text", {
                     x: middleX,
-                    y: labelY + 33,
+                    y: lineY + 18,
                     fill: "#f8fafc",
                     "font-size": 12.5,
                     "font-weight": 800,
@@ -659,6 +645,28 @@
             "font-weight": 750,
             "text-anchor": "middle"
         }, `${options.inletLabel}: ${formatMeasurement(result[options.inletValueKey])}`));
+
+        if (options.offsetAxis === "depth") {
+            drawing.appendChild(svg("text", {
+                x: inletLow.x,
+                y: dimY + 39,
+                fill: "#7f93b5",
+                "font-size": 9.5,
+                "font-weight": 800,
+                "text-anchor": "middle",
+                "letter-spacing": ".08em"
+            }, "BOTTOM"));
+
+            drawing.appendChild(svg("text", {
+                x: inletHigh.x,
+                y: dimY + 39,
+                fill: "#7f93b5",
+                "font-size": 9.5,
+                "font-weight": 800,
+                "text-anchor": "middle",
+                "letter-spacing": ".08em"
+            }, "TOP"));
+        }
 
         /*
          * Outlet dimension.
@@ -742,7 +750,29 @@
              * dashed projection lines make clear which inlet/outlet edges
              * the CAMduct offset is measured between.
              */
-            const offsetDimY = topY + (bottomY - topY) * 0.34;
+            let offsetDimY;
+
+            if (options.offsetAxis === "depth") {
+                const bottomMode =
+                    mode === "bottomUp" ||
+                    mode === "bottomDown";
+
+                /*
+                 * Keep Bottom offsets visually down by the inlet/bottom
+                 * side of the right view, and Top offsets up by the outlet/
+                 * top side. This does not change the CAMduct geometry or
+                 * the calculated offset — only where the dimension is shown.
+                 */
+                offsetDimY = bottomMode
+                    ? bottomY - 38
+                    : topY + 38;
+            } else {
+                offsetDimY =
+                    topY +
+                    (bottomY - topY) *
+                    0.34;
+            }
+
             const minX = Math.min(inletReference.x, outletReference.x);
             const maxX = Math.max(inletReference.x, outletReference.x);
 
@@ -779,18 +809,14 @@
                 "marker-end": `url(#${options.prefix}Arrow)`
             }));
 
-            const offsetModeText = options.offsetAxis === "width"
-                ? widthModeLabel(mode)
-                : depthModeLabel(mode);
-
             drawing.appendChild(svg("text", {
                 x: (minX + maxX) / 2,
                 y: offsetDimY - 11,
                 fill: "#f5b941",
-                "font-size": 12.5,
-                "font-weight": 800,
+                "font-size": 13,
+                "font-weight": 850,
                 "text-anchor": "middle"
-            }, `${options.offsetLabel}: ${offsetModeText} ${formatMeasurement(offsetValue)}`));
+            }, formatMeasurement(offsetValue)));
         }
 
         container.appendChild(drawing);
