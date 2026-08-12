@@ -401,7 +401,12 @@
         return element;
     }
 
-    function viewCoordinates(result, dimensionKey, positionKey) {
+    function viewCoordinates(
+        result,
+        dimensionKey,
+        positionKey,
+        reverseHorizontal = false
+    ) {
         const stations = result.stations;
         const minEdge = Math.min(
             ...stations.map(station => station[positionKey])
@@ -439,9 +444,21 @@
                     ? station[positionKey]
                     : station[positionKey] + station[dimensionKey];
 
+                const normalX =
+                    originX +
+                    edge *
+                    scale;
+
+                const x = reverseHorizontal
+                    ? viewWidth - normalX
+                    : normalX;
+
                 return {
-                    x: originX + edge * scale,
-                    y: baseY - station.lengthPosition * scale
+                    x,
+                    y:
+                        baseY -
+                        station.lengthPosition *
+                        scale
                 };
             }
         };
@@ -482,7 +499,8 @@
         const coordinates = viewCoordinates(
             result,
             options.dimensionKey,
-            options.positionKey
+            options.positionKey,
+            Boolean(options.reverseHorizontal)
         );
 
         const drawing = svg("svg", {
@@ -647,6 +665,10 @@
         }, `${options.inletLabel}: ${formatMeasurement(result[options.inletValueKey])}`));
 
         if (options.offsetAxis === "depth") {
+            /*
+             * With the right view mirrored, inletHigh (TOP) appears on
+             * screen-left and inletLow (BOTTOM) appears on screen-right.
+             */
             drawing.appendChild(svg("text", {
                 x: inletLow.x,
                 y: dimY + 39,
@@ -970,7 +992,8 @@
             offsetValueKey: "offsetWidth",
             offsetModeKey: "offsetWidthMode",
             offsetAxis: "width",
-            offsetLabel: "Offset Width"
+            offsetLabel: "Offset Width",
+            reverseHorizontal: false
         });
 
         renderTransitionView(byId(IDS.sideView), result, {
@@ -987,7 +1010,15 @@
             offsetValueKey: "offsetDepth",
             offsetModeKey: "offsetDepthMode",
             offsetAxis: "depth",
-            offsetLabel: "Offset Depth"
+            offsetLabel: "Offset Depth",
+
+            /*
+             * Looking at the fitting FROM THE RIGHT:
+             * TOP is shown on the left side of the screen and
+             * BOTTOM is shown on the right side, matching the
+             * shop/CAMduct right-view convention.
+             */
+            reverseHorizontal: true
         });
 
         renderSummary(result);
