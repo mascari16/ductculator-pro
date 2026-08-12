@@ -1548,10 +1548,10 @@
     ) {
 
         const panel = panelLayout || {
-            x: 1250,
-            y: 35,
-            width: 420,
-            height: 590,
+            x: 1100,
+            y: 20,
+            width: 560,
+            height: 620,
             mobile: false
         };
 
@@ -1583,27 +1583,27 @@
                 noteSize: 14
             }
             : {
-                padding: 24,
-                gap: 12,
-                titleSize: 23,
-                titleOffsetY: 38,
-                subtitleSize: 14,
-                subtitleOffsetY: 63,
-                cardsStartY: 91,
-                cardHeight: 76,
-                rowStep: 88,
-                cardRadius: 10,
-                labelSize: 13,
-                valueSize: 20,
-                horizontalPadding: 14,
-                labelOffsetY: 24,
-                valueOffsetY: 54,
-                quantityGap: 13,
-                quantityHeight: 54,
-                quantityLabelSize: 13,
-                quantityValueSize: 20,
-                noteGap: 15,
-                noteSize: 14
+                padding: 26,
+                gap: 14,
+                titleSize: 28,
+                titleOffsetY: 42,
+                subtitleSize: 16,
+                subtitleOffsetY: 70,
+                cardsStartY: 101,
+                cardHeight: 82,
+                rowStep: 94,
+                cardRadius: 11,
+                labelSize: 14.5,
+                valueSize: 23,
+                horizontalPadding: 16,
+                labelOffsetY: 26,
+                valueOffsetY: 59,
+                quantityGap: 14,
+                quantityHeight: 60,
+                quantityLabelSize: 14.5,
+                quantityValueSize: 23,
+                noteGap: 14,
+                noteSize: 15
             };
 
         const group =
@@ -1955,7 +1955,7 @@
             ).matches;
 
         const viewWidth =
-            isMobile ? 500 : 1740;
+            isMobile ? 500 : 1750;
 
         const viewHeight =
             isMobile ? 1310 : 660;
@@ -1985,10 +1985,10 @@
                     mobile: true
                 }
                 : {
-                    x: 1250,
-                    y: 35,
-                    width: 420,
-                    height: 590,
+                    x: 1100,
+                    y: 20,
+                    width: 560,
+                    height: 620,
                     mobile: false
                 };
 
