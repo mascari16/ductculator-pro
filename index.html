@@ -138,6 +138,22 @@
 
 </div>
 
+<div class="tool-card" id="openProCalc">
+
+    <div class="tool-icon">🔢</div>
+
+    <h3>HVAC Pro Calc</h3>
+
+    <p>
+        4090-Style Key Layout<br>
+        Feet-Inch-Fraction Math<br>
+        Offsets, Fan Laws, VP/FPM
+    </p>
+
+    <button>Open Calculator →</button>
+
+</div>
+
             <div class="tool-card disabled">
 
                 <div class="tool-icon">🔄</div>
@@ -245,6 +261,8 @@
     <span class="icon">↔️</span>
     <span class="text">Transition Splitter</span>
 </button>
+
+<button data-open-procalc type="button"><span class="icon">🔢</span><span class="text">HVAC Pro Calc</span></button>
 
 <button disabled>
 
@@ -537,6 +555,8 @@
             <span class="icon">↔️</span>
             <span class="text">Transition Splitter</span>
         </button>
+
+        <button data-open-procalc type="button"><span class="icon">🔢</span><span class="text">HVAC Pro Calc</span></button>
 
         <button disabled>
 
@@ -925,6 +945,8 @@
             <span class="text">Transition Splitter</span>
         </button>
 
+        <button data-open-procalc type="button"><span class="icon">🔢</span><span class="text">HVAC Pro Calc</span></button>
+
         <button disabled>
 
             <span class="icon">🔄</span>
@@ -1173,6 +1195,7 @@
         <button id="transitionOpenEquivalent" type="button"><span class="icon">⭕</span><span class="text">Equivalent Sizes</span></button>
         <button id="transitionOpenSheetMetal" type="button"><span class="icon">🧮</span><span class="text">Sheet Metal</span></button>
         <button class="active" type="button"><span class="icon">↔️</span><span class="text">Transition Splitter</span></button>
+        <button data-open-procalc type="button"><span class="icon">🔢</span><span class="text">HVAC Pro Calc</span></button>
         <button disabled><span class="icon">🔄</span><span class="text">Reverse Calculator</span></button>
         <hr>
         <button disabled><span class="icon">⚙</span><span class="text">Settings</span></button>
@@ -1272,6 +1295,56 @@
 </div>
 
 <!-- ===================================================
+     HVAC PRO CALC WORKSPACE
+     The calculator lives in hvac-pro-calc.html (it also works on its
+     own) and is embedded here so its keys, styles and keyboard
+     shortcuts stay isolated from the rest of the app.
+=================================================== -->
+
+<div id="proCalcWorkspace" class="workspace">
+
+    <button id="proCalcMobileMenuBtn" class="mobile-menu-btn" type="button">☰</button>
+    <div id="proCalcMobileOverlay" class="mobile-overlay"></div>
+
+    <aside class="sidebar procalc-sidebar">
+        <div class="sidebar-top">
+            <button id="toggleProCalcSidebar" class="toggle-btn" type="button">☰</button>
+            <h2>Ductculator</h2>
+        </div>
+
+        <button data-nav-target="dashboard" type="button"><span class="icon">🏠</span><span class="text">Dashboard</span></button>
+        <hr>
+        <button data-nav-target="airflowWorkspace" type="button"><span class="icon">💨</span><span class="text">Airflow</span></button>
+        <button disabled><span class="icon">📏</span><span class="text">Pressure Loss</span></button>
+        <button data-nav-target="equivalentWorkspace" type="button"><span class="icon">⭕</span><span class="text">Equivalent Sizes</span></button>
+        <button data-nav-target="sheetMetalWorkspace" type="button"><span class="icon">🧮</span><span class="text">Sheet Metal</span></button>
+        <button data-nav-target="transitionWorkspace" type="button"><span class="icon">↔️</span><span class="text">Transition Splitter</span></button>
+        <button class="active" type="button"><span class="icon">🔢</span><span class="text">HVAC Pro Calc</span></button>
+        <button disabled><span class="icon">🔄</span><span class="text">Reverse Calculator</span></button>
+        <hr>
+        <button disabled><span class="icon">⚙</span><span class="text">Settings</span></button>
+    </aside>
+
+    <section class="content procalc-content">
+        <header>
+            <h1>HVAC Pro Calc</h1>
+            <p>Same key layout and functions as the 4090 (ITI version). Tap <strong class="procalc-conv">Conv</strong> and the yellow functions flip onto the keys.</p>
+        </header>
+
+        <div class="procalc-frame-wrap">
+            <iframe
+                id="proCalcFrame"
+                class="procalc-frame"
+                title="HVAC Pro Calc"
+                data-src="hvac-pro-calc.html?embed"
+                loading="lazy"></iframe>
+        </div>
+
+        <p class="procalc-popout"><a href="hvac-pro-calc.html" target="_blank" rel="noopener">Open the calculator in its own tab ↗</a></p>
+    </section>
+</div>
+
+<!-- ===================================================
      JAVASCRIPT
 =================================================== -->
 
@@ -1284,6 +1357,7 @@
 <script src="offsetiso.js?v=20260812-6"></script>
 <script src="js/equivalentUI.js?v=20260812-6"></script>
 <script src="js/transitionSplitter.js?v=20260812-6"></script>
+<script src="js/proCalc.js?v=20261124-1"></script>
 
 </body>
 
