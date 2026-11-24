@@ -26,7 +26,7 @@ function selectedRoundLabel(data) {
 function buildRoundHeader(data, subtitle) {
     if (data.round === null) {
         return `
-            <div class="warning-banner">⚠ CUSTOM DUCT REQUIRED</div>
+            <div class="warning-banner">⚠ Custom duct required</div>
             <h2>${data.exactDiameter.toFixed(2)}\"</h2>
             <p>
                 Required diameter exceeds the largest standard round duct
@@ -36,7 +36,7 @@ function buildRoundHeader(data, subtitle) {
     }
 
     return `
-        <h2>${data.round}\" ROUND</h2>
+        <h2>${data.round}\" round</h2>
         <p>${subtitle}</p>
     `;
 }
@@ -127,24 +127,24 @@ function buildResults(data) {
 
             <div class="result-grid">
                 <div class="result-box">
-                    <div class="box-label">📐 Exact Diameter</div>
+                    <div class="box-label">Exact Diameter</div>
                     <div class="box-value diameter">${data.exactDiameter.toFixed(2)}\"</div>
                 </div>
                 <div class="result-box">
-                    <div class="box-label">💨 Actual Velocity</div>
+                    <div class="box-label">Actual Velocity</div>
                     <div class="box-value velocity">${Math.round(data.actualVelocity)} FPM</div>
                 </div>
                 <div class="result-box">
-                    <div class="box-label">📦 Required Area</div>
+                    <div class="box-label">Required Area</div>
                     <div class="box-value area">${data.requiredArea.toFixed(3)} ft²</div>
                 </div>
                 <div class="result-box">
-                    <div class="box-label">📊 Actual Area</div>
+                    <div class="box-label">Actual Area</div>
                     <div class="box-value area">${data.actualArea.toFixed(3)} ft²</div>
                 </div>
             </div>
 
-            <div class="section-title">📊 Duct Analysis</div>
+            <div class="section-title">Duct Analysis</div>
             <div class="analysis-grid">
                 <div class="analysis-item"><span>Round Duct</span><strong class="diameter">${selectedRoundLabel(data)}</strong></div>
                 <div class="analysis-item"><span>Target Velocity</span><strong class="velocity">${Math.round(data.targetVelocity)} FPM</strong></div>
@@ -153,14 +153,14 @@ function buildResults(data) {
                 <div class="analysis-item"><span>Area Difference</span><strong>${signedPercent(areaDifference)}</strong></div>
             </div>
 
-            <div class="section-title">📐 Duct Options</div>
+            <div class="section-title">Duct Options</div>
             <div class="options-grid">
                 ${buildAreaOptionsTable("Rectangle", "▭", rectangles)}
                 ${buildAreaOptionsTable("Flat Oval", "⬭", ovals)}
             </div>
 
             <details class="engineering-breakdown">
-                <summary>🧮 Engineering Breakdown</summary>
+                <summary>Engineering Breakdown</summary>
                 <div class="breakdown-content">
                     <div class="breakdown-method"><span>Calculation Method</span><strong>Constant Velocity</strong></div>
                     <div class="breakdown-step">
@@ -350,13 +350,13 @@ function buildEqualFrictionResults(data) {
             </div>
 
             <div class="result-grid">
-                <div class="result-box"><div class="box-label">📐 Exact Diameter</div><div class="box-value diameter">${data.exactDiameter.toFixed(2)}\"</div></div>
-                <div class="result-box"><div class="box-label">💨 Actual Velocity</div><div class="box-value velocity">${Math.round(data.actualVelocity)} FPM</div></div>
-                <div class="result-box"><div class="box-label">🎯 Target Friction</div><div class="box-value friction">${data.targetFrictionRate.toFixed(3)}</div></div>
-                <div class="result-box"><div class="box-label">📉 Actual Friction</div><div class="box-value friction">${data.actualFrictionRate.toFixed(3)}</div></div>
+                <div class="result-box"><div class="box-label">Exact Diameter</div><div class="box-value diameter">${data.exactDiameter.toFixed(2)}\"</div></div>
+                <div class="result-box"><div class="box-label">Actual Velocity</div><div class="box-value velocity">${Math.round(data.actualVelocity)} FPM</div></div>
+                <div class="result-box"><div class="box-label">Target Friction</div><div class="box-value friction">${data.targetFrictionRate.toFixed(3)}</div></div>
+                <div class="result-box"><div class="box-label">Actual Friction</div><div class="box-value friction">${data.actualFrictionRate.toFixed(3)}</div></div>
             </div>
 
-            <div class="section-title">📊 Duct Analysis</div>
+            <div class="section-title">Duct Analysis</div>
             <div class="analysis-grid">
                 <div class="analysis-item"><span>Airflow</span><strong>${data.cfm.toFixed(0)} CFM</strong></div>
                 <div class="analysis-item"><span>Selected Round</span><strong class="diameter">${selectedRoundLabel(data)}</strong></div>
@@ -364,7 +364,7 @@ function buildEqualFrictionResults(data) {
                 <div class="analysis-item"><span>Actual Area</span><strong>${data.actualArea.toFixed(3)} ft²</strong></div>
             </div>
 
-            <div class="section-title">📐 Equal-Friction Options</div>
+            <div class="section-title">Equal-Friction Options</div>
             <div class="options-grid">
                 ${buildFrictionOptionsTable("Rectangle", "▭", rectangles)}
                 ${buildFrictionOptionsTable("Flat Oval", "⬭", ovals)}
@@ -376,7 +376,7 @@ function buildEqualFrictionResults(data) {
             </p>
 
             <details class="engineering-breakdown">
-                <summary>🧮 Engineering Breakdown</summary>
+                <summary>Engineering Breakdown</summary>
                 <div class="breakdown-content">
                     <div class="breakdown-method"><span>Calculation Method</span><strong>Equal Friction</strong></div>
                     <div class="breakdown-step">
@@ -549,13 +549,13 @@ function buildStaticRegainResults(data) {
             </div>
 
             <div class="result-grid">
-                <div class="result-box"><div class="box-label">🎯 Target Velocity</div><div class="box-value velocity">${Math.round(data.targetVelocity)} FPM</div></div>
-                <div class="result-box"><div class="box-label">💨 Actual Velocity</div><div class="box-value velocity">${Math.round(data.actualVelocity)} FPM</div></div>
-                <div class="result-box"><div class="box-label">🎯 Desired Regain</div><div class="box-value friction">${data.desiredStaticRegain.toFixed(3)} in.</div></div>
-                <div class="result-box"><div class="box-label">📈 Actual Regain</div><div class="box-value friction">${data.actualStaticRegain.toFixed(3)} in.</div></div>
+                <div class="result-box"><div class="box-label">Target Velocity</div><div class="box-value velocity">${Math.round(data.targetVelocity)} FPM</div></div>
+                <div class="result-box"><div class="box-label">Actual Velocity</div><div class="box-value velocity">${Math.round(data.actualVelocity)} FPM</div></div>
+                <div class="result-box"><div class="box-label">Desired Regain</div><div class="box-value friction">${data.desiredStaticRegain.toFixed(3)} in.</div></div>
+                <div class="result-box"><div class="box-label">Actual Regain</div><div class="box-value friction">${data.actualStaticRegain.toFixed(3)} in.</div></div>
             </div>
 
-            <div class="section-title">📊 Static Regain Analysis</div>
+            <div class="section-title">Static Regain Analysis</div>
             <div class="analysis-grid">
                 <div class="analysis-item"><span>Entering Velocity</span><strong>${Math.round(data.enteringVelocity)} FPM</strong></div>
                 <div class="analysis-item"><span>Entering Velocity Pressure</span><strong>${data.enteringVelocityPressure.toFixed(3)} in.</strong></div>
@@ -564,14 +564,14 @@ function buildStaticRegainResults(data) {
                 <div class="analysis-item"><span>Required Area</span><strong>${data.requiredArea.toFixed(3)} ft²</strong></div>
             </div>
 
-            <div class="section-title">📐 Duct Options</div>
+            <div class="section-title">Duct Options</div>
             <div class="options-grid">
                 ${buildStaticOptionsTable("Rectangle", "▭", rectangles)}
                 ${buildStaticOptionsTable("Flat Oval", "⬭", ovals)}
             </div>
 
             <details class="engineering-breakdown">
-                <summary>🧮 Engineering Breakdown</summary>
+                <summary>Engineering Breakdown</summary>
                 <div class="breakdown-content">
                     <div class="breakdown-method"><span>Calculation Method</span><strong>Static Regain — Single Step</strong></div>
                     <div class="breakdown-step">

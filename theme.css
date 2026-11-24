@@ -1,0 +1,805 @@
+/* =====================================================
+   DUCTCULATOR PRO — theme.css
+   Visual layer only: loaded last, changes colour, type and
+   surfaces. No layout grids, ids or behaviour live here.
+
+   Idea: a shop drawing on galvanized steel.
+   - Graphite steel surfaces.
+   - Safety yellow = the answer or the action (a layout marker).
+   - Blueprint cyan = drawn geometry and dimension lines only.
+   - Barlow Condensed for headings, numbers and keys; Barlow
+     for reading. Same pair as the HVAC Pro Calc, so the app
+     reads as one tool.
+===================================================== */
+
+:root{
+    --bg:#181c1f;
+    --bg2:#1c2024;
+    --card:#21272c;
+    --card2:#21272c;
+    --cardHover:#2a3138;
+    --sunk:#191d21;
+    --border:#3a444d;
+    --border-soft:rgba(160,175,186,.14);
+
+    --yellow:#f2c230;
+    --yellow-hi:#ffd54a;
+    --yellow-ink:#211a02;
+    --cyan:#7cc4e4;
+
+    /* existing variable names, re-pointed */
+    --blue:#7cc4e4;
+    --blueHover:#9fd5ee;
+    --green:#3ccf7a;
+    --orange:#f0a43a;
+    --purple:#7cc4e4;
+    --red:#ef5b5b;
+    --white:#eef1f3;
+    --gray:#9ba7b1;
+
+    --font:"Barlow","Segoe UI",system-ui,sans-serif;
+    --font-c:"Barlow Condensed","Arial Narrow","Segoe UI",system-ui,sans-serif;
+
+    --grid:
+        linear-gradient(rgba(124,196,228,.055) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(124,196,228,.055) 1px, transparent 1px);
+    --grid-size:18px 18px;
+}
+
+body{
+    font-family:var(--font);
+    font-size:16px;
+    line-height:1.5;
+    color:var(--white);
+    background:var(--bg);
+    -webkit-font-smoothing:antialiased;
+    font-variant-numeric:tabular-nums;
+}
+
+h1,h2,h3,h4{
+    font-family:var(--font-c);
+    font-weight:700;
+    letter-spacing:.005em;
+}
+
+:where(button,a,input,select,summary,[tabindex]):focus-visible{
+    outline:2px solid var(--yellow);
+    outline-offset:2px;
+}
+
+/* =====================================================
+   Dashboard
+===================================================== */
+
+.hero{
+    width:95%;
+    max-width:1500px;
+    margin:0 auto 34px;
+    padding:56px 0 26px;
+    text-align:left;
+    border-bottom:1px solid var(--border);
+}
+
+.hero h1{
+    margin-bottom:6px;
+    color:var(--white);
+    font-size:clamp(44px,6vw,68px);
+    line-height:1;
+    letter-spacing:0;
+}
+
+.hero p{
+    color:var(--gray);
+    font-size:19px;
+}
+
+.dashboard h2{
+    margin-bottom:18px;
+    color:var(--gray);
+    font-family:var(--font);
+    font-size:15px;
+    font-weight:600;
+}
+
+.tool-grid{
+    gap:18px;
+}
+
+.tool-card{
+    padding:0 0 26px;
+    overflow:hidden;
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:12px;
+    cursor:pointer;
+    transition:border-color .15s ease;
+}
+
+.tool-card:hover{
+    transform:none;
+    box-shadow:none;
+    border-color:#5d6a75;
+}
+
+.tool-card > :not(.tool-icon){
+    margin-left:26px;
+    margin-right:26px;
+}
+
+.tool-icon{
+    height:150px;
+    margin:0 0 20px;
+    padding:18px 22px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:0;
+    background-color:var(--sunk);
+    background-image:var(--grid);
+    background-size:var(--grid-size);
+    border-bottom:1px solid var(--border);
+}
+
+.tool-drawing{
+    width:100%;
+    height:100%;
+    max-width:260px;
+    overflow:visible;
+}
+
+.tool-drawing .ln{fill:none;stroke:var(--cyan);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.tool-drawing .hd{fill:none;stroke:var(--cyan);stroke-width:1.1;stroke-dasharray:5 4;opacity:.45}
+.tool-drawing .dm{fill:none;stroke:var(--yellow);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.tool-drawing .ext{fill:none;stroke:var(--yellow);stroke-width:1;stroke-dasharray:2 3;opacity:.55}
+.tool-drawing .dm-t{fill:var(--yellow);font:600 13px var(--font-c)}
+.tool-drawing .dm-f{fill:var(--yellow);stroke:none}
+
+.tool-card:hover .tool-drawing .ln{stroke:#a9dcf2}
+
+/* One page-load moment: the drawings sketch themselves in. */
+.tool-drawing .ln{
+    stroke-dasharray:1;
+    stroke-dashoffset:0;
+    animation:ductculator-draw 1s cubic-bezier(.3,.7,.3,1) both;
+}
+
+.tool-card:nth-child(2) .tool-drawing .ln{animation-delay:.06s}
+.tool-card:nth-child(3) .tool-drawing .ln{animation-delay:.12s}
+.tool-card:nth-child(4) .tool-drawing .ln{animation-delay:.18s}
+.tool-card:nth-child(5) .tool-drawing .ln{animation-delay:.24s}
+.tool-card:nth-child(6) .tool-drawing .ln{animation-delay:.30s}
+.tool-card:nth-child(7) .tool-drawing .ln{animation-delay:.36s}
+
+@keyframes ductculator-draw{
+    from{stroke-dashoffset:1}
+    to{stroke-dashoffset:0}
+}
+
+@media (prefers-reduced-motion:reduce){
+    .tool-drawing .ln{animation:none}
+}
+
+.tool-card h3{
+    margin-bottom:8px;
+    font-size:27px;
+    line-height:1.1;
+}
+
+.tool-card p{
+    margin-bottom:22px;
+    color:var(--gray);
+    font-size:15px;
+    line-height:1.7;
+}
+
+.tool-card button{
+    padding:10px 20px;
+    border-radius:8px;
+    background:var(--yellow);
+    color:var(--yellow-ink);
+    font:600 17px/1.1 var(--font-c);
+    letter-spacing:.01em;
+}
+
+.tool-card button:hover{
+    background:var(--yellow-hi);
+}
+
+.tool-card.disabled{
+    opacity:1;
+    cursor:default;
+    border-style:dashed;
+    background:transparent;
+}
+
+.tool-card.disabled:hover{
+    border-color:var(--border);
+}
+
+.tool-card.disabled .tool-icon{
+    background-color:transparent;
+}
+
+.tool-card.disabled .tool-drawing .ln,
+.tool-card.disabled .tool-drawing .hd,
+.tool-card.disabled .tool-drawing .dm,
+.tool-card.disabled .tool-drawing .ext{
+    stroke:#56626c;
+}
+
+.tool-card.disabled .tool-drawing .dm-f{fill:#56626c}
+
+.tool-card.disabled h3{color:#aab4bc}
+
+.tool-card.disabled p{color:#7f8a93}
+
+.tool-card span{
+    color:var(--gray);
+    font-weight:600;
+    font-size:14px;
+}
+
+/* =====================================================
+   Sidebar
+===================================================== */
+
+.sidebar{
+    background:var(--bg2);
+    border-right:1px solid var(--border);
+}
+
+.sidebar h2{
+    color:var(--white);
+    font-size:24px;
+}
+
+.toggle-btn{
+    background:var(--card);
+    border:1px solid var(--border);
+    color:var(--white);
+}
+
+.toggle-btn:hover{
+    background:var(--cardHover);
+}
+
+.sidebar button{
+    margin-bottom:4px;
+    padding:11px 12px;
+    border-radius:8px;
+    color:#cfd6db;
+    font-size:15px;
+}
+
+.sidebar button:hover{
+    background:#262d33;
+    color:var(--white);
+}
+
+.sidebar button.active{
+    background:#2a3138;
+    color:var(--white);
+    box-shadow:inset 3px 0 0 var(--yellow);
+}
+
+.sidebar button:disabled{
+    color:#6f7a83;
+    cursor:default;
+}
+
+.sidebar button:disabled:hover{
+    background:none;
+}
+
+.sidebar hr{
+    margin:16px 0;
+}
+
+.icon{
+    width:30px;
+    vertical-align:middle;
+}
+
+.nav-glyph{
+    width:20px;
+    height:20px;
+    vertical-align:-4px;
+    fill:none;
+    stroke:currentColor;
+    stroke-width:1.7;
+    stroke-linecap:round;
+    stroke-linejoin:round;
+    color:var(--gray);
+}
+
+.nav-glyph .dots{stroke-width:2.4}
+
+.sidebar button:hover .nav-glyph{color:var(--white)}
+.sidebar button.active .nav-glyph{color:var(--yellow)}
+.sidebar button:disabled .nav-glyph{color:#5c666f}
+
+.sidebar.collapsed .nav-glyph{
+    width:22px;
+    height:22px;
+    vertical-align:middle;
+}
+
+.sidebar.collapsed button.active{
+    box-shadow:inset 0 -3px 0 var(--yellow);
+}
+
+.mobile-menu-btn{
+    background:var(--card) !important;
+    border-color:var(--border) !important;
+    color:var(--white) !important;
+}
+
+/* =====================================================
+   Screen headers, panels, inputs, primary buttons
+===================================================== */
+
+.content header{
+    margin-bottom:24px;
+}
+
+.content h1{
+    margin-bottom:4px;
+    font-size:46px;
+    line-height:1.05;
+}
+
+.content header p{
+    max-width:75ch;
+    color:var(--gray);
+    font-size:16px;
+}
+
+.panel{
+    background:var(--card);
+    border-radius:12px;
+}
+
+.panel h3{
+    margin-bottom:12px;
+    font-size:22px;
+}
+
+.panel label{
+    margin-top:16px;
+    margin-bottom:6px;
+    color:#b9c3ca;
+    font-size:14px;
+    font-weight:500;
+}
+
+.panel input,
+.panel select,
+.transition-input-grid input,
+.transition-input-panel select,
+.transition-offset-row input{
+    border:1px solid #3f4a53;
+    border-radius:8px;
+    background:#15191c;
+    color:var(--white);
+    font-family:var(--font);
+    font-variant-numeric:tabular-nums;
+}
+
+.panel input:focus,
+.panel select:focus,
+.transition-input-grid input:focus,
+.transition-input-panel select:focus,
+.transition-offset-row input:focus{
+    outline:none;
+    border-color:var(--yellow);
+    box-shadow:0 0 0 3px rgba(242,194,48,.18);
+}
+
+.input-help{
+    color:var(--gray);
+}
+
+.calculate,
+#calculateOffsetBtn,
+.transition-calculate-btn{
+    border:0;
+    border-radius:8px;
+    background:var(--yellow);
+    color:var(--yellow-ink);
+    font:600 18px/1.1 var(--font-c);
+    letter-spacing:.01em;
+}
+
+.calculate:hover,
+#calculateOffsetBtn:hover,
+.transition-calculate-btn:hover{
+    background:var(--yellow-hi);
+    filter:none;
+}
+
+/* =====================================================
+   Results (Airflow)
+===================================================== */
+
+.result-card{
+    background:var(--card);
+    border-radius:12px;
+}
+
+.result-header{
+    background-color:#232a30;
+    background-image:var(--grid);
+    background-size:var(--grid-size);
+    border-bottom:1px solid var(--border);
+}
+
+.result-header h2{
+    color:var(--yellow);
+    font-size:62px;
+    line-height:1;
+    margin-bottom:8px;
+}
+
+.result-header p{
+    color:var(--gray);
+}
+
+.warning-banner{
+    font-family:var(--font);
+    letter-spacing:0;
+    text-transform:none;
+}
+
+.result-box,
+.analysis-item{
+    background:var(--sunk);
+    border-color:var(--border);
+    border-radius:10px;
+}
+
+.box-label,
+.analysis-item span{
+    color:var(--gray);
+    font-size:14px;
+    letter-spacing:0;
+    text-transform:none;
+}
+
+.box-value,
+.analysis-item strong{
+    color:var(--white);
+    font-family:var(--font-c);
+    font-weight:600;
+}
+
+.box-value{font-size:38px;line-height:1.05}
+
+.box-value.diameter,
+.box-value.velocity,
+.box-value.area,
+.box-value.friction{
+    color:var(--white);
+}
+
+.section-title{
+    padding:24px 30px 0;
+    background:none;
+    border-top:1px solid var(--border);
+    border-bottom:0;
+    color:var(--white);
+    font-family:var(--font-c);
+    font-size:22px;
+    font-weight:600;
+    letter-spacing:0;
+    text-transform:none;
+}
+
+.engineering-breakdown{
+    background:var(--sunk);
+    border-radius:10px;
+}
+
+.engineering-breakdown summary{
+    background:#262d33;
+    font-family:var(--font-c);
+    font-size:19px;
+    font-weight:600;
+}
+
+.breakdown-content code{
+    font-family:Consolas,"Cascadia Mono",monospace;
+}
+
+.formula-label{
+    text-transform:none;
+    letter-spacing:0;
+    font-size:13px;
+}
+
+/* Option tables (Airflow + Equivalent Sizes) */
+.options-card{
+    background:var(--sunk);
+    border-radius:10px;
+}
+
+.options-card h3{
+    padding:13px 16px;
+    background:#2a3238;
+    font-size:20px;
+    font-weight:600;
+}
+
+.options-table th{
+    background:#232a30;
+    color:var(--gray);
+    font-family:var(--font);
+    font-size:13px;
+    font-weight:600;
+}
+
+.options-table td{
+    font-variant-numeric:tabular-nums;
+}
+
+.options-table tbody tr:hover{
+    background:rgba(242,194,48,.06);
+}
+
+.good{color:var(--green)}
+.okay{color:#e8c547}
+.warn{color:var(--orange)}
+.bad{color:var(--red)}
+
+.equivalent-source-summary{
+    background:var(--sunk);
+    border-radius:8px;
+}
+
+.equivalent-source-summary strong{
+    font-family:var(--font-c);
+    font-size:22px;
+    font-weight:600;
+}
+
+/* =====================================================
+   Elbow Offset
+===================================================== */
+
+#offsetResults .result-main{
+    border:1px solid rgba(242,194,48,.55);
+    border-radius:10px;
+    background:rgba(242,194,48,.07);
+}
+
+#offsetResults .result-main strong{
+    color:var(--yellow);
+    font-family:var(--font-c);
+    font-size:34px;
+    font-weight:700;
+}
+
+#offsetResults .result-row{
+    border-bottom-color:var(--border);
+}
+
+#offsetResults .result-row strong{
+    font-family:var(--font-c);
+    font-size:19px;
+    font-weight:600;
+}
+
+.offset-iso-card{
+    background:var(--card);
+    border-color:var(--border);
+    border-radius:12px;
+}
+
+.offset-iso-header h3{
+    font-size:20px;
+}
+
+.offset-iso-container{
+    background-color:var(--sunk);
+    background-image:var(--grid);
+    background-size:var(--grid-size);
+    border-color:var(--border);
+    border-radius:10px;
+}
+
+/* =====================================================
+   Transition Splitter
+===================================================== */
+
+.transition-view-card,
+.transition-output-section{
+    background:var(--card);
+    border-radius:12px;
+    box-shadow:none;
+}
+
+.transition-view-heading{
+    border-bottom-color:var(--border);
+}
+
+.transition-view-heading h3{
+    font-size:23px;
+}
+
+.transition-view-kicker,
+.transition-input-title > span,
+.transition-output-heading > div > span{
+    color:var(--gray);
+    font-family:var(--font);
+    font-size:13px;
+    font-weight:600;
+    letter-spacing:0;
+}
+
+.transition-view-help{
+    font-size:13px;
+}
+
+.transition-view-canvas{
+    background-color:var(--sunk);
+    background-image:var(--grid);
+    background-size:var(--grid-size);
+}
+
+.transition-input-panel{
+    background:var(--card);
+    border-radius:12px;
+    box-shadow:none;
+}
+
+.transition-input-title h2,
+.transition-output-heading h2{
+    font-size:27px;
+}
+
+.transition-input-title p,
+.transition-output-heading p{
+    font-size:14px;
+}
+
+.transition-input-grid label,
+.transition-split-label,
+.transition-offset-section h3{
+    color:#c3ccd2;
+    font-family:var(--font);
+    font-size:14px;
+    font-weight:600;
+}
+
+.transition-input-note{
+    border-color:var(--border);
+    background:var(--sunk);
+    color:var(--gray);
+    font-size:13px;
+    line-height:1.5;
+}
+
+.transition-summary-card{
+    background:var(--card);
+    border-radius:10px;
+}
+
+.transition-summary-card span{
+    font-size:13px;
+    font-weight:500;
+    letter-spacing:0;
+    text-transform:none;
+}
+
+.transition-summary-card strong{
+    font-family:var(--font-c);
+    font-size:26px;
+    font-weight:600;
+}
+
+.transition-summary-primary{
+    border-color:rgba(242,194,48,.55);
+    background:rgba(242,194,48,.07);
+}
+
+.transition-summary-primary strong{
+    color:var(--yellow);
+}
+
+.transition-fitting-card{
+    background:var(--sunk);
+    border-color:var(--border);
+    border-radius:10px;
+}
+
+.transition-fitting-heading{
+    background:#262d33;
+    border-bottom-color:var(--border);
+}
+
+.transition-fitting-heading span{
+    font-size:12px;
+    font-weight:600;
+    letter-spacing:0;
+}
+
+.transition-fitting-heading h3{
+    font-size:23px;
+}
+
+.transition-fitting-size{
+    color:var(--white);
+    font-family:var(--font-c);
+    font-size:18px;
+    font-weight:600;
+}
+
+.transition-fitting-size b{
+    color:var(--yellow);
+}
+
+.transition-entry{
+    background:var(--card);
+    border-color:var(--border);
+    border-radius:8px;
+}
+
+.transition-entry span{
+    color:var(--gray);
+    font-size:12px;
+    font-weight:600;
+    letter-spacing:0;
+    text-transform:none;
+}
+
+.transition-entry strong{
+    font-family:var(--font-c);
+    font-size:22px;
+    font-weight:600;
+    line-height:1.15;
+}
+
+.transition-entry small{
+    color:var(--gray);
+    font-size:12px;
+}
+
+.transition-entry-length{
+    border-color:rgba(242,194,48,.45);
+}
+
+/* =====================================================
+   HVAC Pro Calc frame
+===================================================== */
+
+.procalc-frame-wrap,
+.procalc-frame{
+    background:var(--bg);
+    border-radius:12px;
+}
+
+.procalc-conv{
+    color:var(--yellow);
+}
+
+/* =====================================================
+   Phones
+===================================================== */
+
+@media (max-width:900px){
+    .hero{
+        padding:34px 0 18px;
+        margin-bottom:24px;
+    }
+
+    .content h1{
+        font-size:36px;
+    }
+
+    .result-header h2{
+        font-size:48px;
+    }
+
+    .tool-icon{
+        height:130px;
+    }
+}

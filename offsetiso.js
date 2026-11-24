@@ -1389,7 +1389,7 @@
             svg("path", {
                 d: "M 0 0 L 5 2.5 L 0 5",
                 fill: "none",
-                stroke: "#f4b942",
+                stroke: "#f2c231",
                 "stroke-width": 1.35,
                 "stroke-linecap": "round",
                 "stroke-linejoin": "round"
@@ -1410,14 +1410,14 @@
         gradient.appendChild(
             svg("stop", {
                 offset: "0%",
-                "stop-color": "#17243a"
+                "stop-color": "#2a3035"
             })
         );
 
         gradient.appendChild(
             svg("stop", {
                 offset: "100%",
-                "stop-color": "#0d1728"
+                "stop-color": "#1d2125"
             })
         );
 
@@ -1527,8 +1527,8 @@
                 width,
                 height: cardHeight,
                 rx: metrics.cardRadius || 10,
-                fill: "#111d31",
-                stroke: "#2a3d5c",
+                fill: "#23282c",
+                stroke: "#434c55",
                 "stroke-width": 1.1
             })
         );
@@ -1537,7 +1537,7 @@
             svg("text", {
                 x: x + horizontalPadding,
                 y: labelY,
-                fill: "#8fa6c9",
+                fill: "#a1aeb7",
                 "font-size": labelSize,
                 "font-weight": 700
             }, label.toUpperCase())
@@ -1547,7 +1547,7 @@
             svg("text", {
                 x: x + horizontalPadding,
                 y: valueY,
-                fill: "#f4f7ff",
+                fill: "#f8fafb",
                 "font-size": valueSize,
                 "font-weight": 780
             }, value)
@@ -1632,7 +1632,7 @@
                 rx: isMobilePanel ? 20 : 18,
                 fill:
                     "url(#singleElbowDataGradient)",
-                stroke: "#2a3d5c",
+                stroke: "#434c55",
                 "stroke-width": 1.5
             })
         );
@@ -1645,7 +1645,7 @@
                 y:
                     panel.y +
                     metrics.titleOffsetY,
-                fill: "#f4f7ff",
+                fill: "#f8fafb",
                 "font-size":
                     metrics.titleSize,
                 "font-weight": 780
@@ -1660,7 +1660,7 @@
                 y:
                     panel.y +
                     metrics.subtitleOffsetY,
-                fill: "#8097ba",
+                fill: "#909faa",
                 "font-size":
                     metrics.subtitleSize,
                 "font-weight": 520
@@ -1789,8 +1789,8 @@
                 height:
                     metrics.quantityHeight,
                 rx: 10,
-                fill: "#111d31",
-                stroke: "#2a3d5c",
+                fill: "#23282c",
+                stroke: "#434c55",
                 "stroke-width": 1.1
             })
         );
@@ -1804,7 +1804,7 @@
                 y:
                     quantityY +
                     22,
-                fill: "#8fa6c9",
+                fill: "#a1aeb7",
                 "font-size":
                     metrics.quantityLabelSize,
                 "font-weight": 700
@@ -1821,7 +1821,7 @@
                 y:
                     quantityY +
                     36,
-                fill: "#f4f7ff",
+                fill: "#f8fafb",
                 "font-size":
                     metrics.quantityValueSize,
                 "font-weight": 780,
@@ -1845,7 +1845,7 @@
                     panel.width -
                     metrics.padding,
                 y2: noteY,
-                stroke: "#2a3d5c",
+                stroke: "#434c55",
                 "stroke-width": 1
             })
         );
@@ -1856,7 +1856,7 @@
                     panel.x +
                     metrics.padding,
                 y: noteY + 31,
-                fill: "#9aadd0",
+                fill: "#abb7bf",
                 "font-size":
                     metrics.noteSize,
                 "font-weight": 520
@@ -1876,7 +1876,7 @@
                     panel.x +
                     metrics.padding,
                 y: noteY + 57,
-                fill: "#9aadd0",
+                fill: "#abb7bf",
                 "font-size":
                     metrics.noteSize,
                 "font-weight": 520
@@ -2164,7 +2164,7 @@ drawing.appendChild(
         ], true),
         class:
             "offset-iso-top-panel",
-        fill: "#31518a",
+        fill: "#5b6974",
         stroke: "none"
     })
 );
@@ -2182,7 +2182,7 @@ drawing.appendChild(
         ], true),
         class:
             "offset-iso-bottom-panel",
-        fill: "#274474",
+        fill: "#4c5761",
         stroke: "none"
     })
 );
@@ -2212,7 +2212,7 @@ drawing.appendChild(
             svg("path", {
                 d: path(nearHeel),
                 fill: "none",
-                stroke: "#78a7ff",
+                stroke: "#8cc8e4",
                 "stroke-width": 2,
                 "stroke-linecap": "round",
                 "stroke-linejoin": "round"
@@ -2223,7 +2223,7 @@ drawing.appendChild(
             svg("path", {
                 d: path(nearThroat),
                 fill: "none",
-                stroke: "#78a7ff",
+                stroke: "#8cc8e4",
                 "stroke-width": 2,
                 "stroke-linecap": "round",
                 "stroke-linejoin": "round"
@@ -2251,7 +2251,7 @@ drawing.appendChild(
                     )
                 ),
                 fill: "none",
-                stroke: "#9fb0ca",
+                stroke: "#abb6be",
                 "stroke-width": 1.15,
                 "stroke-dasharray": "5 8",
                 "stroke-linecap": "round",
@@ -2268,7 +2268,7 @@ drawing.appendChild(
                     )
                 ),
                 fill: "none",
-                stroke: "#9fb0ca",
+                stroke: "#abb6be",
                 "stroke-width": 1.15,
                 "stroke-dasharray": "5 8",
                 "stroke-linecap": "round",
@@ -2325,7 +2325,7 @@ drawing.appendChild(
             svg("path", {
                 d: path(center),
                 fill:"none",
-                stroke:"#9fb7dc",
+                stroke:"#b5bfc6",
                 "stroke-width":1.0,
                 "stroke-dasharray":"10 5 2 5",
                 opacity:0.24

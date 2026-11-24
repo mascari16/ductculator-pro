@@ -9,8 +9,8 @@
     padding: 18px;
     box-sizing: border-box;
 
-    background: #111827;
-    border: 1px solid #29364a;
+    background: #1e2326;
+    border: 1px solid #3a4249;
     border-radius: 14px;
 
     overflow: hidden;
@@ -38,7 +38,7 @@
 .offset-iso-note {
     margin: 0;
 
-    color: #94a3b8;
+    color: #9aa8b2;
     font-size: 12px;
 }
 
@@ -52,8 +52,8 @@
     align-items: center;
     justify-content: center;
 
-    background: #0b1220;
-    border: 1px solid #22304a;
+    background: #181c1f;
+    border: 1px solid #363e45;
     border-radius: 10px;
 
     overflow: hidden;
@@ -72,33 +72,33 @@
 /* Duct surfaces */
 
 .offset-iso-top-panel {
-    fill: rgba(79, 140, 255, 0.3);
+    fill: rgba(107,184,220,0.3);
 
-    stroke: #7da6ff;
+    stroke: #90cae5;
     stroke-width: 2;
     stroke-linejoin: round;
 }
 
 .offset-iso-bottom-panel {
-    fill: rgba(79, 140, 255, 0.12);
+    fill: rgba(107,184,220,0.12);
 
-    stroke: #7da6ff;
+    stroke: #90cae5;
     stroke-width: 2;
     stroke-linejoin: round;
 }
 
 .offset-iso-side-panel {
-    fill: rgba(79, 140, 255, 0.2);
+    fill: rgba(107,184,220,0.2);
 
-    stroke: #7da6ff;
+    stroke: #90cae5;
     stroke-width: 2;
     stroke-linejoin: round;
 }
 
 .offset-iso-end-face {
-    fill: rgba(79, 140, 255, 0.14);
+    fill: rgba(107,184,220,0.14);
 
-    stroke: #a7c2ff;
+    stroke: #acd8ec;
     stroke-width: 2.25;
     stroke-linejoin: round;
 }
@@ -106,7 +106,7 @@
 .offset-iso-hidden-line {
     fill: none;
 
-    stroke: #53627a;
+    stroke: #64727f;
     stroke-width: 1.5;
     stroke-dasharray: 7 6;
 }
@@ -116,7 +116,7 @@
 .offset-iso-center-line {
     fill: none;
 
-    stroke: #94a3b8;
+    stroke: #9aa8b2;
     stroke-width: 1.5;
     stroke-dasharray: 10 7;
 }
@@ -126,19 +126,19 @@
 .offset-iso-dimension-line {
     fill: none;
 
-    stroke: #f4b942;
+    stroke: #f2c231;
     stroke-width: 1.9;
 }
 
 .offset-iso-extension-line {
     fill: none;
 
-    stroke: #f4b942;
+    stroke: #f2c231;
     stroke-width: 1.45;
 }
 
 .offset-iso-dimension-text {
-    fill: #f4b942;
+    fill: #f2c231;
 
     font-family: Arial, Helvetica, sans-serif;
     font-size: 18px;
@@ -148,13 +148,13 @@
     dominant-baseline: middle;
 
     paint-order: stroke;
-    stroke: #0b1220;
+    stroke: #181c1f;
     stroke-width: 6px;
     stroke-linejoin: round;
 }
 
 .offset-iso-size-text {
-    fill: #dbeafe;
+    fill: #acd8ec;
 
     font-family: Arial, Helvetica, sans-serif;
     font-size: 18px;
@@ -163,13 +163,13 @@
     text-anchor: middle;
 
     paint-order: stroke;
-    stroke: #0b1220;
+    stroke: #181c1f;
     stroke-width: 6px;
     stroke-linejoin: round;
 }
 
 .offset-iso-title-text {
-    fill: #94a3b8;
+    fill: #9aa8b2;
 
     font-family: Arial, Helvetica, sans-serif;
     font-size: 13px;

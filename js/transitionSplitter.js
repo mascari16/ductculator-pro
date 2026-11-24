@@ -479,7 +479,7 @@
         marker.appendChild(svg("path", {
             d: "M 0 0 L 7 3.5 L 0 7",
             fill: "none",
-            stroke: "#f5b941",
+            stroke: "#f2c231",
             "stroke-width": 1.2,
             "stroke-linecap": "round",
             "stroke-linejoin": "round"
@@ -518,7 +518,7 @@
         drawing.appendChild(svg("text", {
             x: 18,
             y: 25,
-            fill: "#8fb4ff",
+            fill: "#9ed1e8",
             "font-size": 12,
             "font-weight": 850,
             "letter-spacing": ".10em"
@@ -527,16 +527,16 @@
         drawing.appendChild(svg("text", {
             x: 18,
             y: 43,
-            fill: "#7f93b5",
+            fill: "#8d9ca7",
             "font-size": 10.5,
             "font-weight": 650
         }, options.viewDirection));
 
         const segmentPalette = [
-            "rgba(79,140,255,.26)",
+            "rgba(107,184,220,.26)",
             "rgba(34,211,238,.16)",
             "rgba(139,92,246,.18)",
-            "rgba(79,140,255,.20)"
+            "rgba(107,184,220,.20)"
         ];
 
         result.fittings.forEach((fitting, index) => {
@@ -552,7 +552,7 @@
                     .map(point => `${point.x},${point.y}`)
                     .join(" "),
                 fill: segmentPalette[index % segmentPalette.length],
-                stroke: "#76a5ff",
+                stroke: "#8ac7e4",
                 "stroke-width": 2
             }));
 
@@ -569,15 +569,15 @@
                 width: 84,
                 height: 30,
                 rx: 15,
-                fill: "rgba(11,18,32,.88)",
-                stroke: "#4f8cff",
+                fill: "rgba(24,28,31,.88)",
+                stroke: "#6bb8dc",
                 "stroke-width": 1
             }));
 
             drawing.appendChild(svg("text", {
                 x: centerX,
                 y: centerY + 1,
-                fill: "#f8fafc",
+                fill: "#f9fafb",
                 "font-size": 15,
                 "font-weight": 750,
                 "text-anchor": "middle",
@@ -600,7 +600,7 @@
                 y1: low.y,
                 x2: high.x,
                 y2: high.y,
-                stroke: isEnd ? "#a8c4ff" : "#f5b941",
+                stroke: isEnd ? "#acd8ec" : "#f2c231",
                 "stroke-width": isEnd ? 2.4 : 2,
                 "stroke-dasharray": isEnd ? "" : "7 5"
             }));
@@ -612,7 +612,7 @@
                 drawing.appendChild(svg("text", {
                     x: middleX,
                     y: lineY - 9,
-                    fill: "#f5b941",
+                    fill: "#f2c231",
                     "font-size": 11.5,
                     "font-weight": 800,
                     "text-anchor": "middle"
@@ -621,7 +621,7 @@
                 drawing.appendChild(svg("text", {
                     x: middleX,
                     y: lineY + 18,
-                    fill: "#f8fafc",
+                    fill: "#f9fafb",
                     "font-size": 12.5,
                     "font-weight": 800,
                     "text-anchor": "middle"
@@ -649,7 +649,7 @@
             y1: dimY,
             x2: inletHigh.x,
             y2: dimY,
-            stroke: "#f5b941",
+            stroke: "#f2c231",
             "stroke-width": 1.6,
             "marker-start": `url(#${options.prefix}Arrow)`,
             "marker-end": `url(#${options.prefix}Arrow)`
@@ -658,7 +658,7 @@
         drawing.appendChild(svg("text", {
             x: (inletLow.x + inletHigh.x) / 2,
             y: dimY + 22,
-            fill: "#f5b941",
+            fill: "#f2c231",
             "font-size": 14,
             "font-weight": 750,
             "text-anchor": "middle"
@@ -672,7 +672,7 @@
             drawing.appendChild(svg("text", {
                 x: inletLow.x,
                 y: dimY + 39,
-                fill: "#7f93b5",
+                fill: "#8d9ca7",
                 "font-size": 9.5,
                 "font-weight": 800,
                 "text-anchor": "middle",
@@ -682,7 +682,7 @@
             drawing.appendChild(svg("text", {
                 x: inletHigh.x,
                 y: dimY + 39,
-                fill: "#7f93b5",
+                fill: "#8d9ca7",
                 "font-size": 9.5,
                 "font-weight": 800,
                 "text-anchor": "middle",
@@ -696,7 +696,7 @@
         drawing.appendChild(svg("text", {
             x: (outletLow.x + outletHigh.x) / 2,
             y: Math.min(outletLow.y, outletHigh.y) - 17,
-            fill: "#f5b941",
+            fill: "#f2c231",
             "font-size": 14,
             "font-weight": 750,
             "text-anchor": "middle"
@@ -722,7 +722,7 @@
             y1: bottomY,
             x2: lengthX,
             y2: topY,
-            stroke: "#f5b941",
+            stroke: "#f2c231",
             "stroke-width": 1.6,
             "marker-start": `url(#${options.prefix}Arrow)`,
             "marker-end": `url(#${options.prefix}Arrow)`
@@ -731,7 +731,7 @@
         const lengthText = svg("text", {
             x: lengthX - 14,
             y: (bottomY + topY) / 2,
-            fill: "#f5b941",
+            fill: "#f2c231",
             "font-size": 14,
             "font-weight": 750,
             "text-anchor": "middle"
@@ -803,7 +803,7 @@
                 y1: inletReference.y,
                 x2: inletReference.x,
                 y2: offsetDimY,
-                stroke: "#f5b941",
+                stroke: "#f2c231",
                 "stroke-width": 1,
                 "stroke-dasharray": "4 5",
                 opacity: .72
@@ -814,7 +814,7 @@
                 y1: outletReference.y,
                 x2: outletReference.x,
                 y2: offsetDimY,
-                stroke: "#f5b941",
+                stroke: "#f2c231",
                 "stroke-width": 1,
                 "stroke-dasharray": "4 5",
                 opacity: .72
@@ -825,7 +825,7 @@
                 y1: offsetDimY,
                 x2: maxX,
                 y2: offsetDimY,
-                stroke: "#f5b941",
+                stroke: "#f2c231",
                 "stroke-width": 1.8,
                 "marker-start": `url(#${options.prefix}Arrow)`,
                 "marker-end": `url(#${options.prefix}Arrow)`
@@ -834,7 +834,7 @@
             drawing.appendChild(svg("text", {
                 x: (minX + maxX) / 2,
                 y: offsetDimY - 11,
-                fill: "#f5b941",
+                fill: "#f2c231",
                 "font-size": 13,
                 "font-weight": 850,
                 "text-anchor": "middle"
@@ -856,19 +856,19 @@
 
         summary.innerHTML = `
             <div class="transition-summary-card">
-                <span>Original Length</span>
+                <span>Original length</span>
                 <strong>${formatMeasurement(result.length)}</strong>
             </div>
             <div class="transition-summary-card transition-summary-primary">
-                <span>Split Into</span>
-                <strong>${result.splitCount} Fittings</strong>
+                <span>Split into</span>
+                <strong>${result.splitCount} fittings</strong>
             </div>
             <div class="transition-summary-card">
-                <span>Each Length</span>
+                <span>Each length</span>
                 <strong>${formatMeasurement(eachLength)}</strong>
             </div>
             <div class="transition-summary-card">
-                <span>Intermediate Breaks</span>
+                <span>Intermediate breaks</span>
                 <strong>${result.splitCount - 1}</strong>
             </div>
         `;
@@ -912,7 +912,7 @@
                 <article class="transition-fitting-card">
                     <div class="transition-fitting-heading">
                         <div>
-                            <span>CAMDUCT ENTRY</span>
+                            <span>CAMduct entry</span>
                             <h3>Fitting ${fitting.number}</h3>
                         </div>
                         <div class="transition-fitting-size">

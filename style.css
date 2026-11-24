@@ -13,17 +13,17 @@
 
     color-scheme: dark;
 
-    --bg:#0b1220;
-    --bg2:#121b2e;
+    --bg:#181c1f;
+    --bg2:#22272b;
 
-    --card:#1b263b;
-    --card2:#24344d;
-    --cardHover:#2c3f5e;
+    --card:#2c3338;
+    --card2:#394148;
+    --cardHover:#444e57;
 
-    --border:#32445f;
+    --border:#48525b;
 
-    --blue:#4f8cff;
-    --blueHover:#6aa4ff;
+    --blue:#6bb8dc;
+    --blueHover:#80c3e1;
 
     --green:#22c55e;
     --orange:#f59e0b;
@@ -31,8 +31,8 @@
     --cyan:#22d3ee;
     --red:#ef4444;
 
-    --white:#f8fafc;
-    --gray:#94a3b8;
+    --white:#f9fafb;
+    --gray:#9aa8b2;
 
 }
 
@@ -159,7 +159,7 @@ DASHBOARD
 
     transform:translateY(-8px);
     border-color:var(--blue);
-    box-shadow:0 18px 40px rgba(79,140,255,.18);
+    box-shadow:0 18px 40px rgba(107,184,220,.18);
 
 }
 
@@ -495,7 +495,7 @@ CALCULATOR
     padding:14px;
     border-radius:10px;
     border:1px solid var(--border);
-    background:#0f172a;
+    background:#1f2327;
     color:white;
     font-size:15px;
 
@@ -551,7 +551,7 @@ RESULTS
 
 .result-header{
 
-    background:#253754;
+    background:#3c454d;
     padding:28px 35px;
 
 }
@@ -621,7 +621,7 @@ METRIC CARDS
 
 .result-box{
 
-    background:#10192d;
+    background:#202529;
     border:1px solid var(--border);
     border-radius:14px;
     padding:22px;
@@ -684,11 +684,11 @@ SECTION TITLES
 
     background:linear-gradient(
         90deg,
-        #32486d,
-        #2b3f61
+        #4e5a64,
+        #454f58
     );
 
-    border-top:1px solid #5b8cff;
+    border-top:1px solid #75bddf;
     border-bottom:1px solid var(--border);
 
     font-size:22px;
@@ -717,7 +717,7 @@ TABLES
 
 .equivalent-table thead th{
 
-    background:#40557c;
+    background:#5c6975;
 
     color:#ffffff;
 
@@ -753,7 +753,7 @@ TABLES
 
 .equivalent-table tbody tr:hover{
 
-    background:rgba(70,110,180,.12);
+    background:rgba(109,128,141,.12);
 
 }
 
@@ -827,7 +827,7 @@ EQUIVALENT SIZES PANEL
 
     margin-bottom:12px;
 
-    background:#10192d;
+    background:#202529;
 
     border:1px solid var(--border);
 
@@ -910,7 +910,7 @@ DUCT ANALYSIS
 
 .analysis-item{
 
-    background:#10192d;
+    background:#202529;
 
     border:1px solid var(--border);
 
@@ -952,7 +952,7 @@ ENGINEERING BREAKDOWN
 
     margin:30px;
 
-    background:#10192d;
+    background:#202529;
 
     border:1px solid var(--border);
 
@@ -972,7 +972,7 @@ ENGINEERING BREAKDOWN
 
     padding:18px 22px;
 
-    background:#253754;
+    background:#3c454d;
 
     color:var(--white);
 
@@ -1050,7 +1050,7 @@ ENGINEERING BREAKDOWN
 
     padding:12px 14px;
 
-    background:#0b1220;
+    background:#181c1f;
 
     border:1px solid var(--border);
 
@@ -1387,7 +1387,7 @@ DUCT OPTIONS
 
 .options-card{
 
-    background:#10192d;
+    background:#202529;
 
     border:1px solid var(--border);
 
@@ -1399,7 +1399,7 @@ DUCT OPTIONS
 
 .options-card h3{
 
-    background:#32486d;
+    background:#4e5a64;
 
     padding:18px;
 
@@ -1421,7 +1421,7 @@ DUCT OPTIONS
 
 .options-table th{
 
-    background:#253754;
+    background:#3c454d;
 
     padding:15px;
 
@@ -1445,7 +1445,7 @@ DUCT OPTIONS
 
 .options-table tbody tr:hover{
 
-    background:rgba(79,140,255,.08);
+    background:rgba(107,184,220,.08);
 
 }
 
@@ -1543,7 +1543,7 @@ DUCT OPTIONS
     display: block;
     margin-top: 18px;
     margin-bottom: 8px;
-    color: #9fb3cf;
+    color: #aeb9c0;
 }
 
 #sheetMetalWorkspace .panel input,
@@ -1555,9 +1555,9 @@ DUCT OPTIONS
     width: 100%;
     margin-top: 18px;
     padding: 12px 16px;
-    border: 1px solid #4f8cff;
+    border: 1px solid #6bb8dc;
     border-radius: 10px;
-    background: #4f8cff;
+    background: #6bb8dc;
     color: #ffffff;
     font-size: 16px;
     font-weight: 700;
@@ -1581,20 +1581,20 @@ DUCT OPTIONS
     justify-content: space-between;
     gap: 20px;
     padding: 14px 0;
-    border-bottom: 1px solid #32445f;
+    border-bottom: 1px solid #48525b;
 }
 
 #offsetResults .result-main {
     margin-bottom: 4px;
     padding: 16px;
-    border: 1px solid #4f8cff;
+    border: 1px solid #6bb8dc;
     border-radius: 10px;
-    background: rgba(79, 140, 255, 0.1);
+    background: rgba(107,184,220,0.1);
 }
 
 #offsetResults .result-main span,
 #offsetResults .result-row span {
-    color: #9fb3cf;
+    color: #aeb9c0;
 }
 
 #offsetResults .result-main strong {
@@ -1639,7 +1639,7 @@ DUCT OPTIONS
 .offset-diagram-card{    
     margin-top:24px;
     padding:20px;
-    border:1px solid #32445f;
+    border:1px solid #48525b;
     border-radius:14px;
     background:rgba(255,255,255,0.02);
 }
@@ -1660,9 +1660,9 @@ DUCT OPTIONS
     position:absolute;
     font-weight:600;
     font-size:16px;
-    color:#69a7ff;
-    background:rgba(22,32,52,.92);
-    border:1px solid #3d69b8;
+    color:#80c2e1;
+    background:rgba(39,44,49,.92);
+    border:1px solid #6b7d8a;
     border-radius:8px;
     padding:6px 12px;
     white-space:nowrap;
@@ -1741,7 +1741,7 @@ DUCT OPTIONS
 
     transform:translateX(-50%);
 
-    border-left:2px solid #69a7ff;
+    border-left:2px solid #80c2e1;
 }
 
 /* Overall-length text */
@@ -1757,9 +1757,9 @@ DUCT OPTIONS
 
     padding:5px 12px;
 
-    color:#69a7ff;
-    background:#1d2b43;
-    border:1px solid #3d69b8;
+    color:#80c2e1;
+    background:#31383e;
+    border:1px solid #6b7d8a;
     border-radius:7px;
 
     font-size:15px;
@@ -1785,7 +1785,7 @@ DUCT OPTIONS
 
     transform:translateX(-50%);
 
-    border-top:2px dashed rgba(105,167,255,.7);
+    border-top:2px dashed rgba(128,194,225,.7);
 }
 
 .dimension-overall .extension-left{
@@ -1805,8 +1805,8 @@ DUCT OPTIONS
     width:12px;
     height:12px;
 
-    border-top:2px solid #69a7ff;
-    border-left:2px solid #69a7ff;
+    border-top:2px solid #80c2e1;
+    border-left:2px solid #80c2e1;
 }
 
 /* Top arrow points downward */
@@ -1983,7 +1983,7 @@ DUCT OPTIONS
     overflow:hidden;
     border:1px solid var(--border);
     border-radius:16px;
-    background:#0d1628;
+    background:#1d2125;
     box-shadow:0 10px 28px rgba(0,0,0,.16);
 }
 
@@ -1993,7 +1993,7 @@ DUCT OPTIONS
     justify-content:space-between;
     gap:14px;
     padding:17px 18px 12px;
-    border-bottom:1px solid rgba(148,163,184,.13);
+    border-bottom:1px solid rgba(154,168,178,.13);
 }
 
 .transition-view-heading h3{
@@ -2045,7 +2045,7 @@ DUCT OPTIONS
     padding:22px;
     border:1px solid var(--border);
     border-radius:16px;
-    background:linear-gradient(180deg,#1b263b,#182338);
+    background:linear-gradient(180deg,#2c3338,#292f35);
     box-shadow:0 12px 32px rgba(0,0,0,.2);
 }
 
@@ -2072,7 +2072,7 @@ DUCT OPTIONS
 }
 
 .transition-input-grid label{
-    color:#b8cae8;
+    color:#cad1d6;
     font-size:13px;
     font-weight:650;
 }
@@ -2082,9 +2082,9 @@ DUCT OPTIONS
 .transition-offset-row input{
     width:100%;
     min-width:0;
-    border:1px solid #375078;
+    border:1px solid #56626d;
     border-radius:9px;
-    background:#0f182a;
+    background:#1f2327;
     color:var(--white);
     padding:11px 12px;
     font-size:14px;
@@ -2095,19 +2095,19 @@ DUCT OPTIONS
 .transition-input-panel select:focus,
 .transition-offset-row input:focus{
     border-color:var(--blue);
-    box-shadow:0 0 0 2px rgba(79,140,255,.14);
+    box-shadow:0 0 0 2px rgba(107,184,220,.14);
 }
 
 .transition-offset-section{
     margin-top:15px;
     padding-top:14px;
-    border-top:1px solid rgba(148,163,184,.14);
+    border-top:1px solid rgba(154,168,178,.14);
 }
 
 .transition-offset-section h3{
     margin:0 0 8px;
     font-size:14px;
-    color:#b8cae8;
+    color:#cad1d6;
 }
 
 .transition-offset-row{
@@ -2119,7 +2119,7 @@ DUCT OPTIONS
 .transition-split-label{
     display:block;
     margin:17px 0 7px;
-    color:#b8cae8;
+    color:#cad1d6;
     font-size:13px;
     font-weight:700;
 }
@@ -2144,10 +2144,10 @@ DUCT OPTIONS
 .transition-input-note{
     margin-top:14px;
     padding:12px 13px;
-    border:1px solid rgba(79,140,255,.22);
+    border:1px solid rgba(107,184,220,.22);
     border-radius:10px;
-    background:rgba(79,140,255,.07);
-    color:#aebed8;
+    background:rgba(107,184,220,.07);
+    color:#bbc4cb;
     font-size:11px;
     line-height:1.5;
 }
@@ -2163,7 +2163,7 @@ DUCT OPTIONS
     padding:14px 16px;
     border:1px solid var(--border);
     border-radius:12px;
-    background:#152036;
+    background:#272d32;
 }
 
 .transition-summary-card span{
@@ -2182,8 +2182,8 @@ DUCT OPTIONS
 }
 
 .transition-summary-primary{
-    border-color:#4f8cff;
-    background:rgba(79,140,255,.14);
+    border-color:#6bb8dc;
+    background:rgba(107,184,220,.14);
 }
 
 .transition-error{
@@ -2211,7 +2211,7 @@ DUCT OPTIONS
     padding:18px;
     border:1px solid var(--border);
     border-radius:16px;
-    background:#10192d;
+    background:#202529;
 }
 
 .transition-output-heading{
@@ -2243,9 +2243,9 @@ DUCT OPTIONS
 
 .transition-fitting-card{
     overflow:hidden;
-    border:1px solid #344a6d;
+    border:1px solid #4f5b65;
     border-radius:13px;
-    background:#16223a;
+    background:#292f35;
 }
 
 .transition-fitting-heading{
@@ -2254,12 +2254,12 @@ DUCT OPTIONS
     justify-content:space-between;
     gap:14px;
     padding:14px 16px;
-    border-bottom:1px solid rgba(148,163,184,.14);
-    background:#1b2b49;
+    border-bottom:1px solid rgba(154,168,178,.14);
+    background:#333a41;
 }
 
 .transition-fitting-heading span{
-    color:#8fa9d2;
+    color:#a6b2bb;
     font-size:10px;
     font-weight:800;
     letter-spacing:.1em;
@@ -2271,7 +2271,7 @@ DUCT OPTIONS
 }
 
 .transition-fitting-size{
-    color:#dbeafe;
+    color:#acd8ec;
     font-size:13px;
     font-weight:750;
     text-align:right;
@@ -2292,15 +2292,15 @@ DUCT OPTIONS
 .transition-entry{
     min-width:0;
     padding:10px 11px;
-    border:1px solid rgba(78,103,145,.48);
+    border:1px solid rgba(97,114,126,.48);
     border-radius:9px;
-    background:#111c31;
+    background:#23282c;
 }
 
 .transition-entry span{
     display:block;
     margin-bottom:4px;
-    color:#8fa6c9;
+    color:#a1aeb7;
     font-size:9px;
     line-height:1.25;
     font-weight:750;
@@ -2310,14 +2310,14 @@ DUCT OPTIONS
 .transition-entry strong{
     display:block;
     overflow-wrap:anywhere;
-    color:#f8fafc;
+    color:#f9fafb;
     font-size:14px;
     line-height:1.25;
 }
 
 .transition-entry-emphasis{
-    border-color:#4f8cff;
-    background:rgba(79,140,255,.11);
+    border-color:#6bb8dc;
+    background:rgba(107,184,220,.11);
 }
 
 @media(max-width:1250px){
@@ -2396,7 +2396,7 @@ DUCT OPTIONS
 .transition-entry small{
     display:block;
     margin-top:3px;
-    color:#8fa6c9;
+    color:#a1aeb7;
     font-size:9px;
     font-weight:650;
 }
@@ -2416,14 +2416,14 @@ DUCT OPTIONS
 
 .transition-entry-grid-refined .transition-entry-length{
     grid-column:1 / -1;
-    border-color:rgba(78,103,145,.48);
-    background:#111c31;
+    border-color:rgba(97,114,126,.48);
+    background:#23282c;
 }
 
 .transition-entry-grid-refined .transition-entry-offset{
     min-height:68px;
-    border-color:rgba(79,140,255,.42);
-    background:rgba(79,140,255,.075);
+    border-color:rgba(107,184,220,.42);
+    background:rgba(107,184,220,.075);
 }
 
 .transition-entry-grid-refined .transition-entry-offset strong{
