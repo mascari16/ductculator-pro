@@ -38,6 +38,10 @@
         offsetDepth: "transitionOffsetDepth",
         offsetDepthMode: "transitionOffsetDepthMode",
         splitCount: "transitionSplitCount",
+        maxPiece: "transitionMaxPiece",
+        maxPieceGroup: "transitionMaxPieceGroup",
+        taperLimit: "transitionTaperLimit",
+        taperNote: "transitionTaperNote",
         calculate: "calculateTransitionSplit",
         topView: "transitionTopView",
         sideView: "transitionSideView",
@@ -192,7 +196,10 @@
             offsetWidthMode: byId(IDS.offsetWidthMode)?.value || "leftIn",
             offsetDepth: parseMeasurement(byId(IDS.offsetDepth)?.value, 0),
             offsetDepthMode: byId(IDS.offsetDepthMode)?.value || "topUp",
-            splitCount: Number(byId(IDS.splitCount)?.value || 2)
+            splitCount: Number(byId(IDS.splitCount)?.value || 2),
+            splitMode: byId(IDS.splitCount)?.value === "auto" ? "auto" : "fixed",
+            maxPiece: parseMeasurement(byId(IDS.maxPiece)?.value),
+            taperLimit: Number(byId(IDS.taperLimit)?.value)
         };
     }
 
@@ -217,6 +224,24 @@
 
         if (!Number.isFinite(data.offsetDepth)) {
             return "Enter a valid Offset Depth.";
+        }
+
+        if (data.splitMode === "auto") {
+            if (!Number.isFinite(data.maxPiece) || data.maxPiece <= 0) {
+                return "Enter a valid Max piece length greater than zero.";
+            }
+
+            data.splitCount = Math.ceil(data.length / data.maxPiece - 1e-9);
+
+            if (data.splitCount < 2) {
+                return `The whole transition (${formatMeasurement(data.length)}) already fits in one piece at a max of ${formatMeasurement(data.maxPiece)}. No split is needed.`;
+            }
+
+            if (data.splitCount > 12) {
+                return `That would take ${data.splitCount} pieces. Use a longer Max piece length (12 pieces is the most this tool lays out).`;
+            }
+
+            return "";
         }
 
         if (![2, 3, 4].includes(data.splitCount)) {
@@ -967,12 +992,88 @@
         }
     }
 
+    /*
+     * Side (taper) angles of the original transition. Every piece of the
+     * split lies on the same straight edges, so splitting never changes
+     * these angles; only a longer transition makes them shallower.
+     */
+    function taperAngles(result) {
+        const L = result.length;
+        const sides = [
+            ["Left side", result.outletLeft],
+            ["Right side", result.outletLeft + result.widthOut - result.widthIn],
+            ["Bottom", result.outletBottom],
+            ["Top", result.outletBottom + result.depthOut - result.depthIn]
+        ].map(([name, shift]) => ({
+            name,
+            shift: Math.abs(shift),
+            angle: Math.atan(Math.abs(shift) / L) * 180 / Math.PI
+        }));
+
+        sides.sort((a, b) => b.angle - a.angle);
+        return sides;
+    }
+
+    function renderTaperNote(result) {
+        const note = byId(IDS.taperNote);
+
+        if (!note) {
+            return;
+        }
+
+        if (!result) {
+            note.innerHTML = "";
+            note.hidden = true;
+            return;
+        }
+
+        const sides = taperAngles(result);
+        const steepest = sides[0];
+        const limit = result.taperLimit;
+        const hasLimit = Number.isFinite(limit) && limit > 0 && limit < 90;
+        const over = hasLimit && steepest.angle > limit + 1e-9;
+
+        let text =
+            `<strong>Steepest side: ${steepest.angle.toFixed(1)}° (${steepest.name.toLowerCase()})</strong>` +
+            `<span>Other sides: ` +
+            sides.slice(1).map(side => `${side.name.toLowerCase()} ${side.angle.toFixed(1)}°`).join(", ") +
+            ".</span>";
+
+        if (over) {
+            const minimumLength =
+                Math.ceil(steepest.shift / Math.tan(limit * Math.PI / 180) * 4) / 4;
+
+            text +=
+                `<span>That is over your ${limit}° limit. Splitting doesn't change side angles because the pieces stay in line. ` +
+                `To meet ${limit}°, the transition needs to be at least ${formatMeasurement(minimumLength)} long.</span>`;
+        } else if (hasLimit) {
+            text += `<span>Within your ${limit}° limit.</span>`;
+        }
+
+        note.className = over
+            ? "transition-taper-note is-over"
+            : "transition-taper-note";
+        note.innerHTML = text;
+        note.hidden = false;
+    }
+
+    function syncSplitMode() {
+        const group = byId(IDS.maxPieceGroup);
+
+        if (group) {
+            group.hidden = byId(IDS.splitCount)?.value !== "auto";
+        }
+    }
+
     function update() {
+        syncSplitMode();
+
         const data = readInputs();
         const error = validate(data);
 
         if (error) {
             showError(error);
+            renderTaperNote(null);
             return;
         }
 
@@ -1023,6 +1124,7 @@
 
         renderSummary(result);
         renderFittings(result);
+        renderTaperNote(result);
     }
 
     function activateOnly(targetId) {
@@ -1128,7 +1230,9 @@
             IDS.offsetWidthMode,
             IDS.offsetDepth,
             IDS.offsetDepthMode,
-            IDS.splitCount
+            IDS.splitCount,
+            IDS.maxPiece,
+            IDS.taperLimit
         ];
 
         inputs.forEach(id => {

@@ -10,6 +10,12 @@
 
     <title>Ductculator Pro</title>
 
+    <meta name="theme-color" content="#181c1f">
+    <meta name="description" content="Duct sizing and fabrication math for the shop.">
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+
     <link rel="stylesheet" href="style.css?v=20260812-6">
 
     <link rel="stylesheet" href="offsetiso.css?v=20260812-6">
@@ -40,11 +46,11 @@
 
     <main class="dashboard">
 
-        <h2>Tools</h2>
+        <h2>Duct sizing</h2>
 
         <div class="tool-grid">
 
-            <div class="tool-card" id="openAirflow">
+<div class="tool-card" id="openAirflow">
 
                 <div class="tool-icon"><svg class="tool-drawing" viewBox="0 0 160 90" aria-hidden="true"><ellipse class="ln" pathLength="1" cx="38" cy="45" rx="9" ry="24"/><path class="ln" pathLength="1" d="M38 21H124M38 69H124M124 21a9 24 0 0 1 0 48"/><path class="ln" pathLength="1" d="M56 36H108M103 32.5L108 36L103 39.5"/><path class="ln" pathLength="1" d="M50 45H114M109 41.5L114 45L109 48.5"/><path class="ln" pathLength="1" d="M56 54H108M103 50.5L108 54L103 57.5"/><path class="dm" d="M14 21v48M10 21h8M10 69h8"/><text class="dm-t" x="1" y="49">Ø</text></svg></div>
 
@@ -66,25 +72,35 @@
 
             </div>
 
-            <div class="tool-card disabled">
+<div class="tool-card" data-nav-target="pressureWorkspace">
 
-                <div class="tool-icon"><svg class="tool-drawing" viewBox="0 0 160 90" aria-hidden="true"><path class="ln" pathLength="1" d="M36 72a44 44 0 1 1 88 0"/><path class="hd" d="M44 72h72"/><path class="ln" pathLength="1" d="M80 28v6M51 40l4 4M109 40l-4 4M40 60h6M120 60h-6"/><path class="dm" d="M80 72l20-26"/><circle class="ln" pathLength="1" cx="80" cy="72" r="3.5"/></svg></div>
+    <div class="tool-icon"><svg class="tool-drawing" viewBox="0 0 160 90" aria-hidden="true"><path class="ln" pathLength="1" d="M36 72a44 44 0 1 1 88 0"/><path class="hd" d="M44 72h72"/><path class="ln" pathLength="1" d="M80 28v6M51 40l4 4M109 40l-4 4M40 60h6M120 60h-6"/><path class="dm" d="M80 72l20-26"/><circle class="ln" pathLength="1" cx="80" cy="72" r="3.5"/></svg></div>
 
-                <h3>Pressure Loss</h3>
+    <h3>Pressure Loss</h3>
 
-                <p>
+    <p>
+        Straight duct friction<br>Fitting losses (C × VP)<br>Total for a section
+    </p>
 
-                    Straight duct<br>
-                    Fittings<br>
-                    Total pressure
+    <button type="button">Open calculator</button>
 
-                </p>
+</div>
 
-                <span>Coming soon</span>
+<div class="tool-card" data-nav-target="reverseWorkspace">
 
-            </div>
+    <div class="tool-icon"><svg class="tool-drawing" viewBox="0 0 160 90" aria-hidden="true"><path class="ln" pathLength="1" d="M14 28H146M14 62H146"/><path class="ln" pathLength="1" d="M14 28v34M146 28v34"/><path class="ln" pathLength="1" d="M40 38H112M107 34.5L112 38L107 41.5"/><path class="dm" d="M120 52H48M53 48.5L48 52L53 55.5"/></svg></div>
 
-            <div class="tool-card" id="openEquivalent">
+    <h3>Reverse Calculator</h3>
+
+    <p>
+        Existing duct size<br>Velocity or airflow<br>Friction rate
+    </p>
+
+    <button type="button">Open calculator</button>
+
+</div>
+
+<div class="tool-card" id="openEquivalent">
 
     <div class="tool-icon"><svg class="tool-drawing" viewBox="0 0 160 90" aria-hidden="true"><circle class="ln" pathLength="1" cx="30" cy="45" r="20"/><path class="dm" d="M56 41h10M56 49h10"/><rect class="ln" pathLength="1" x="74" y="32" width="34" height="26" rx="1.5"/><rect class="ln" pathLength="1" x="116" y="33" width="38" height="24" rx="12"/></svg></div>
 
@@ -105,6 +121,12 @@
     </button>
 
 </div>
+
+        </div>
+
+        <h2>Fabrication</h2>
+
+        <div class="tool-grid">
 
 <div class="tool-card" id="openSheetMetal">
 
@@ -128,6 +150,34 @@
 
 </div>
 
+<div class="tool-card" data-nav-target="roundWorkspace">
+
+    <div class="tool-icon"><svg class="tool-drawing" viewBox="0 0 160 90" aria-hidden="true"><path class="ln" pathLength="1" d="M22.0 18.0 L34.9 19.3 L58.7 29.1 L76.9 47.3 L86.7 71.1 L88.0 84.0"/><path class="ln" pathLength="1" d="M22.0 50.0 L28.6 50.7 L40.9 55.7 L50.3 65.1 L55.3 77.4 L56.0 84.0"/><path class="hd" d="M34.9 19.3L28.6 50.7M58.7 29.1L40.9 55.7M76.9 47.3L50.3 65.1M86.7 71.1L55.3 77.4"/><path class="ln" pathLength="1" d="M88.0 84L56.0 84M22 18L22 50"/><path class="dm" d="M120 84h28M120 52h28"/><path class="dm" d="M144 52v32M140 52h8M140 84h8"/><text class="dm-t" x="126" y="73">Ø</text></svg></div>
+
+    <h3>Round Fittings</h3>
+
+    <p>
+        Offsets, including rolling<br>Laterals, parallel or square<br>Gored elbow layout
+    </p>
+
+    <button type="button">Open calculator</button>
+
+</div>
+
+<div class="tool-card" data-nav-target="rectWorkspace">
+
+    <div class="tool-icon"><svg class="tool-drawing" viewBox="0 0 160 90" aria-hidden="true"><path class="ln" pathLength="1" d="M6 56H52L96 20H154"/><path class="ln" pathLength="1" d="M6 76H60L104 40H154"/><path class="dm" d="M52 56L60 76M96 20L104 40" stroke-dasharray="3 2.5"/><path class="hd" d="M6 66H56L100 30H154"/></svg></div>
+
+    <h3>Rect Fittings</h3>
+
+    <p>
+        Mitered offsets, O × W ÷ L<br>Laterals, radius or straight elbows<br>Miter cuts and lean
+    </p>
+
+    <button type="button">Open calculator</button>
+
+</div>
+
 <div class="tool-card" id="openTransitionSplitter">
 
     <div class="tool-icon"><svg class="tool-drawing" viewBox="0 0 160 90" aria-hidden="true"><path class="ln" pathLength="1" d="M14 12V78L146 60V30Z"/><path class="dm" d="M80 21V69" stroke-dasharray="4 3"/><path class="hd" d="M14 45H146"/></svg></div>
@@ -141,6 +191,40 @@
     </p>
 
     <button>Open calculator</button>
+
+</div>
+
+        </div>
+
+        <h2>Shop math</h2>
+
+        <div class="tool-grid">
+
+<div class="tool-card" data-nav-target="mathWorkspace">
+
+    <div class="tool-icon"><svg class="tool-drawing" viewBox="0 0 160 90" aria-hidden="true"><path class="ln" pathLength="1" d="M22 76H138V16Z"/><path class="ln" pathLength="1" d="M128 76V66H138"/><path class="dm" d="M50 76A28 28 0 0 0 47 63.5"/><text class="dm-t" x="54" y="71">θ</text></svg></div>
+
+    <h3>Layout Math</h3>
+
+    <p>
+        Right triangles<br>Rolling offsets and arcs<br>Swing point radius
+    </p>
+
+    <button type="button">Open calculator</button>
+
+</div>
+
+<div class="tool-card" data-nav-target="takeoffWorkspace">
+
+    <div class="tool-icon"><svg class="tool-drawing" viewBox="0 0 160 90" aria-hidden="true"><rect class="ln" pathLength="1" x="22" y="18" width="116" height="54" rx="1.5"/><path class="dm" d="M51 18V72M80 18V72M109 18V72" stroke-dasharray="3 3"/><path class="hd" d="M22 80H138"/><path class="dm" d="M22 84v-8M138 84v-8"/></svg></div>
+
+    <h3>Material Takeoff</h3>
+
+    <p>
+        Sheet area by piece<br>Galvanized weight by gauge<br>Seam and waste allowance
+    </p>
+
+    <button type="button">Open calculator</button>
 
 </div>
 
@@ -159,24 +243,6 @@
     <button>Open calculator</button>
 
 </div>
-
-            <div class="tool-card disabled">
-
-                <div class="tool-icon"><svg class="tool-drawing" viewBox="0 0 160 90" aria-hidden="true"><path class="ln" pathLength="1" d="M14 28H146M14 62H146"/><path class="ln" pathLength="1" d="M14 28v34M146 28v34"/><path class="ln" pathLength="1" d="M40 38H112M107 34.5L112 38L107 41.5"/><path class="dm" d="M120 52H48M53 48.5L48 52L53 55.5"/></svg></div>
-
-                <h3>Reverse Calculator</h3>
-
-                <p>
-
-                    Existing duct<br>
-                    Velocity<br>
-                    Airflow
-
-                </p>
-
-                <span>Coming soon</span>
-
-            </div>
 
         </div>
 
@@ -208,7 +274,6 @@
     <!-- Sidebar -->
 
     <aside class="sidebar">
-
         <div class="sidebar-top">
 
             <button id="toggleSidebar" class="toggle-btn">
@@ -220,7 +285,6 @@
             <h2>Ductculator</h2>
 
         </div>
-
         <button id="goHome">
 
     <span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1"/><rect x="13.5" y="3.5" width="7" height="7" rx="1"/><rect x="3.5" y="13.5" width="7" height="7" rx="1"/><rect x="13.5" y="13.5" width="7" height="7" rx="1"/></svg></span>
@@ -228,67 +292,50 @@
     <span class="text">Dashboard</span>
 
 </button>
-
-<hr>
-
-<button class="active">
+        <hr>
+        <button class="active">
 
     <span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8.5h10.5a2.75 2.75 0 1 0-2.75-2.75"/><path d="M3 12.5h15a3 3 0 1 1-3 3"/><path d="M3 16.5h6"/></svg></span>
 
     <span class="text">Airflow</span>
 
 </button>
-
-<button disabled>
-
-    <span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.2 17a8.5 8.5 0 1 1 15.6 0"/><path d="M12 14l4-4.6"/><circle cx="12" cy="14.2" r="1.2"/></svg></span>
-
-    <span class="text">Pressure Loss</span>
-
-</button>
-
-<button id="airflowOpenEquivalent">
+        <button data-nav-target="pressureWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.2 17a8.5 8.5 0 1 1 15.6 0"/><path d="M12 14l4-4.6"/><circle cx="12" cy="14.2" r="1.2"/></svg></span><span class="text">Pressure Loss</span></button>
+        <button data-nav-target="reverseWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M19.5 10A8 8 0 0 0 5.6 6.4"/><path d="M4.5 14a8 8 0 0 0 13.9 3.6"/><path d="M5 2.8v3.9h3.9M19 21.2v-3.9h-3.9"/></svg></span><span class="text">Reverse Calculator</span></button>
+        <button id="airflowOpenEquivalent">
 
     <span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><circle cx="7" cy="12" r="4.3"/><rect x="13" y="7.7" width="8" height="8.6" rx="1"/></svg></span>
 
     <span class="text">Equivalent Sizes</span>
 
 </button>
-
-<button id="airflowOpenSheetMetal">
+        <hr>
+        <button id="airflowOpenSheetMetal">
 
     <span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 19h4.5c2.2 0 3.4-1.1 4-3.3l1.9-7.4c.6-2.2 1.8-3.3 4-3.3h4.6"/><path d="M2.5 16.5v5M21.5 2.5v5"/></svg></span>
 
     <span class="text">Elbow Offset</span>
 
 </button>
-
-<button id="airflowOpenTransitionSplitter">
+        <button data-nav-target="roundWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 21v-9a9 9 0 0 1 9-9h9"/><path d="M9 21v-9a3 3 0 0 1 3-3h9"/><path d="M5.6 5.6l4.3 4.3"/></svg></span><span class="text">Round Fittings</span></button>
+        <button data-nav-target="rectWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 14h6l7-7h7"/><path d="M2 19.5h8.3l7-7H22"/></svg></span><span class="text">Rect Fittings</span></button>
+        <button id="airflowOpenTransitionSplitter">
     <span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 4.5v15l17-4.5v-6z"/><path d="M12 6.8v10.4" stroke-dasharray="2 2.2"/></svg></span>
     <span class="text">Transition Splitter</span>
 </button>
-
-<button data-open-procalc type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="2.5" width="14" height="19" rx="2"/><rect x="7.5" y="5" width="9" height="4" rx=".6"/><path class="dots" d="M8.7 12.6h.01M12 12.6h.01M15.3 12.6h.01M8.7 15.9h.01M12 15.9h.01M15.3 15.9h.01M8.7 19h.01M12 19h.01M15.3 19h.01"/></svg></span><span class="text">HVAC Pro Calc</span></button>
-
-<button disabled>
-
-    <span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M19.5 10A8 8 0 0 0 5.6 6.4"/><path d="M4.5 14a8 8 0 0 0 13.9 3.6"/><path d="M5 2.8v3.9h3.9M19 21.2v-3.9h-3.9"/></svg></span>
-
-    <span class="text">Reverse Calculator</span>
-
-</button>
-
-<hr>
-
-<button disabled>
+        <hr>
+        <button data-nav-target="mathWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 20h17V5z"/><path d="M17 20v-3.5h3.5"/></svg></span><span class="text">Layout Math</span></button>
+        <button data-nav-target="takeoffWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="14" rx="1"/><path d="M8 5v14M12.5 5v14M16 5v14" stroke-dasharray="2 2"/></svg></span><span class="text">Material Takeoff</span></button>
+        <button data-open-procalc type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="2.5" width="14" height="19" rx="2"/><rect x="7.5" y="5" width="9" height="4" rx=".6"/><path class="dots" d="M8.7 12.6h.01M12 12.6h.01M15.3 12.6h.01M8.7 15.9h.01M12 15.9h.01M15.3 15.9h.01M8.7 19h.01M12 19h.01M15.3 19h.01"/></svg></span><span class="text">HVAC Pro Calc</span></button>
+        <hr>
+        <button disabled>
 
     <span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg></span>
 
     <span class="text">Settings</span>
 
 </button>
-
-</aside>
+    </aside>
 
     <!-- Main Content -->
 
@@ -499,7 +546,6 @@
     <!-- Sidebar -->
 
     <aside class="sidebar equivalent-sidebar">
-
         <div class="sidebar-top">
 
             <button
@@ -514,7 +560,6 @@
             <h2>Ductculator</h2>
 
         </div>
-
         <button id="equivalentGoHome">
 
             <span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1"/><rect x="13.5" y="3.5" width="7" height="7" rx="1"/><rect x="3.5" y="13.5" width="7" height="7" rx="1"/><rect x="13.5" y="13.5" width="7" height="7" rx="1"/></svg></span>
@@ -522,9 +567,7 @@
             <span class="text">Dashboard</span>
 
         </button>
-
         <hr>
-
         <button id="equivalentOpenAirflow">
 
             <span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8.5h10.5a2.75 2.75 0 1 0-2.75-2.75"/><path d="M3 12.5h15a3 3 0 1 1-3 3"/><path d="M3 16.5h6"/></svg></span>
@@ -532,15 +575,8 @@
             <span class="text">Airflow</span>
 
         </button>
-
-        <button disabled>
-
-            <span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.2 17a8.5 8.5 0 1 1 15.6 0"/><path d="M12 14l4-4.6"/><circle cx="12" cy="14.2" r="1.2"/></svg></span>
-
-            <span class="text">Pressure Loss</span>
-
-        </button>
-
+        <button data-nav-target="pressureWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.2 17a8.5 8.5 0 1 1 15.6 0"/><path d="M12 14l4-4.6"/><circle cx="12" cy="14.2" r="1.2"/></svg></span><span class="text">Pressure Loss</span></button>
+        <button data-nav-target="reverseWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M19.5 10A8 8 0 0 0 5.6 6.4"/><path d="M4.5 14a8 8 0 0 0 13.9 3.6"/><path d="M5 2.8v3.9h3.9M19 21.2v-3.9h-3.9"/></svg></span><span class="text">Reverse Calculator</span></button>
         <button class="active">
 
             <span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><circle cx="7" cy="12" r="4.3"/><rect x="13" y="7.7" width="8" height="8.6" rx="1"/></svg></span>
@@ -548,7 +584,7 @@
             <span class="text">Equivalent Sizes</span>
 
         </button>
-
+        <hr>
         <button id="equivalentOpenSheetMetal">
 
         <span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 19h4.5c2.2 0 3.4-1.1 4-3.3l1.9-7.4c.6-2.2 1.8-3.3 4-3.3h4.6"/><path d="M2.5 16.5v5M21.5 2.5v5"/></svg></span>
@@ -556,24 +592,17 @@
         <span class="text">Elbow Offset</span>
 
         </button>
-
+        <button data-nav-target="roundWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 21v-9a9 9 0 0 1 9-9h9"/><path d="M9 21v-9a3 3 0 0 1 3-3h9"/><path d="M5.6 5.6l4.3 4.3"/></svg></span><span class="text">Round Fittings</span></button>
+        <button data-nav-target="rectWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 14h6l7-7h7"/><path d="M2 19.5h8.3l7-7H22"/></svg></span><span class="text">Rect Fittings</span></button>
         <button id="equivalentOpenTransitionSplitter">
             <span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 4.5v15l17-4.5v-6z"/><path d="M12 6.8v10.4" stroke-dasharray="2 2.2"/></svg></span>
             <span class="text">Transition Splitter</span>
         </button>
-
-        <button data-open-procalc type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="2.5" width="14" height="19" rx="2"/><rect x="7.5" y="5" width="9" height="4" rx=".6"/><path class="dots" d="M8.7 12.6h.01M12 12.6h.01M15.3 12.6h.01M8.7 15.9h.01M12 15.9h.01M15.3 15.9h.01M8.7 19h.01M12 19h.01M15.3 19h.01"/></svg></span><span class="text">HVAC Pro Calc</span></button>
-
-        <button disabled>
-
-            <span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M19.5 10A8 8 0 0 0 5.6 6.4"/><path d="M4.5 14a8 8 0 0 0 13.9 3.6"/><path d="M5 2.8v3.9h3.9M19 21.2v-3.9h-3.9"/></svg></span>
-
-            <span class="text">Reverse Calculator</span>
-
-        </button>
-
         <hr>
-
+        <button data-nav-target="mathWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 20h17V5z"/><path d="M17 20v-3.5h3.5"/></svg></span><span class="text">Layout Math</span></button>
+        <button data-nav-target="takeoffWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="14" rx="1"/><path d="M8 5v14M12.5 5v14M16 5v14" stroke-dasharray="2 2"/></svg></span><span class="text">Material Takeoff</span></button>
+        <button data-open-procalc type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="2.5" width="14" height="19" rx="2"/><rect x="7.5" y="5" width="9" height="4" rx=".6"/><path class="dots" d="M8.7 12.6h.01M12 12.6h.01M15.3 12.6h.01M8.7 15.9h.01M12 15.9h.01M15.3 15.9h.01M8.7 19h.01M12 19h.01M15.3 19h.01"/></svg></span><span class="text">HVAC Pro Calc</span></button>
+        <hr>
         <button disabled>
 
             <span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg></span>
@@ -581,7 +610,6 @@
             <span class="text">Settings</span>
 
         </button>
-
     </aside>
 
     <!-- Main Content -->
@@ -888,7 +916,6 @@
     </div>
 
     <aside class="sidebar sheet-metal-sidebar">
-
         <div class="sidebar-top">
 
             <button
@@ -903,7 +930,6 @@
             <h2>Ductculator</h2>
 
         </div>
-
         <button id="sheetMetalGoHome" type="button">
 
             <span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1"/><rect x="13.5" y="3.5" width="7" height="7" rx="1"/><rect x="3.5" y="13.5" width="7" height="7" rx="1"/><rect x="13.5" y="13.5" width="7" height="7" rx="1"/></svg></span>
@@ -911,9 +937,7 @@
             <span class="text">Dashboard</span>
 
         </button>
-
         <hr>
-
         <button id="sheetMetalOpenAirflow" type="button">
 
             <span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8.5h10.5a2.75 2.75 0 1 0-2.75-2.75"/><path d="M3 12.5h15a3 3 0 1 1-3 3"/><path d="M3 16.5h6"/></svg></span>
@@ -921,15 +945,8 @@
             <span class="text">Airflow</span>
 
         </button>
-
-        <button disabled>
-
-            <span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.2 17a8.5 8.5 0 1 1 15.6 0"/><path d="M12 14l4-4.6"/><circle cx="12" cy="14.2" r="1.2"/></svg></span>
-
-            <span class="text">Pressure Loss</span>
-
-        </button>
-
+        <button data-nav-target="pressureWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.2 17a8.5 8.5 0 1 1 15.6 0"/><path d="M12 14l4-4.6"/><circle cx="12" cy="14.2" r="1.2"/></svg></span><span class="text">Pressure Loss</span></button>
+        <button data-nav-target="reverseWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M19.5 10A8 8 0 0 0 5.6 6.4"/><path d="M4.5 14a8 8 0 0 0 13.9 3.6"/><path d="M5 2.8v3.9h3.9M19 21.2v-3.9h-3.9"/></svg></span><span class="text">Reverse Calculator</span></button>
         <button id="sheetMetalOpenEquivalent" type="button">
 
             <span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><circle cx="7" cy="12" r="4.3"/><rect x="13" y="7.7" width="8" height="8.6" rx="1"/></svg></span>
@@ -937,7 +954,7 @@
             <span class="text">Equivalent Sizes</span>
 
         </button>
-
+        <hr>
         <button class="active" type="button">
 
             <span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 19h4.5c2.2 0 3.4-1.1 4-3.3l1.9-7.4c.6-2.2 1.8-3.3 4-3.3h4.6"/><path d="M2.5 16.5v5M21.5 2.5v5"/></svg></span>
@@ -945,24 +962,17 @@
             <span class="text">Elbow Offset</span>
 
         </button>
-
+        <button data-nav-target="roundWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 21v-9a9 9 0 0 1 9-9h9"/><path d="M9 21v-9a3 3 0 0 1 3-3h9"/><path d="M5.6 5.6l4.3 4.3"/></svg></span><span class="text">Round Fittings</span></button>
+        <button data-nav-target="rectWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 14h6l7-7h7"/><path d="M2 19.5h8.3l7-7H22"/></svg></span><span class="text">Rect Fittings</span></button>
         <button id="sheetMetalOpenTransitionSplitter" type="button">
             <span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 4.5v15l17-4.5v-6z"/><path d="M12 6.8v10.4" stroke-dasharray="2 2.2"/></svg></span>
             <span class="text">Transition Splitter</span>
         </button>
-
-        <button data-open-procalc type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="2.5" width="14" height="19" rx="2"/><rect x="7.5" y="5" width="9" height="4" rx=".6"/><path class="dots" d="M8.7 12.6h.01M12 12.6h.01M15.3 12.6h.01M8.7 15.9h.01M12 15.9h.01M15.3 15.9h.01M8.7 19h.01M12 19h.01M15.3 19h.01"/></svg></span><span class="text">HVAC Pro Calc</span></button>
-
-        <button disabled>
-
-            <span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M19.5 10A8 8 0 0 0 5.6 6.4"/><path d="M4.5 14a8 8 0 0 0 13.9 3.6"/><path d="M5 2.8v3.9h3.9M19 21.2v-3.9h-3.9"/></svg></span>
-
-            <span class="text">Reverse Calculator</span>
-
-        </button>
-
         <hr>
-
+        <button data-nav-target="mathWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 20h17V5z"/><path d="M17 20v-3.5h3.5"/></svg></span><span class="text">Layout Math</span></button>
+        <button data-nav-target="takeoffWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="14" rx="1"/><path d="M8 5v14M12.5 5v14M16 5v14" stroke-dasharray="2 2"/></svg></span><span class="text">Material Takeoff</span></button>
+        <button data-open-procalc type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="2.5" width="14" height="19" rx="2"/><rect x="7.5" y="5" width="9" height="4" rx=".6"/><path class="dots" d="M8.7 12.6h.01M12 12.6h.01M15.3 12.6h.01M8.7 15.9h.01M12 15.9h.01M15.3 15.9h.01M8.7 19h.01M12 19h.01M15.3 19h.01"/></svg></span><span class="text">HVAC Pro Calc</span></button>
+        <hr>
         <button disabled>
 
             <span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg></span>
@@ -970,7 +980,6 @@
             <span class="text">Settings</span>
 
         </button>
-
     </aside>
 
     <section class="content">
@@ -1030,6 +1039,17 @@
     type="text"
     inputmode="decimal"
     value="69">
+
+<div id="snapAngleGroup">
+    <label class="check-row" for="snapStandardAngle">
+        <input id="snapStandardAngle" type="checkbox">
+        <span>Snap to standard angle</span>
+    </label>
+    <p class="input-help snap-help">
+        Rounds to the nearest of 11¼°, 15°, 22½°, 30°, 45° or 60° that fits.
+        The offset stays the same and the overall length adjusts.
+    </p>
+</div>
 
 <label for="ductWidthInput">
     Width (Cheek)
@@ -1204,16 +1224,21 @@
             <button id="toggleTransitionSidebar" class="toggle-btn" type="button">☰</button>
             <h2>Ductculator</h2>
         </div>
-
         <button id="transitionGoHome" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1"/><rect x="13.5" y="3.5" width="7" height="7" rx="1"/><rect x="3.5" y="13.5" width="7" height="7" rx="1"/><rect x="13.5" y="13.5" width="7" height="7" rx="1"/></svg></span><span class="text">Dashboard</span></button>
         <hr>
         <button id="transitionOpenAirflow" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8.5h10.5a2.75 2.75 0 1 0-2.75-2.75"/><path d="M3 12.5h15a3 3 0 1 1-3 3"/><path d="M3 16.5h6"/></svg></span><span class="text">Airflow</span></button>
-        <button disabled><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.2 17a8.5 8.5 0 1 1 15.6 0"/><path d="M12 14l4-4.6"/><circle cx="12" cy="14.2" r="1.2"/></svg></span><span class="text">Pressure Loss</span></button>
+        <button data-nav-target="pressureWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.2 17a8.5 8.5 0 1 1 15.6 0"/><path d="M12 14l4-4.6"/><circle cx="12" cy="14.2" r="1.2"/></svg></span><span class="text">Pressure Loss</span></button>
+        <button data-nav-target="reverseWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M19.5 10A8 8 0 0 0 5.6 6.4"/><path d="M4.5 14a8 8 0 0 0 13.9 3.6"/><path d="M5 2.8v3.9h3.9M19 21.2v-3.9h-3.9"/></svg></span><span class="text">Reverse Calculator</span></button>
         <button id="transitionOpenEquivalent" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><circle cx="7" cy="12" r="4.3"/><rect x="13" y="7.7" width="8" height="8.6" rx="1"/></svg></span><span class="text">Equivalent Sizes</span></button>
+        <hr>
         <button id="transitionOpenSheetMetal" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 19h4.5c2.2 0 3.4-1.1 4-3.3l1.9-7.4c.6-2.2 1.8-3.3 4-3.3h4.6"/><path d="M2.5 16.5v5M21.5 2.5v5"/></svg></span><span class="text">Elbow Offset</span></button>
+        <button data-nav-target="roundWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 21v-9a9 9 0 0 1 9-9h9"/><path d="M9 21v-9a3 3 0 0 1 3-3h9"/><path d="M5.6 5.6l4.3 4.3"/></svg></span><span class="text">Round Fittings</span></button>
+        <button data-nav-target="rectWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 14h6l7-7h7"/><path d="M2 19.5h8.3l7-7H22"/></svg></span><span class="text">Rect Fittings</span></button>
         <button class="active" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 4.5v15l17-4.5v-6z"/><path d="M12 6.8v10.4" stroke-dasharray="2 2.2"/></svg></span><span class="text">Transition Splitter</span></button>
+        <hr>
+        <button data-nav-target="mathWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 20h17V5z"/><path d="M17 20v-3.5h3.5"/></svg></span><span class="text">Layout Math</span></button>
+        <button data-nav-target="takeoffWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="14" rx="1"/><path d="M8 5v14M12.5 5v14M16 5v14" stroke-dasharray="2 2"/></svg></span><span class="text">Material Takeoff</span></button>
         <button data-open-procalc type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="2.5" width="14" height="19" rx="2"/><rect x="7.5" y="5" width="9" height="4" rx=".6"/><path class="dots" d="M8.7 12.6h.01M12 12.6h.01M15.3 12.6h.01M8.7 15.9h.01M12 15.9h.01M15.3 15.9h.01M8.7 19h.01M12 19h.01M15.3 19h.01"/></svg></span><span class="text">HVAC Pro Calc</span></button>
-        <button disabled><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M19.5 10A8 8 0 0 0 5.6 6.4"/><path d="M4.5 14a8 8 0 0 0 13.9 3.6"/><path d="M5 2.8v3.9h3.9M19 21.2v-3.9h-3.9"/></svg></span><span class="text">Reverse Calculator</span></button>
         <hr>
         <button disabled><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg></span><span class="text">Settings</span></button>
     </aside>
@@ -1245,6 +1270,8 @@
                 </div>
 
                 <div id="transitionSplitSummary" class="transition-summary-grid"></div>
+
+                <p id="transitionTaperNote" class="transition-taper-note" hidden></p>
 
                 <section class="transition-output-section">
                     <div class="transition-output-heading">
@@ -1301,7 +1328,18 @@
                     <option value="2" selected>2 Fittings</option>
                     <option value="3">3 Fittings</option>
                     <option value="4">4 Fittings</option>
+                    <option value="auto">By max piece length</option>
                 </select>
+
+                <div id="transitionMaxPieceGroup" class="transition-extra-field" hidden>
+                    <label for="transitionMaxPiece">Max piece length</label>
+                    <input id="transitionMaxPiece" type="text" inputmode="decimal" value="48">
+                </div>
+
+                <div class="transition-extra-field">
+                    <label for="transitionTaperLimit">Max taper angle (optional)</label>
+                    <input id="transitionTaperLimit" type="number" inputmode="decimal" min="1" max="89" step="0.5" placeholder="Your shop limit, e.g. 15">
+                </div>
 
                 <button id="calculateTransitionSplit" class="transition-calculate-btn" type="button">Split Transition</button>
 
@@ -1328,16 +1366,21 @@
             <button id="toggleProCalcSidebar" class="toggle-btn" type="button">☰</button>
             <h2>Ductculator</h2>
         </div>
-
         <button data-nav-target="dashboard" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1"/><rect x="13.5" y="3.5" width="7" height="7" rx="1"/><rect x="3.5" y="13.5" width="7" height="7" rx="1"/><rect x="13.5" y="13.5" width="7" height="7" rx="1"/></svg></span><span class="text">Dashboard</span></button>
         <hr>
         <button data-nav-target="airflowWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8.5h10.5a2.75 2.75 0 1 0-2.75-2.75"/><path d="M3 12.5h15a3 3 0 1 1-3 3"/><path d="M3 16.5h6"/></svg></span><span class="text">Airflow</span></button>
-        <button disabled><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.2 17a8.5 8.5 0 1 1 15.6 0"/><path d="M12 14l4-4.6"/><circle cx="12" cy="14.2" r="1.2"/></svg></span><span class="text">Pressure Loss</span></button>
+        <button data-nav-target="pressureWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.2 17a8.5 8.5 0 1 1 15.6 0"/><path d="M12 14l4-4.6"/><circle cx="12" cy="14.2" r="1.2"/></svg></span><span class="text">Pressure Loss</span></button>
+        <button data-nav-target="reverseWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M19.5 10A8 8 0 0 0 5.6 6.4"/><path d="M4.5 14a8 8 0 0 0 13.9 3.6"/><path d="M5 2.8v3.9h3.9M19 21.2v-3.9h-3.9"/></svg></span><span class="text">Reverse Calculator</span></button>
         <button data-nav-target="equivalentWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><circle cx="7" cy="12" r="4.3"/><rect x="13" y="7.7" width="8" height="8.6" rx="1"/></svg></span><span class="text">Equivalent Sizes</span></button>
+        <hr>
         <button data-nav-target="sheetMetalWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 19h4.5c2.2 0 3.4-1.1 4-3.3l1.9-7.4c.6-2.2 1.8-3.3 4-3.3h4.6"/><path d="M2.5 16.5v5M21.5 2.5v5"/></svg></span><span class="text">Elbow Offset</span></button>
+        <button data-nav-target="roundWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 21v-9a9 9 0 0 1 9-9h9"/><path d="M9 21v-9a3 3 0 0 1 3-3h9"/><path d="M5.6 5.6l4.3 4.3"/></svg></span><span class="text">Round Fittings</span></button>
+        <button data-nav-target="rectWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 14h6l7-7h7"/><path d="M2 19.5h8.3l7-7H22"/></svg></span><span class="text">Rect Fittings</span></button>
         <button data-nav-target="transitionWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 4.5v15l17-4.5v-6z"/><path d="M12 6.8v10.4" stroke-dasharray="2 2.2"/></svg></span><span class="text">Transition Splitter</span></button>
+        <hr>
+        <button data-nav-target="mathWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 20h17V5z"/><path d="M17 20v-3.5h3.5"/></svg></span><span class="text">Layout Math</span></button>
+        <button data-nav-target="takeoffWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="14" rx="1"/><path d="M8 5v14M12.5 5v14M16 5v14" stroke-dasharray="2 2"/></svg></span><span class="text">Material Takeoff</span></button>
         <button class="active" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="2.5" width="14" height="19" rx="2"/><rect x="7.5" y="5" width="9" height="4" rx=".6"/><path class="dots" d="M8.7 12.6h.01M12 12.6h.01M15.3 12.6h.01M8.7 15.9h.01M12 15.9h.01M15.3 15.9h.01M8.7 19h.01M12 19h.01M15.3 19h.01"/></svg></span><span class="text">HVAC Pro Calc</span></button>
-        <button disabled><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M19.5 10A8 8 0 0 0 5.6 6.4"/><path d="M4.5 14a8 8 0 0 0 13.9 3.6"/><path d="M5 2.8v3.9h3.9M19 21.2v-3.9h-3.9"/></svg></span><span class="text">Reverse Calculator</span></button>
         <hr>
         <button disabled><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg></span><span class="text">Settings</span></button>
     </aside>
@@ -1362,9 +1405,451 @@
 </div>
 
 <!-- ===================================================
+     REVERSE CALCULATOR WORKSPACE
+=================================================== -->
+
+<div id="reverseWorkspace" class="workspace tool-screen">
+
+    <button class="mobile-menu-btn" type="button" data-mobile-menu aria-label="Open menu">☰</button>
+    <div class="mobile-overlay"></div>
+
+    <aside class="sidebar">
+        <div class="sidebar-top">
+            <button class="toggle-btn" type="button" data-sidebar-toggle aria-label="Collapse menu">☰</button>
+            <h2>Ductculator</h2>
+        </div>
+        <button data-nav-target="dashboard" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1"/><rect x="13.5" y="3.5" width="7" height="7" rx="1"/><rect x="3.5" y="13.5" width="7" height="7" rx="1"/><rect x="13.5" y="13.5" width="7" height="7" rx="1"/></svg></span><span class="text">Dashboard</span></button>
+        <hr>
+        <button data-nav-target="airflowWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8.5h10.5a2.75 2.75 0 1 0-2.75-2.75"/><path d="M3 12.5h15a3 3 0 1 1-3 3"/><path d="M3 16.5h6"/></svg></span><span class="text">Airflow</span></button>
+        <button data-nav-target="pressureWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.2 17a8.5 8.5 0 1 1 15.6 0"/><path d="M12 14l4-4.6"/><circle cx="12" cy="14.2" r="1.2"/></svg></span><span class="text">Pressure Loss</span></button>
+        <button class="active" type="button" aria-current="page"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M19.5 10A8 8 0 0 0 5.6 6.4"/><path d="M4.5 14a8 8 0 0 0 13.9 3.6"/><path d="M5 2.8v3.9h3.9M19 21.2v-3.9h-3.9"/></svg></span><span class="text">Reverse Calculator</span></button>
+        <button data-nav-target="equivalentWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><circle cx="7" cy="12" r="4.3"/><rect x="13" y="7.7" width="8" height="8.6" rx="1"/></svg></span><span class="text">Equivalent Sizes</span></button>
+        <hr>
+        <button data-nav-target="sheetMetalWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 19h4.5c2.2 0 3.4-1.1 4-3.3l1.9-7.4c.6-2.2 1.8-3.3 4-3.3h4.6"/><path d="M2.5 16.5v5M21.5 2.5v5"/></svg></span><span class="text">Elbow Offset</span></button>
+        <button data-nav-target="roundWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 21v-9a9 9 0 0 1 9-9h9"/><path d="M9 21v-9a3 3 0 0 1 3-3h9"/><path d="M5.6 5.6l4.3 4.3"/></svg></span><span class="text">Round Fittings</span></button>
+        <button data-nav-target="rectWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 14h6l7-7h7"/><path d="M2 19.5h8.3l7-7H22"/></svg></span><span class="text">Rect Fittings</span></button>
+        <button data-nav-target="transitionWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 4.5v15l17-4.5v-6z"/><path d="M12 6.8v10.4" stroke-dasharray="2 2.2"/></svg></span><span class="text">Transition Splitter</span></button>
+        <hr>
+        <button data-nav-target="mathWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 20h17V5z"/><path d="M17 20v-3.5h3.5"/></svg></span><span class="text">Layout Math</span></button>
+        <button data-nav-target="takeoffWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="14" rx="1"/><path d="M8 5v14M12.5 5v14M16 5v14" stroke-dasharray="2 2"/></svg></span><span class="text">Material Takeoff</span></button>
+        <button data-open-procalc type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="2.5" width="14" height="19" rx="2"/><rect x="7.5" y="5" width="9" height="4" rx=".6"/><path class="dots" d="M8.7 12.6h.01M12 12.6h.01M15.3 12.6h.01M8.7 15.9h.01M12 15.9h.01M15.3 15.9h.01M8.7 19h.01M12 19h.01M15.3 19h.01"/></svg></span><span class="text">HVAC Pro Calc</span></button>
+        <hr>
+        <button disabled><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg></span><span class="text">Settings</span></button>
+    </aside>
+
+    <section class="content">
+        <header>
+            <h1>Reverse Calculator</h1>
+            <p>Check an existing duct: velocity, airflow and friction from its size.</p>
+        </header>
+
+        
+
+        <div class="calculator tool-calc">
+            <div class="panel tool-inputs">
+                <h3>Inputs</h3>
+                <label for="rvShape">Duct shape</label>
+<select id="rvShape"><option value="round">Round</option><option value="rectangle" selected>Rectangle</option><option value="flatOval">Flat oval</option></select><div id="rvRoundGroup" hidden>
+<label for="rvDia">Diameter</label>
+<input id="rvDia" type="text" inputmode="decimal" value="18">
+</div><div id="rvRectGroup">
+<label for="rvW">Width</label>
+<input id="rvW" type="text" inputmode="decimal" value="24">
+<label for="rvH">Height</label>
+<input id="rvH" type="text" inputmode="decimal" value="12">
+</div><label for="rvSolve">Solve for</label>
+<select id="rvSolve"><option value="velocity" selected>Velocity from airflow</option><option value="cfm">Airflow from velocity</option></select><div id="rvCfmGroup">
+<label for="rvCfm">Airflow (CFM)</label>
+<input id="rvCfm" type="number" inputmode="decimal" value="1600" step="any" min="0">
+</div><div id="rvFpmGroup" hidden>
+<label for="rvFpm">Velocity (FPM)</label>
+<input id="rvFpm" type="number" inputmode="decimal" value="800" step="any" min="0">
+</div><label for="rvRun">Run length, ft (optional)</label>
+<input id="rvRun" type="number" inputmode="decimal" value="" step="any" min="0" placeholder="e.g. 100">
+            </div>
+
+            <div class="panel tool-output">
+                <h3>Results</h3>
+                <div id="reverseResults" class="kv-list" aria-live="polite"></div>
+                
+            </div>
+        </div>
+    </section>
+</div>
+
+<!-- ===================================================
+     PRESSURE LOSS WORKSPACE
+=================================================== -->
+
+<div id="pressureWorkspace" class="workspace tool-screen">
+
+    <button class="mobile-menu-btn" type="button" data-mobile-menu aria-label="Open menu">☰</button>
+    <div class="mobile-overlay"></div>
+
+    <aside class="sidebar">
+        <div class="sidebar-top">
+            <button class="toggle-btn" type="button" data-sidebar-toggle aria-label="Collapse menu">☰</button>
+            <h2>Ductculator</h2>
+        </div>
+        <button data-nav-target="dashboard" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1"/><rect x="13.5" y="3.5" width="7" height="7" rx="1"/><rect x="3.5" y="13.5" width="7" height="7" rx="1"/><rect x="13.5" y="13.5" width="7" height="7" rx="1"/></svg></span><span class="text">Dashboard</span></button>
+        <hr>
+        <button data-nav-target="airflowWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8.5h10.5a2.75 2.75 0 1 0-2.75-2.75"/><path d="M3 12.5h15a3 3 0 1 1-3 3"/><path d="M3 16.5h6"/></svg></span><span class="text">Airflow</span></button>
+        <button class="active" type="button" aria-current="page"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.2 17a8.5 8.5 0 1 1 15.6 0"/><path d="M12 14l4-4.6"/><circle cx="12" cy="14.2" r="1.2"/></svg></span><span class="text">Pressure Loss</span></button>
+        <button data-nav-target="reverseWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M19.5 10A8 8 0 0 0 5.6 6.4"/><path d="M4.5 14a8 8 0 0 0 13.9 3.6"/><path d="M5 2.8v3.9h3.9M19 21.2v-3.9h-3.9"/></svg></span><span class="text">Reverse Calculator</span></button>
+        <button data-nav-target="equivalentWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><circle cx="7" cy="12" r="4.3"/><rect x="13" y="7.7" width="8" height="8.6" rx="1"/></svg></span><span class="text">Equivalent Sizes</span></button>
+        <hr>
+        <button data-nav-target="sheetMetalWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 19h4.5c2.2 0 3.4-1.1 4-3.3l1.9-7.4c.6-2.2 1.8-3.3 4-3.3h4.6"/><path d="M2.5 16.5v5M21.5 2.5v5"/></svg></span><span class="text">Elbow Offset</span></button>
+        <button data-nav-target="roundWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 21v-9a9 9 0 0 1 9-9h9"/><path d="M9 21v-9a3 3 0 0 1 3-3h9"/><path d="M5.6 5.6l4.3 4.3"/></svg></span><span class="text">Round Fittings</span></button>
+        <button data-nav-target="rectWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 14h6l7-7h7"/><path d="M2 19.5h8.3l7-7H22"/></svg></span><span class="text">Rect Fittings</span></button>
+        <button data-nav-target="transitionWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 4.5v15l17-4.5v-6z"/><path d="M12 6.8v10.4" stroke-dasharray="2 2.2"/></svg></span><span class="text">Transition Splitter</span></button>
+        <hr>
+        <button data-nav-target="mathWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 20h17V5z"/><path d="M17 20v-3.5h3.5"/></svg></span><span class="text">Layout Math</span></button>
+        <button data-nav-target="takeoffWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="14" rx="1"/><path d="M8 5v14M12.5 5v14M16 5v14" stroke-dasharray="2 2"/></svg></span><span class="text">Material Takeoff</span></button>
+        <button data-open-procalc type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="2.5" width="14" height="19" rx="2"/><rect x="7.5" y="5" width="9" height="4" rx=".6"/><path class="dots" d="M8.7 12.6h.01M12 12.6h.01M15.3 12.6h.01M8.7 15.9h.01M12 15.9h.01M15.3 15.9h.01M8.7 19h.01M12 19h.01M15.3 19h.01"/></svg></span><span class="text">HVAC Pro Calc</span></button>
+        <hr>
+        <button disabled><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg></span><span class="text">Settings</span></button>
+    </aside>
+
+    <section class="content">
+        <header>
+            <h1>Pressure Loss</h1>
+            <p>Friction and fitting losses for one duct section.</p>
+        </header>
+
+        
+
+        <div class="calculator tool-calc">
+            <div class="panel tool-inputs">
+                <h3>Inputs</h3>
+                <label for="plShape">Duct shape</label>
+<select id="plShape"><option value="round">Round</option><option value="rectangle" selected>Rectangle</option><option value="flatOval">Flat oval</option></select><div id="plRoundGroup" hidden>
+<label for="plDia">Diameter</label>
+<input id="plDia" type="text" inputmode="decimal" value="18">
+</div><div id="plRectGroup">
+<label for="plW">Width</label>
+<input id="plW" type="text" inputmode="decimal" value="24">
+<label for="plH">Height</label>
+<input id="plH" type="text" inputmode="decimal" value="12">
+</div><label for="plCfm">Airflow (CFM)</label>
+<input id="plCfm" type="number" inputmode="decimal" value="1600" step="any" min="0"><label for="plLen">Straight duct length, ft</label>
+<input id="plLen" type="number" inputmode="decimal" value="50" step="any" min="0"><label for="plExtra">Other losses, in. w.g. (optional)</label>
+<input id="plExtra" type="number" inputmode="decimal" value="" step="0.01" min="0" placeholder="coils, grilles, dampers"><div class="fit-table-wrap">
+    <table class="fit-table">
+        <thead><tr><th>Fitting</th><th>C</th><th>Qty</th><th>Loss</th><th><span class="sr-only">Remove</span></th></tr></thead>
+        <tbody id="plFittingRows"></tbody>
+    </table>
+</div>
+<button type="button" id="plAddFitting" class="tool-secondary">Add fitting</button>
+<textarea id="plFittingsData" hidden>[{"name":"90° elbow","c":"0.25","qty":"2"}]</textarea>
+            </div>
+
+            <div class="panel tool-output">
+                <h3>Results</h3>
+                <div id="pressureResults" class="kv-list" aria-live="polite"></div>
+                
+            </div>
+        </div>
+    </section>
+</div>
+
+<!-- ===================================================
+     ROUND FITTINGS WORKSPACE
+=================================================== -->
+
+<div id="roundWorkspace" class="workspace tool-screen">
+
+    <button class="mobile-menu-btn" type="button" data-mobile-menu aria-label="Open menu">☰</button>
+    <div class="mobile-overlay"></div>
+
+    <aside class="sidebar">
+        <div class="sidebar-top">
+            <button class="toggle-btn" type="button" data-sidebar-toggle aria-label="Collapse menu">☰</button>
+            <h2>Ductculator</h2>
+        </div>
+        <button data-nav-target="dashboard" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1"/><rect x="13.5" y="3.5" width="7" height="7" rx="1"/><rect x="3.5" y="13.5" width="7" height="7" rx="1"/><rect x="13.5" y="13.5" width="7" height="7" rx="1"/></svg></span><span class="text">Dashboard</span></button>
+        <hr>
+        <button data-nav-target="airflowWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8.5h10.5a2.75 2.75 0 1 0-2.75-2.75"/><path d="M3 12.5h15a3 3 0 1 1-3 3"/><path d="M3 16.5h6"/></svg></span><span class="text">Airflow</span></button>
+        <button data-nav-target="pressureWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.2 17a8.5 8.5 0 1 1 15.6 0"/><path d="M12 14l4-4.6"/><circle cx="12" cy="14.2" r="1.2"/></svg></span><span class="text">Pressure Loss</span></button>
+        <button data-nav-target="reverseWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M19.5 10A8 8 0 0 0 5.6 6.4"/><path d="M4.5 14a8 8 0 0 0 13.9 3.6"/><path d="M5 2.8v3.9h3.9M19 21.2v-3.9h-3.9"/></svg></span><span class="text">Reverse Calculator</span></button>
+        <button data-nav-target="equivalentWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><circle cx="7" cy="12" r="4.3"/><rect x="13" y="7.7" width="8" height="8.6" rx="1"/></svg></span><span class="text">Equivalent Sizes</span></button>
+        <hr>
+        <button data-nav-target="sheetMetalWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 19h4.5c2.2 0 3.4-1.1 4-3.3l1.9-7.4c.6-2.2 1.8-3.3 4-3.3h4.6"/><path d="M2.5 16.5v5M21.5 2.5v5"/></svg></span><span class="text">Elbow Offset</span></button>
+        <button class="active" type="button" aria-current="page"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 21v-9a9 9 0 0 1 9-9h9"/><path d="M9 21v-9a3 3 0 0 1 3-3h9"/><path d="M5.6 5.6l4.3 4.3"/></svg></span><span class="text">Round Fittings</span></button>
+        <button data-nav-target="rectWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 14h6l7-7h7"/><path d="M2 19.5h8.3l7-7H22"/></svg></span><span class="text">Rect Fittings</span></button>
+        <button data-nav-target="transitionWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 4.5v15l17-4.5v-6z"/><path d="M12 6.8v10.4" stroke-dasharray="2 2.2"/></svg></span><span class="text">Transition Splitter</span></button>
+        <hr>
+        <button data-nav-target="mathWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 20h17V5z"/><path d="M17 20v-3.5h3.5"/></svg></span><span class="text">Layout Math</span></button>
+        <button data-nav-target="takeoffWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="14" rx="1"/><path d="M8 5v14M12.5 5v14M16 5v14" stroke-dasharray="2 2"/></svg></span><span class="text">Material Takeoff</span></button>
+        <button data-open-procalc type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="2.5" width="14" height="19" rx="2"/><rect x="7.5" y="5" width="9" height="4" rx=".6"/><path class="dots" d="M8.7 12.6h.01M12 12.6h.01M15.3 12.6h.01M8.7 15.9h.01M12 15.9h.01M15.3 15.9h.01M8.7 19h.01M12 19h.01M15.3 19h.01"/></svg></span><span class="text">HVAC Pro Calc</span></button>
+        <hr>
+        <button disabled><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg></span><span class="text">Settings</span></button>
+    </aside>
+
+    <section class="content">
+        <header>
+            <h1>Round Fittings</h1>
+            <p>Round duct offsets, laterals and gored elbows.</p>
+        </header>
+
+        <div class="seg" role="tablist" aria-label="Choose a calculation" data-tabs="roundTab"><button type="button" role="tab" data-tab="offset">Offset</button><button type="button" role="tab" data-tab="lateral">Lateral</button><button type="button" role="tab" data-tab="gored">Gored elbow</button></div>
+<input type="hidden" id="roundTab" value="offset">
+
+        <div class="calculator tool-calc">
+            <div class="panel tool-inputs">
+                <h3>Inputs</h3>
+                <div data-panel="offset"><label for="rfD">Diameter</label>
+<input id="rfD" type="text" inputmode="decimal" value="12"><label for="rfRise">Rise (offset)</label>
+<input id="rfRise" type="text" inputmode="decimal" value="24"><label for="rfRoll">Roll (sideways, optional)</label>
+<input id="rfRoll" type="text" inputmode="decimal" value="0"><p class="input-help">A rolling offset moves up and over at once. Leave roll at 0 for a plain offset.</p><label for="rfMode">Calculation mode</label>
+<select id="rfMode"><option value="solveAngle" selected>Solve elbow angle</option><option value="knownAngle">Known elbow angle</option></select><div id="rfLenGroup">
+<label for="rfLen">Length (run)</label>
+<input id="rfLen" type="text" inputmode="decimal" value="48">
+</div><div id="rfAngleGroup" hidden>
+<label for="rfAngle">Elbow angle</label>
+<input id="rfAngle" type="number" inputmode="decimal" value="45" step="any" min="1" max="89.9">
+</div><label for="rfClr">CLR (× diameter)</label>
+<input id="rfClr" type="number" inputmode="decimal" value="1.5" step="0.05" min="0.5"><label for="rfGores">Gores per elbow</label>
+<input id="rfGores" type="number" inputmode="decimal" value="5" step="1" min="2" max="20"></div><div data-panel="lateral" hidden><label for="rlD">Branch diameter</label>
+<input id="rlD" type="text" inputmode="decimal" value="10"><label for="rlAngle">Lateral angle</label>
+<input id="rlAngle" type="number" inputmode="decimal" value="45" step="any" min="1" max="89"><label for="rlOrient">Branch ends up</label>
+<select id="rlOrient"><option value="parallel" selected>Parallel to the main</option><option value="perpendicular">Square to the main</option></select><div id="rlOffsetGroup">
+<label for="rlOffset">Offset from main centerline</label>
+<input id="rlOffset" type="text" inputmode="decimal" value="30">
+</div><div id="rlRollGroup">
+<label for="rlRoll">Roll (sideways, optional)</label>
+<input id="rlRoll" type="text" inputmode="decimal" value="0">
+</div><div id="rlAdvanceGroup" hidden>
+<label for="rlAdvance">Distance along the main</label>
+<input id="rlAdvance" type="text" inputmode="decimal" value="24">
+</div><label for="rlClr">Elbow CLR (× diameter)</label>
+<input id="rlClr" type="number" inputmode="decimal" value="1.5" step="0.05" min="0.5"></div><div data-panel="gored" hidden><label for="rgD">Diameter</label>
+<input id="rgD" type="text" inputmode="decimal" value="14"><label for="rgAngle">Elbow angle</label>
+<input id="rgAngle" type="number" inputmode="decimal" value="90" step="any" min="1" max="90"><label for="rgClr">CLR (× diameter)</label>
+<input id="rgClr" type="number" inputmode="decimal" value="1.5" step="0.05" min="0.5"><label for="rgGores">Gores</label>
+<input id="rgGores" type="number" inputmode="decimal" value="5" step="1" min="2" max="20"><p class="input-help">Count both half-size end gores. A 5-gore 90° has 3 full gores and 2 end gores.</p></div>
+            </div>
+
+            <div class="panel tool-output">
+                <h3>Results</h3>
+                <div id="roundResults" class="kv-list" aria-live="polite"></div>
+                <figure class="tool-figure" data-panel="offset"><svg class="tool-drawing fig-drawing" viewBox="0 0 320 150" role="img" aria-label="Diagram of the measurements"><path class="ln" d="M10 112H96C116 112 121 107 128 97L182 55C189 45 195 40 214 40H310"/><path class="hd" d="M96 112V60M214 40V128"/><path class="dm" d="M298 40V112M293 40h10M293 112h10"/><text class="fig-t fig-y" x="286" y="80" text-anchor="end">Rise</text><path class="dm" d="M96 132H214M96 127v10M214 127v10"/><text class="fig-t fig-y" x="155" y="146" text-anchor="middle">Length (run)</text><text class="fig-t" x="150" y="66" text-anchor="middle">travel</text><text class="fig-t" x="10" y="30" text-anchor="start">Roll = sideways part of the offset (into the page)</text></svg></figure><figure class="tool-figure" data-panel="lateral"><svg class="tool-drawing fig-drawing" viewBox="0 0 320 150" role="img" aria-label="Diagram of the measurements"><path class="ln" d="M10 118H310"/><path class="ln" d="M70 118L140 48C146 42 152 40 160 40H310"/><path class="dm" d="M296 40V118M291 40h10M291 118h10"/><text class="fig-t fig-y" x="286" y="82" text-anchor="end">Offset</text><path class="dm" d="M98 118A28 28 0 0 0 90 98"/><text class="fig-t fig-y" x="108" y="108" text-anchor="start">angle</text><circle class="ln" cx="70" cy="118" r="3"/><text class="fig-t" x="70" y="138" text-anchor="start">branch meets main centerline</text><text class="fig-t" x="10" y="30" text-anchor="start">Parallel shown. "Square to the main" turns the branch up instead.</text></svg></figure><figure class="tool-figure" data-panel="gored"><svg class="tool-drawing fig-drawing" viewBox="0 0 160 90" role="img" aria-label="Diagram of the measurements"><path class="ln" d="M22.0 18.0 L34.9 19.3 L58.7 29.1 L76.9 47.3 L86.7 71.1 L88.0 84.0"/><path class="ln" d="M22.0 50.0 L28.6 50.7 L40.9 55.7 L50.3 65.1 L55.3 77.4 L56.0 84.0"/><path class="hd" d="M34.9 19.3L28.6 50.7M58.7 29.1L40.9 55.7M76.9 47.3L50.3 65.1M86.7 71.1L55.3 77.4"/><path class="ln" d="M88.0 84L56.0 84M22 18L22 50"/><path class="dm" d="M120 84h28M120 52h28"/><path class="dm" d="M144 52v32M140 52h8M140 84h8"/><text class="dm-t" x="126" y="73">Ø</text></svg><figcaption>End gores are half the size of full gores.</figcaption></figure>
+            </div>
+        </div>
+    </section>
+</div>
+
+<!-- ===================================================
+     RECT FITTINGS WORKSPACE
+=================================================== -->
+
+<div id="rectWorkspace" class="workspace tool-screen">
+
+    <button class="mobile-menu-btn" type="button" data-mobile-menu aria-label="Open menu">☰</button>
+    <div class="mobile-overlay"></div>
+
+    <aside class="sidebar">
+        <div class="sidebar-top">
+            <button class="toggle-btn" type="button" data-sidebar-toggle aria-label="Collapse menu">☰</button>
+            <h2>Ductculator</h2>
+        </div>
+        <button data-nav-target="dashboard" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1"/><rect x="13.5" y="3.5" width="7" height="7" rx="1"/><rect x="3.5" y="13.5" width="7" height="7" rx="1"/><rect x="13.5" y="13.5" width="7" height="7" rx="1"/></svg></span><span class="text">Dashboard</span></button>
+        <hr>
+        <button data-nav-target="airflowWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8.5h10.5a2.75 2.75 0 1 0-2.75-2.75"/><path d="M3 12.5h15a3 3 0 1 1-3 3"/><path d="M3 16.5h6"/></svg></span><span class="text">Airflow</span></button>
+        <button data-nav-target="pressureWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.2 17a8.5 8.5 0 1 1 15.6 0"/><path d="M12 14l4-4.6"/><circle cx="12" cy="14.2" r="1.2"/></svg></span><span class="text">Pressure Loss</span></button>
+        <button data-nav-target="reverseWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M19.5 10A8 8 0 0 0 5.6 6.4"/><path d="M4.5 14a8 8 0 0 0 13.9 3.6"/><path d="M5 2.8v3.9h3.9M19 21.2v-3.9h-3.9"/></svg></span><span class="text">Reverse Calculator</span></button>
+        <button data-nav-target="equivalentWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><circle cx="7" cy="12" r="4.3"/><rect x="13" y="7.7" width="8" height="8.6" rx="1"/></svg></span><span class="text">Equivalent Sizes</span></button>
+        <hr>
+        <button data-nav-target="sheetMetalWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 19h4.5c2.2 0 3.4-1.1 4-3.3l1.9-7.4c.6-2.2 1.8-3.3 4-3.3h4.6"/><path d="M2.5 16.5v5M21.5 2.5v5"/></svg></span><span class="text">Elbow Offset</span></button>
+        <button data-nav-target="roundWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 21v-9a9 9 0 0 1 9-9h9"/><path d="M9 21v-9a3 3 0 0 1 3-3h9"/><path d="M5.6 5.6l4.3 4.3"/></svg></span><span class="text">Round Fittings</span></button>
+        <button class="active" type="button" aria-current="page"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 14h6l7-7h7"/><path d="M2 19.5h8.3l7-7H22"/></svg></span><span class="text">Rect Fittings</span></button>
+        <button data-nav-target="transitionWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 4.5v15l17-4.5v-6z"/><path d="M12 6.8v10.4" stroke-dasharray="2 2.2"/></svg></span><span class="text">Transition Splitter</span></button>
+        <hr>
+        <button data-nav-target="mathWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 20h17V5z"/><path d="M17 20v-3.5h3.5"/></svg></span><span class="text">Layout Math</span></button>
+        <button data-nav-target="takeoffWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="14" rx="1"/><path d="M8 5v14M12.5 5v14M16 5v14" stroke-dasharray="2 2"/></svg></span><span class="text">Material Takeoff</span></button>
+        <button data-open-procalc type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="2.5" width="14" height="19" rx="2"/><rect x="7.5" y="5" width="9" height="4" rx=".6"/><path class="dots" d="M8.7 12.6h.01M12 12.6h.01M15.3 12.6h.01M8.7 15.9h.01M12 15.9h.01M15.3 15.9h.01M8.7 19h.01M12 19h.01M15.3 19h.01"/></svg></span><span class="text">HVAC Pro Calc</span></button>
+        <hr>
+        <button disabled><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg></span><span class="text">Settings</span></button>
+    </aside>
+
+    <section class="content">
+        <header>
+            <h1>Rect Fittings</h1>
+            <p>Mitered offsets and laterals for rectangular duct.</p>
+        </header>
+
+        <div class="seg" role="tablist" aria-label="Choose a calculation" data-tabs="rectTab"><button type="button" role="tab" data-tab="mitered">Mitered offset</button><button type="button" role="tab" data-tab="lateral">Lateral</button></div>
+<input type="hidden" id="rectTab" value="mitered">
+
+        <div class="calculator tool-calc">
+            <div class="panel tool-inputs">
+                <h3>Inputs</h3>
+                <div data-panel="mitered"><label for="moW">Width (cheek)</label>
+<input id="moW" type="text" inputmode="decimal" value="24"><label for="moO">Offset</label>
+<input id="moO" type="text" inputmode="decimal" value="12"><label for="moL">Length (miter to miter)</label>
+<input id="moL" type="text" inputmode="decimal" value="30"><p class="input-help">Two straight (mitered) elbows. For radius elbows, use Elbow Offset.</p></div><div data-panel="lateral" hidden><label for="xlW">Branch width (cheek)</label>
+<input id="xlW" type="text" inputmode="decimal" value="12"><label for="xlAngle">Lateral angle</label>
+<input id="xlAngle" type="number" inputmode="decimal" value="45" step="any" min="1" max="89"><label for="xlOrient">Branch ends up</label>
+<select id="xlOrient"><option value="parallel" selected>Parallel to the main</option><option value="perpendicular">Square to the main</option></select><div id="xlOffsetGroup">
+<label for="xlOffset">Offset from main centerline</label>
+<input id="xlOffset" type="text" inputmode="decimal" value="30">
+</div><div id="xlAdvanceGroup" hidden>
+<label for="xlAdvance">Distance along the main</label>
+<input id="xlAdvance" type="text" inputmode="decimal" value="24">
+</div><label for="xlType">Elbow type</label>
+<select id="xlType"><option value="radius" selected>Radius elbow</option><option value="straight">Straight (mitered) elbow</option></select><div id="xlClrGroup">
+<label for="xlClr">Elbow CLR (× width)</label>
+<input id="xlClr" type="number" inputmode="decimal" value="1" step="0.05" min="0.5">
+</div></div>
+            </div>
+
+            <div class="panel tool-output">
+                <h3>Results</h3>
+                <div id="rectResults" class="kv-list" aria-live="polite"></div>
+                <figure class="tool-figure" data-panel="mitered"><svg class="tool-drawing fig-drawing" viewBox="0 0 320 160" role="img" aria-label="Diagram of the measurements"><path class="ln" d="M10 104H120L196 44H310"/><path class="ln" d="M10 126H130L206 66H310"/><path class="dm" d="M120 104L130 126M196 44L206 66" stroke-dasharray="4 3"/><path class="dm" d="M296 55V115M291 55h10M291 115h10"/><text class="fig-t fig-y" x="286" y="90" text-anchor="end">Offset</text><path class="dm" d="M125 140H201M125 135v10M201 135v10"/><text class="fig-t fig-y" x="163" y="153" text-anchor="middle">Length</text><text class="fig-t" x="60" y="96" text-anchor="middle">Width (cheek)</text><text class="fig-t" x="10" y="24" text-anchor="start">Dashed lines are the miter joints.</text></svg></figure><figure class="tool-figure" data-panel="lateral"><svg class="tool-drawing fig-drawing" viewBox="0 0 320 150" role="img" aria-label="Diagram of the measurements"><path class="ln" d="M10 118H310"/><path class="ln" d="M70 118L140 48C146 42 152 40 160 40H310"/><path class="dm" d="M296 40V118M291 40h10M291 118h10"/><text class="fig-t fig-y" x="286" y="82" text-anchor="end">Offset</text><path class="dm" d="M98 118A28 28 0 0 0 90 98"/><text class="fig-t fig-y" x="108" y="108" text-anchor="start">angle</text><circle class="ln" cx="70" cy="118" r="3"/><text class="fig-t" x="70" y="138" text-anchor="start">branch meets main centerline</text><text class="fig-t" x="10" y="30" text-anchor="start">Parallel shown. "Square to the main" turns the branch up instead.</text></svg></figure>
+            </div>
+        </div>
+    </section>
+</div>
+
+<!-- ===================================================
+     LAYOUT MATH WORKSPACE
+=================================================== -->
+
+<div id="mathWorkspace" class="workspace tool-screen">
+
+    <button class="mobile-menu-btn" type="button" data-mobile-menu aria-label="Open menu">☰</button>
+    <div class="mobile-overlay"></div>
+
+    <aside class="sidebar">
+        <div class="sidebar-top">
+            <button class="toggle-btn" type="button" data-sidebar-toggle aria-label="Collapse menu">☰</button>
+            <h2>Ductculator</h2>
+        </div>
+        <button data-nav-target="dashboard" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1"/><rect x="13.5" y="3.5" width="7" height="7" rx="1"/><rect x="3.5" y="13.5" width="7" height="7" rx="1"/><rect x="13.5" y="13.5" width="7" height="7" rx="1"/></svg></span><span class="text">Dashboard</span></button>
+        <hr>
+        <button data-nav-target="airflowWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8.5h10.5a2.75 2.75 0 1 0-2.75-2.75"/><path d="M3 12.5h15a3 3 0 1 1-3 3"/><path d="M3 16.5h6"/></svg></span><span class="text">Airflow</span></button>
+        <button data-nav-target="pressureWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.2 17a8.5 8.5 0 1 1 15.6 0"/><path d="M12 14l4-4.6"/><circle cx="12" cy="14.2" r="1.2"/></svg></span><span class="text">Pressure Loss</span></button>
+        <button data-nav-target="reverseWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M19.5 10A8 8 0 0 0 5.6 6.4"/><path d="M4.5 14a8 8 0 0 0 13.9 3.6"/><path d="M5 2.8v3.9h3.9M19 21.2v-3.9h-3.9"/></svg></span><span class="text">Reverse Calculator</span></button>
+        <button data-nav-target="equivalentWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><circle cx="7" cy="12" r="4.3"/><rect x="13" y="7.7" width="8" height="8.6" rx="1"/></svg></span><span class="text">Equivalent Sizes</span></button>
+        <hr>
+        <button data-nav-target="sheetMetalWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 19h4.5c2.2 0 3.4-1.1 4-3.3l1.9-7.4c.6-2.2 1.8-3.3 4-3.3h4.6"/><path d="M2.5 16.5v5M21.5 2.5v5"/></svg></span><span class="text">Elbow Offset</span></button>
+        <button data-nav-target="roundWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 21v-9a9 9 0 0 1 9-9h9"/><path d="M9 21v-9a3 3 0 0 1 3-3h9"/><path d="M5.6 5.6l4.3 4.3"/></svg></span><span class="text">Round Fittings</span></button>
+        <button data-nav-target="rectWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 14h6l7-7h7"/><path d="M2 19.5h8.3l7-7H22"/></svg></span><span class="text">Rect Fittings</span></button>
+        <button data-nav-target="transitionWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 4.5v15l17-4.5v-6z"/><path d="M12 6.8v10.4" stroke-dasharray="2 2.2"/></svg></span><span class="text">Transition Splitter</span></button>
+        <hr>
+        <button class="active" type="button" aria-current="page"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 20h17V5z"/><path d="M17 20v-3.5h3.5"/></svg></span><span class="text">Layout Math</span></button>
+        <button data-nav-target="takeoffWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="14" rx="1"/><path d="M8 5v14M12.5 5v14M16 5v14" stroke-dasharray="2 2"/></svg></span><span class="text">Material Takeoff</span></button>
+        <button data-open-procalc type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="2.5" width="14" height="19" rx="2"/><rect x="7.5" y="5" width="9" height="4" rx=".6"/><path class="dots" d="M8.7 12.6h.01M12 12.6h.01M15.3 12.6h.01M8.7 15.9h.01M12 15.9h.01M15.3 15.9h.01M8.7 19h.01M12 19h.01M15.3 19h.01"/></svg></span><span class="text">HVAC Pro Calc</span></button>
+        <hr>
+        <button disabled><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg></span><span class="text">Settings</span></button>
+    </aside>
+
+    <section class="content">
+        <header>
+            <h1>Layout Math</h1>
+            <p>Triangles, rolling offsets, arcs and swing radius for layout.</p>
+        </header>
+
+        <div class="seg" role="tablist" aria-label="Choose a calculation" data-tabs="mathTab"><button type="button" role="tab" data-tab="triangle">Right triangle</button><button type="button" role="tab" data-tab="rolling">Rolling offset</button><button type="button" role="tab" data-tab="arc">Arc</button><button type="button" role="tab" data-tab="swing">Swing radius</button></div>
+<input type="hidden" id="mathTab" value="triangle">
+
+        <div class="calculator tool-calc">
+            <div class="panel tool-inputs">
+                <h3>Inputs</h3>
+                <div data-panel="triangle"><p class="input-help">Fill in any two. Leave the other two blank.</p><label for="tmRise">Rise</label>
+<input id="tmRise" type="text" inputmode="decimal" value="12"><label for="tmRun">Run</label>
+<input id="tmRun" type="text" inputmode="decimal" value="16"><label for="tmDiag">Diagonal</label>
+<input id="tmDiag" type="text" inputmode="decimal" value=""><label for="tmAngle">Angle from run (°)</label>
+<input id="tmAngle" type="number" inputmode="decimal" value="" step="any" min="0" max="89.99"></div><div data-panel="rolling" hidden><label for="roRise">Rise</label>
+<input id="roRise" type="text" inputmode="decimal" value="18"><label for="roRoll">Roll</label>
+<input id="roRoll" type="text" inputmode="decimal" value="24"><label for="roAngle">Fitting angle</label>
+<input id="roAngle" type="number" inputmode="decimal" value="45" step="any" min="1" max="89.9"></div><div data-panel="arc" hidden><label for="arR">Radius</label>
+<input id="arR" type="text" inputmode="decimal" value="60"><label for="arAngle">Angle (°)</label>
+<input id="arAngle" type="number" inputmode="decimal" value="30" step="any" min="0"><label for="arArc">Arc length (if no angle)</label>
+<input id="arArc" type="text" inputmode="decimal" value=""><label for="arW">Cheek width (optional)</label>
+<input id="arW" type="text" inputmode="decimal" value=""></div><div data-panel="swing" hidden><label for="swO">Offset</label>
+<input id="swO" type="text" inputmode="decimal" value="12"><label for="swL">Length</label>
+<input id="swL" type="text" inputmode="decimal" value="48"></div>
+            </div>
+
+            <div class="panel tool-output">
+                <h3>Results</h3>
+                <div id="mathResults" class="kv-list" aria-live="polite"></div>
+                <figure class="tool-figure" data-panel="triangle"><svg class="tool-drawing fig-drawing" viewBox="0 0 320 150" role="img" aria-label="Diagram of the measurements"><path class="ln" d="M40 125H270V25Z"/><path class="ln" d="M258 125V113H270"/><path class="dm" d="M88 125A48 48 0 0 0 84 106"/><text class="fig-t fig-y" x="96" y="119" text-anchor="start">angle</text><text class="fig-t" x="155" y="142" text-anchor="middle">Run</text><text class="fig-t" x="282" y="80" text-anchor="start">Rise</text><text class="fig-t" x="140" y="64" text-anchor="end">Diagonal</text></svg></figure><figure class="tool-figure" data-panel="rolling"><svg class="tool-drawing fig-drawing" viewBox="0 0 320 150" role="img" aria-label="Diagram of the measurements"><path class="ln" d="M60 125H230V30Z"/><path class="dm" d="M60 125L230 30"/><text class="fig-t" x="145" y="142" text-anchor="middle">Roll</text><text class="fig-t" x="242" y="80" text-anchor="start">Rise</text><text class="fig-t fig-y" x="130" y="68" text-anchor="end">True offset</text><text class="fig-t" x="10" y="22" text-anchor="start">Looking along the duct: rise and roll make the true offset.</text></svg></figure><figure class="tool-figure" data-panel="arc"><svg class="tool-drawing fig-drawing" viewBox="0 0 320 150" role="img" aria-label="Diagram of the measurements"><path class="ln" d="M60 120A150 150 0 0 1 260 120"/><path class="hd" d="M60 120H260"/><path class="dm" d="M160 120V70"/><text class="fig-t fig-y" x="168" y="100" text-anchor="start">Rise</text><text class="fig-t" x="160" y="138" text-anchor="middle">Chord</text><text class="fig-t" x="160" y="58" text-anchor="middle">Arc length</text></svg></figure><figure class="tool-figure" data-panel="swing"><svg class="tool-drawing fig-drawing" viewBox="0 0 320 160" role="img" aria-label="Diagram of the measurements"><path class="ln" d="M20 120C90 120 110 110 160 80C210 50 230 40 300 40"/><path class="dm" d="M300 40V120M295 40h10M295 120h10"/><text class="fig-t fig-y" x="290" y="84" text-anchor="end">Offset</text><path class="dm" d="M20 138H300M20 133v10M300 133v10"/><text class="fig-t fig-y" x="160" y="152" text-anchor="middle">Length</text></svg></figure>
+            </div>
+        </div>
+    </section>
+</div>
+
+<!-- ===================================================
+     MATERIAL TAKEOFF WORKSPACE
+=================================================== -->
+
+<div id="takeoffWorkspace" class="workspace tool-screen">
+
+    <button class="mobile-menu-btn" type="button" data-mobile-menu aria-label="Open menu">☰</button>
+    <div class="mobile-overlay"></div>
+
+    <aside class="sidebar">
+        <div class="sidebar-top">
+            <button class="toggle-btn" type="button" data-sidebar-toggle aria-label="Collapse menu">☰</button>
+            <h2>Ductculator</h2>
+        </div>
+        <button data-nav-target="dashboard" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1"/><rect x="13.5" y="3.5" width="7" height="7" rx="1"/><rect x="3.5" y="13.5" width="7" height="7" rx="1"/><rect x="13.5" y="13.5" width="7" height="7" rx="1"/></svg></span><span class="text">Dashboard</span></button>
+        <hr>
+        <button data-nav-target="airflowWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8.5h10.5a2.75 2.75 0 1 0-2.75-2.75"/><path d="M3 12.5h15a3 3 0 1 1-3 3"/><path d="M3 16.5h6"/></svg></span><span class="text">Airflow</span></button>
+        <button data-nav-target="pressureWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.2 17a8.5 8.5 0 1 1 15.6 0"/><path d="M12 14l4-4.6"/><circle cx="12" cy="14.2" r="1.2"/></svg></span><span class="text">Pressure Loss</span></button>
+        <button data-nav-target="reverseWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M19.5 10A8 8 0 0 0 5.6 6.4"/><path d="M4.5 14a8 8 0 0 0 13.9 3.6"/><path d="M5 2.8v3.9h3.9M19 21.2v-3.9h-3.9"/></svg></span><span class="text">Reverse Calculator</span></button>
+        <button data-nav-target="equivalentWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><circle cx="7" cy="12" r="4.3"/><rect x="13" y="7.7" width="8" height="8.6" rx="1"/></svg></span><span class="text">Equivalent Sizes</span></button>
+        <hr>
+        <button data-nav-target="sheetMetalWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 19h4.5c2.2 0 3.4-1.1 4-3.3l1.9-7.4c.6-2.2 1.8-3.3 4-3.3h4.6"/><path d="M2.5 16.5v5M21.5 2.5v5"/></svg></span><span class="text">Elbow Offset</span></button>
+        <button data-nav-target="roundWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 21v-9a9 9 0 0 1 9-9h9"/><path d="M9 21v-9a3 3 0 0 1 3-3h9"/><path d="M5.6 5.6l4.3 4.3"/></svg></span><span class="text">Round Fittings</span></button>
+        <button data-nav-target="rectWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 14h6l7-7h7"/><path d="M2 19.5h8.3l7-7H22"/></svg></span><span class="text">Rect Fittings</span></button>
+        <button data-nav-target="transitionWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 4.5v15l17-4.5v-6z"/><path d="M12 6.8v10.4" stroke-dasharray="2 2.2"/></svg></span><span class="text">Transition Splitter</span></button>
+        <hr>
+        <button data-nav-target="mathWorkspace" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 20h17V5z"/><path d="M17 20v-3.5h3.5"/></svg></span><span class="text">Layout Math</span></button>
+        <button class="active" type="button" aria-current="page"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="14" rx="1"/><path d="M8 5v14M12.5 5v14M16 5v14" stroke-dasharray="2 2"/></svg></span><span class="text">Material Takeoff</span></button>
+        <button data-open-procalc type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="2.5" width="14" height="19" rx="2"/><rect x="7.5" y="5" width="9" height="4" rx=".6"/><path class="dots" d="M8.7 12.6h.01M12 12.6h.01M15.3 12.6h.01M8.7 15.9h.01M12 15.9h.01M15.3 15.9h.01M8.7 19h.01M12 19h.01M15.3 19h.01"/></svg></span><span class="text">HVAC Pro Calc</span></button>
+        <hr>
+        <button disabled><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg></span><span class="text">Settings</span></button>
+    </aside>
+
+    <section class="content">
+        <header>
+            <h1>Material Takeoff</h1>
+            <p>Sheet area and galvanized weight for a list of duct pieces.</p>
+        </header>
+
+        
+
+        <div class="calculator tool-calc">
+            <div class="panel tool-inputs">
+                <h3>Inputs</h3>
+                <label for="toAllow">Seam and waste allowance (%)</label>
+<input id="toAllow" type="number" inputmode="decimal" value="0" step="1" min="0" max="100"><p class="input-help">Rect sizes as 24 x 12, round as the diameter. Lengths in inches or feet-inches.</p><div class="fit-table-wrap">
+    <table class="fit-table takeoff-table">
+        <thead><tr><th>Item</th><th>Shape</th><th>Size</th><th>Length</th><th>Qty</th><th>Gauge</th><th>Area</th><th><span class="sr-only">Remove</span></th></tr></thead>
+        <tbody id="toRows"></tbody>
+    </table>
+</div>
+<button type="button" id="toAdd" class="tool-secondary">Add item</button>
+<textarea id="toData" hidden>[{"name":"Main","shape":"rect","size":"24 x 12","length":"5'","qty":"4","gauge":"24"},{"name":"Branch","shape":"round","size":"10","length":"60","qty":"6","gauge":"26"}]</textarea>
+            </div>
+
+            <div class="panel tool-output">
+                <h3>Results</h3>
+                <div id="takeoffResults" class="kv-list" aria-live="polite"></div>
+                
+            </div>
+        </div>
+    </section>
+</div>
+
+<!-- ===================================================
      JAVASCRIPT
 =================================================== -->
 
+<script src="js/persist.js?v=20261124-2"></script>
 <script src="js/formulas.js?v=20260812-6"></script>
 <script src="js/rectangle.js?v=20260812-6"></script>
 <script src="js/flatOval.js?v=20260812-6"></script>
@@ -1375,7 +1860,13 @@
 <script src="js/equivalentUI.js?v=20260812-6"></script>
 <script src="js/transitionSplitter.js?v=20260812-6"></script>
 <script src="js/proCalc.js?v=20261124-1"></script>
-<script src="js/navigation.js?v=20261124-1"></script>
+<script src="js/shared.js?v=20261124-2"></script>
+<script src="js/sizingTools.js?v=20261124-2"></script>
+<script src="js/roundFittings.js?v=20261124-2"></script>
+<script src="js/rectFittings.js?v=20261124-2"></script>
+<script src="js/layoutMath.js?v=20261124-2"></script>
+<script src="js/takeoff.js?v=20261124-2"></script>
+<script src="js/navigation.js?v=20261124-2"></script>
 
 </body>
 

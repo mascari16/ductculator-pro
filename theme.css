@@ -840,3 +840,609 @@ h1,h2,h3,h4{
     opacity:.45;
     cursor:not-allowed;
 }
+
+/* =====================================================
+   Sidebar: longer menu now scrolls on short screens
+===================================================== */
+
+.sidebar{
+    overflow-x:hidden;
+    overflow-y:auto;
+    scrollbar-width:thin;
+}
+
+.sidebar hr{
+    margin:10px 0;
+}
+
+.sidebar button{
+    padding:9px 12px;
+    margin-bottom:2px;
+}
+
+/* Dashboard groups */
+.dashboard h2 + .tool-grid{
+    margin-bottom:34px;
+}
+
+/* =====================================================
+   Tool screens (Reverse, Pressure Loss, Round, Rect,
+   Layout Math, Takeoff)
+===================================================== */
+
+.seg{
+    display:inline-flex;
+    flex-wrap:wrap;
+    gap:4px;
+    margin-bottom:18px;
+    padding:4px;
+    background:var(--sunk);
+    border:1px solid var(--border);
+    border-radius:10px;
+}
+
+.seg button{
+    padding:8px 16px;
+    border:0;
+    border-radius:7px;
+    background:none;
+    color:#c3ccd2;
+    font:600 17px/1.1 var(--font-c);
+    cursor:pointer;
+}
+
+.seg button:hover{
+    color:var(--white);
+    background:#262d33;
+}
+
+.seg button.is-on{
+    background:var(--yellow);
+    color:var(--yellow-ink);
+}
+
+.tool-calc{
+    grid-template-columns:minmax(300px,380px) minmax(0,1fr);
+}
+
+#pressureWorkspace .tool-calc{
+    grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);
+}
+
+#takeoffWorkspace .tool-calc{
+    grid-template-columns:minmax(0,1.6fr) minmax(280px,1fr);
+}
+
+.tool-inputs .input-help{
+    margin-top:8px;
+    font-size:13px;
+    line-height:1.45;
+}
+
+.kv-list{
+    display:flex;
+    flex-direction:column;
+}
+
+.kv-row{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    gap:18px;
+    padding:12px 0;
+    border-bottom:1px solid var(--border);
+}
+
+.kv-row span{
+    color:#b9c3ca;
+}
+
+.kv-row span em{
+    display:block;
+    margin-top:2px;
+    color:var(--gray);
+    font-size:12.5px;
+    font-style:normal;
+}
+
+.kv-row strong{
+    color:var(--white);
+    font-family:var(--font-c);
+    font-size:20px;
+    font-weight:600;
+    text-align:right;
+}
+
+.kv-row strong small{
+    display:block;
+    color:var(--gray);
+    font-family:var(--font);
+    font-size:12.5px;
+    font-weight:500;
+}
+
+.kv-main{
+    margin-bottom:6px;
+    padding:14px 16px;
+    border:1px solid rgba(242,194,48,.55);
+    border-radius:10px;
+    background:rgba(242,194,48,.07);
+}
+
+.kv-main strong{
+    color:var(--yellow);
+    font-size:34px;
+    font-weight:700;
+    line-height:1;
+}
+
+.kv-head{
+    margin:20px 0 2px;
+    color:var(--white);
+    font-size:19px;
+    font-weight:600;
+}
+
+.kv-text{
+    margin-top:14px;
+    color:var(--gray);
+    font-size:13px;
+    line-height:1.5;
+}
+
+.kv-problem{
+    padding:14px 16px;
+    border:1px solid rgba(239,91,91,.6);
+    border-radius:10px;
+    background:rgba(127,29,29,.22);
+}
+
+.kv-problem strong{
+    display:block;
+    margin-bottom:4px;
+    color:#ffd3d3;
+    font-family:var(--font-c);
+    font-size:20px;
+    font-weight:600;
+}
+
+.kv-problem p,
+.kv-problem li{
+    color:#f3d6d6;
+    font-size:14px;
+    line-height:1.5;
+}
+
+.kv-problem ol{
+    margin:8px 0 0 18px;
+}
+
+.tool-figure{
+    margin:22px 0 0;
+    padding:14px;
+    background-color:var(--sunk);
+    background-image:var(--grid);
+    background-size:var(--grid-size);
+    border:1px solid var(--border);
+    border-radius:10px;
+}
+
+.fig-drawing{
+    display:block;
+    width:100%;
+    max-width:none;
+    height:auto;
+    max-height:220px;
+}
+
+.fig-drawing .ln{
+    animation:none;
+    stroke-dasharray:none;
+}
+
+.fig-t{
+    fill:var(--gray);
+    font:500 12px var(--font);
+}
+
+.fig-y{
+    fill:var(--yellow);
+    font:600 14px var(--font-c);
+}
+
+.tool-figure figcaption{
+    margin-top:8px;
+    color:var(--gray);
+    font-size:13px;
+}
+
+.tool-secondary{
+    margin-top:12px;
+    padding:9px 16px;
+    border:1px solid var(--border);
+    border-radius:8px;
+    background:var(--card);
+    color:var(--white);
+    font:600 16px/1.1 var(--font-c);
+    cursor:pointer;
+}
+
+.tool-secondary:hover{
+    border-color:#5d6a75;
+    background:var(--cardHover);
+}
+
+/* Editable rows (fittings, takeoff) */
+.fit-table-wrap{
+    margin-top:18px;
+    overflow-x:auto;
+}
+
+.fit-table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:14px;
+}
+
+.fit-table th{
+    padding:6px 4px;
+    color:var(--gray);
+    font-size:12.5px;
+    font-weight:600;
+    text-align:left;
+    border-bottom:1px solid var(--border);
+}
+
+.fit-table td{
+    padding:5px 4px;
+    vertical-align:middle;
+}
+
+.panel .fit-table input,
+.panel .fit-table select{
+    width:100%;
+    min-width:44px;
+    padding:8px;
+    font-size:14px;
+}
+
+.fit-table td:first-child{min-width:110px}
+.takeoff-table td:nth-child(2){min-width:92px}
+.takeoff-table td:nth-child(3){min-width:84px}
+.takeoff-table td:nth-child(5){min-width:58px}
+.takeoff-table td:nth-child(4){min-width:64px}
+.takeoff-table td:nth-child(6){min-width:92px}
+
+.row-loss{
+    color:#cfd6db;
+    white-space:nowrap;
+    font-variant-numeric:tabular-nums;
+}
+
+.row-remove{
+    padding:6px 8px;
+    border:0;
+    background:none;
+    color:var(--gray);
+    font-size:13px;
+    cursor:pointer;
+    text-decoration:underline;
+}
+
+.row-remove:hover{color:var(--red)}
+
+.row-empty{
+    padding:12px 4px !important;
+    color:var(--gray);
+}
+
+.sr-only{
+    position:absolute;
+    width:1px;
+    height:1px;
+    overflow:hidden;
+    clip:rect(0 0 0 0);
+    white-space:nowrap;
+}
+
+/* =====================================================
+   Elbow Offset snap + Transition extras
+===================================================== */
+
+#snapAngleGroup:not(:has(input:checked)) .snap-help{
+    display:none;
+}
+
+.transition-extra-field label{
+    display:block;
+    margin:15px 0 6px;
+    color:#c3ccd2;
+    font-size:14px;
+    font-weight:600;
+}
+
+.transition-extra-field input{
+    width:100%;
+    padding:11px 12px;
+    border:1px solid #3f4a53;
+    border-radius:8px;
+    background:#15191c;
+    color:var(--white);
+    font:inherit;
+}
+
+.transition-extra-field input:focus{
+    outline:none;
+    border-color:var(--yellow);
+    box-shadow:0 0 0 3px rgba(242,194,48,.18);
+}
+
+.transition-taper-note{
+    margin-top:10px;
+    padding:12px 14px;
+    border:1px solid var(--border);
+    border-radius:10px;
+    background:var(--card);
+    color:var(--gray);
+    font-size:14px;
+    line-height:1.5;
+}
+
+.transition-taper-note strong{
+    color:var(--white);
+    font-family:var(--font-c);
+    font-size:18px;
+    font-weight:600;
+}
+
+.transition-taper-note span{
+    display:block;
+}
+
+.transition-taper-note.is-over{
+    border-color:rgba(240,164,58,.7);
+    background:rgba(240,164,58,.08);
+}
+
+.transition-taper-note.is-over strong{
+    color:var(--orange);
+}
+
+/* =====================================================
+   Jobs and sharing
+===================================================== */
+
+.job-tools{
+    margin-top:12px;
+    max-width:620px;
+}
+
+.job-tools summary{
+    display:inline-block;
+    padding:6px 12px;
+    border:1px solid var(--border);
+    border-radius:8px;
+    color:#cfd6db;
+    font-size:14px;
+    font-weight:600;
+    cursor:pointer;
+    list-style:none;
+}
+
+.job-tools summary::-webkit-details-marker{display:none}
+
+.job-tools[open] summary{
+    border-color:var(--yellow);
+    color:var(--white);
+}
+
+.job-body{
+    margin-top:10px;
+    padding:14px;
+    border:1px solid var(--border);
+    border-radius:10px;
+    background:var(--card);
+}
+
+.job-save{
+    display:flex;
+    gap:8px;
+}
+
+.job-name,
+.job-link{
+    flex:1;
+    min-width:0;
+    padding:9px 11px;
+    border:1px solid #3f4a53;
+    border-radius:8px;
+    background:#15191c;
+    color:var(--white);
+    font:inherit;
+    font-size:14px;
+}
+
+.job-link{
+    width:100%;
+    margin-top:10px;
+}
+
+.job-name:focus{
+    outline:none;
+    border-color:var(--yellow);
+}
+
+.job-btn{
+    padding:9px 14px;
+    border:1px solid var(--border);
+    border-radius:8px;
+    background:var(--sunk);
+    color:var(--white);
+    font:600 15px/1.1 var(--font-c);
+    cursor:pointer;
+    white-space:nowrap;
+}
+
+.job-btn:hover{border-color:#5d6a75}
+
+.job-primary{
+    border-color:var(--yellow);
+    background:var(--yellow);
+    color:var(--yellow-ink);
+}
+
+.job-primary:hover{background:var(--yellow-hi)}
+
+.job-list{
+    margin:12px 0;
+    list-style:none;
+}
+
+.job-list li{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:6px 0;
+    border-bottom:1px solid var(--border-soft);
+}
+
+.job-open{
+    flex:1;
+    min-width:0;
+    padding:0;
+    border:0;
+    background:none;
+    color:var(--white);
+    font:inherit;
+    font-size:15px;
+    text-align:left;
+    cursor:pointer;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+
+.job-open:hover{color:var(--yellow)}
+
+.job-date{
+    color:var(--gray);
+    font-size:12.5px;
+}
+
+.job-delete{
+    border:0;
+    background:none;
+    color:var(--gray);
+    font-size:13px;
+    text-decoration:underline;
+    cursor:pointer;
+}
+
+.job-delete:hover{color:var(--red)}
+
+.job-empty{
+    color:var(--gray);
+    font-size:14px;
+}
+
+.job-actions{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+}
+
+.job-status{
+    min-height:1.2em;
+    margin-top:8px;
+    color:var(--green);
+    font-size:13.5px;
+}
+
+/* =====================================================
+   Phones (new screens)
+===================================================== */
+
+@media (max-width:900px){
+    .tool-screen .content{
+        padding:75px 12px 30px;
+    }
+
+    .tool-calc,
+    #pressureWorkspace .tool-calc,
+    #takeoffWorkspace .tool-calc{
+        display:block;
+    }
+
+    .tool-calc > .panel + .panel{
+        margin-top:16px;
+    }
+
+    .seg{
+        display:flex;
+    }
+
+    .seg button{
+        flex:1 1 auto;
+    }
+
+    .kv-main strong{
+        font-size:28px;
+    }
+}
+
+/* =====================================================
+   Print sheet: the open screen only, as shown on screen
+===================================================== */
+
+@media print{
+    @page{margin:12mm}
+
+    *{
+        -webkit-print-color-adjust:exact !important;
+        print-color-adjust:exact !important;
+    }
+
+    html,body{
+        height:auto !important;
+        overflow:visible !important;
+    }
+
+    .sidebar,
+    .mobile-menu-btn,
+    .mobile-overlay,
+    .job-tools,
+    .procalc-popout,
+    .seg,
+    .tool-secondary,
+    .row-remove,
+    #calculateOffsetBtn,
+    .transition-calculate-btn{
+        display:none !important;
+    }
+
+    .workspace.active{
+        display:block !important;
+        position:static !important;
+        height:auto !important;
+        overflow:visible !important;
+    }
+
+    .workspace.active .content{
+        height:auto !important;
+        overflow:visible !important;
+        padding:0 !important;
+    }
+
+    .panel,
+    .result-card,
+    .tool-figure,
+    .transition-fitting-card,
+    .offset-iso-card{
+        break-inside:avoid;
+    }
+
+    .tool-figure[hidden],
+    [data-panel][hidden]{
+        display:none !important;
+    }
+}

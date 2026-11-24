@@ -429,6 +429,15 @@ const customClrGroup =
 const noStraightInput =
     document.getElementById("noStraightElbows");
 
+const snapAngleInput =
+    document.getElementById("snapStandardAngle");
+
+const snapAngleGroup =
+    document.getElementById("snapAngleGroup");
+
+// Standard elbow angles a shop can build without a special.
+const STANDARD_ELBOW_ANGLES = [11.25, 15, 22.5, 30, 45, 60];
+
 const customClrInput =
     document.getElementById("customClrInput");
 
@@ -493,6 +502,12 @@ function updateOffsetModeFields() {
 
     overallLengthInput.style.display =
         knownAngle ? "none" : "block";
+
+    // Snapping only applies when the app is solving the angle.
+    if (snapAngleGroup) {
+        snapAngleGroup.style.display =
+            knownAngle ? "none" : "";
+    }
 }
 
 offsetMode.addEventListener(
@@ -1475,6 +1490,90 @@ calculateOffsetBtn.addEventListener("click", () => {
 
     }
 
+    /*
+     * Snap to standard angle (solve mode): round the solved angle to the
+     * nearest standard angle that still fits, keep the offset, and let
+     * the overall length (and straight) follow from the snapped angle.
+     * With "Elbows only, no straight" the CLR is re-solved instead.
+     */
+    let snappedFrom = null;
+
+    if (
+        snapAngleInput &&
+        snapAngleInput.checked &&
+        offsetMode.value === "solveAngle"
+    ) {
+
+        const solvedAngle = elbowAngle;
+
+        const candidates =
+            STANDARD_ELBOW_ANGLES
+                .slice()
+                .sort((a, b) =>
+                    Math.abs(a - solvedAngle) -
+                    Math.abs(b - solvedAngle)
+                );
+
+        let chosenAngle = null;
+        let chosenRadius = centerlineRadius;
+
+        for (const angle of candidates) {
+
+            const radians = angle * Math.PI / 180;
+
+            if (noStraight) {
+
+                const radius =
+                    offset / (2 * (1 - Math.cos(radians)));
+
+                if (radius >= bendDimension / 2) {
+                    chosenAngle = angle;
+                    chosenRadius = radius;
+                    break;
+                }
+
+            } else {
+
+                const straight =
+                    offset / Math.sin(radians) -
+                    2 * centerlineRadius * Math.tan(radians / 2);
+
+                if (straight >= -0.001) {
+                    chosenAngle = angle;
+                    break;
+                }
+
+            }
+
+        }
+
+        if (chosenAngle === null) {
+
+            showOffsetProblem(
+                "No standard angle fits",
+                `None of the standard angles (${STANDARD_ELBOW_ANGLES.join("°, ")}°) can make this offset with these settings.`,
+                [
+                    `Keep the ${formatSheetMetalMeasurement(ductWidth)} × ${formatSheetMetalMeasurement(ductDepth)} duct size.`,
+                    "Uncheck Snap to standard angle to use the exact solved angle.",
+                    noStraight
+                        ? "Or increase the offset so a standard angle leaves room for a throat."
+                        : "Or choose a smaller CLR so a standard angle has room between the elbows."
+                ]
+            );
+
+            return;
+
+        }
+
+        if (Math.abs(chosenAngle - solvedAngle) > 1e-9) {
+            snappedFrom = solvedAngle;
+        }
+
+        elbowAngle = chosenAngle;
+        centerlineRadius = chosenRadius;
+
+    }
+
     const throatRadius =
         centerlineRadius -
         bendDimension / 2;
@@ -1565,7 +1664,9 @@ calculateOffsetBtn.addEventListener("click", () => {
         <div class="result-main">
 
             <span>${
-                offsetMode.value === "solveAngle"
+                snappedFrom !== null
+                    ? "Standard Elbow Angle"
+                    : offsetMode.value === "solveAngle"
                     ? "Required Elbow Angle"
                     : "Elbow Angle"
             }</span>
@@ -1575,6 +1676,28 @@ calculateOffsetBtn.addEventListener("click", () => {
             </strong>
 
         </div>
+
+        ${snappedFrom !== null ? `
+        <div class="result-row">
+
+            <span>Snapped from</span>
+
+            <strong>${snappedFrom.toFixed(2)}°</strong>
+
+        </div>
+
+        <div class="result-row">
+
+            <span>Overall length change</span>
+
+            <strong>${
+                calculatedOverallLength - requestedOverallLength >= 0 ? "+" : "−"
+            }${formatSheetMetalMeasurement(
+                Math.abs(calculatedOverallLength - requestedOverallLength)
+            ).replace(/^0 (?=\d+\/)/, "")}</strong>
+
+        </div>
+        ` : ""}
 
         ${noStraight ? `
         <div class="result-row">
@@ -1802,6 +1925,7 @@ calculateOffsetBtn.addEventListener("click", () => {
     elbowAngleInput,
     offsetMode,
     noStraightInput,
+    snapAngleInput,
 ]
 .filter(Boolean)
 .forEach((element) => {
