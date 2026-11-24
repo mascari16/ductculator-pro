@@ -369,6 +369,11 @@ function buildEqualFrictionResults(data) {
                 ${buildFrictionOptionsTable("Rectangle", "▭", rectangles)}
                 ${buildFrictionOptionsTable("Flat Oval", "⬭", ovals)}
             </div>
+            <p class="options-legend">
+                Friction Δ compares each size with the target friction rate:
+                <strong>+</strong> is higher friction, <strong>−</strong> is lower.
+                Green is within 2%.
+            </p>
 
             <details class="engineering-breakdown">
                 <summary>🧮 Engineering Breakdown</summary>

@@ -102,7 +102,7 @@
 
 <div class="tool-card" id="openSheetMetal">
 
-    <div class="tool-icon">📐</div>
+    <div class="tool-icon">🧮</div>
 
     <h3>Sheet Metal Calculator</h3>
 
@@ -437,7 +437,7 @@
 
                 <div id="results" class="results">
 
-                    Enter values and press Calculate.
+                    Results update automatically as you type.
 
                 </div>
 
@@ -824,6 +824,12 @@
 
                     </div>
 
+                    <p class="options-legend">
+                        Friction Match: <strong>+</strong> means more friction than the
+                        source duct (smaller), <strong>−</strong> means less friction
+                        (larger). Green is within 2%.
+                    </p>
+
                 </div>
 
             </div>
@@ -1163,9 +1169,11 @@
         <button id="transitionGoHome" type="button"><span class="icon">🏠</span><span class="text">Dashboard</span></button>
         <hr>
         <button id="transitionOpenAirflow" type="button"><span class="icon">💨</span><span class="text">Airflow</span></button>
+        <button disabled><span class="icon">📏</span><span class="text">Pressure Loss</span></button>
         <button id="transitionOpenEquivalent" type="button"><span class="icon">⭕</span><span class="text">Equivalent Sizes</span></button>
         <button id="transitionOpenSheetMetal" type="button"><span class="icon">🧮</span><span class="text">Sheet Metal</span></button>
         <button class="active" type="button"><span class="icon">↔️</span><span class="text">Transition Splitter</span></button>
+        <button disabled><span class="icon">🔄</span><span class="text">Reverse Calculator</span></button>
         <hr>
         <button disabled><span class="icon">⚙</span><span class="text">Settings</span></button>
     </aside>

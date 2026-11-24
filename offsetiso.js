@@ -61,10 +61,15 @@
                 position:relative;
             }
 
+            /*
+             * Desktop: top-left corner, which is empty in both desktop
+             * layouts. Top-right collided with the fabrication data panel.
+             */
             .offset-iso-clr-warning{
                 position:absolute;
                 top:5px;
-                right:14px;
+                left:14px;
+                right:auto;
                 z-index:10;
 
                 display:inline-flex;
@@ -121,7 +126,8 @@
             .offset-iso-clr-warning-tooltip{
                 position:absolute;
                 top:calc(100% + 9px);
-                right:0;
+                left:0;
+                right:auto;
 
                 width:285px;
                 padding:12px 14px;
@@ -190,6 +196,9 @@
                     display:block;
                     width:100%;
                     max-width:none;
+                    /* The stacked layout is tall by design; the 620px
+                       desktop cap was shrinking it to ~65% width. */
+                    max-height:none;
                     height:auto;
                     margin:0;
                     border:0;
@@ -204,6 +213,11 @@
                     max-width:210px;
                     padding:8px 11px;
                     font-size:11px;
+                }
+
+                .offset-iso-clr-warning-tooltip{
+                    left:auto;
+                    right:0;
                 }
 
             }
@@ -1873,6 +1887,34 @@
 
     }
 
+    /*
+     * Choose the desktop layout from the preview container's real width.
+     * A zero width (hidden workspace, first paint) falls back to the
+     * full layout; the ResizeObserver re-renders once a width is known.
+     */
+    const OFFSET_ISO_COMPACT_BELOW = 1150;
+
+    function getOffsetIsoLayoutMode(container) {
+
+        if (
+            window.matchMedia(
+                "(max-width: 700px)"
+            ).matches
+        ) {
+            return "mobile";
+        }
+
+        const width =
+            container ? container.clientWidth : 0;
+
+        return width > 0 && width < OFFSET_ISO_COMPACT_BELOW
+            ? "compact"
+            : "full";
+
+    }
+
+    let lastOffsetIsoLayoutMode = null;
+
     function render() {
 
         const container =
@@ -1885,6 +1927,9 @@
             return;
 
         }
+
+        lastOffsetIsoLayoutMode =
+            getOffsetIsoLayoutMode(container);
 
         container.innerHTML = "";
         container.classList.remove(
@@ -1954,11 +1999,25 @@
                 "(max-width: 700px)"
             ).matches;
 
+        const layoutMode =
+            getOffsetIsoLayoutMode(container);
+
+        /*
+         * Compact desktop layout: the full 1750-unit layout is scaled
+         * down to ~40% inside a typical laptop results panel, which made
+         * the fabrication data unreadable (≈6px labels). The compact
+         * layout keeps the side-by-side arrangement but uses a 1000-unit
+         * canvas and the phone-sized panel text, so it renders at about
+         * the same scale as the phone layout.
+         */
+        const isCompact =
+            layoutMode === "compact";
+
         const viewWidth =
-            isMobile ? 500 : 1750;
+            isMobile ? 500 : isCompact ? 1000 : 1750;
 
         const viewHeight =
-            isMobile ? 1310 : 660;
+            isMobile ? 1310 : isCompact ? 680 : 660;
 
         const drawingArea =
             isMobile
@@ -1967,6 +2026,13 @@
                     y: 35,
                     width: 484,
                     height: 570
+                }
+                : isCompact
+                ? {
+                    x: 15,
+                    y: 40,
+                    width: 500,
+                    height: 600
                 }
                 : {
                     x: 45,
@@ -1981,6 +2047,14 @@
                     x: 4,
                     y: 635,
                     width: 492,
+                    height: 640,
+                    mobile: true
+                }
+                : isCompact
+                ? {
+                    x: 535,
+                    y: 20,
+                    width: 455,
                     height: 640,
                     mobile: true
                 }
@@ -2697,6 +2771,27 @@ drawing.appendChild(
 
             }
         );
+
+        /*
+         * Re-render only when the container crosses a layout breakpoint
+         * (sidebar collapse, window resize, workspace becoming visible).
+         */
+        const isoContainer =
+            document.getElementById(ids.container);
+
+        if (
+            isoContainer &&
+            typeof ResizeObserver === "function"
+        ) {
+            new ResizeObserver(() => {
+                if (
+                    getOffsetIsoLayoutMode(isoContainer) !==
+                    lastOffsetIsoLayoutMode
+                ) {
+                    render();
+                }
+            }).observe(isoContainer);
+        }
 
         window.OffsetIso = {
             render,
