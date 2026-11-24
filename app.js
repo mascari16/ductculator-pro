@@ -426,6 +426,9 @@ const clrMultiplier =
 const customClrGroup =
     document.getElementById("customClrGroup");
 
+const noStraightInput =
+    document.getElementById("noStraightElbows");
+
 const customClrInput =
     document.getElementById("customClrInput");
 
@@ -499,6 +502,46 @@ offsetMode.addEventListener(
 
 updateOffsetModeFields();
 
+
+/*
+ * "Elbows only, no straight": with zero straight the offset and length
+ * (or angle) fix the radius, so the CLR setting is set aside.
+ */
+function updateNoStraightFields() {
+
+    if (!noStraightInput) {
+        return;
+    }
+
+    const on = noStraightInput.checked;
+
+    clrMultiplier.disabled = on;
+
+    const clrLabel =
+        document.querySelector('label[for="clrMultiplier"]');
+
+    if (clrLabel) {
+        clrLabel.classList.toggle("is-disabled", on);
+    }
+
+    customClrGroup.style.display =
+        !on && clrMultiplier.value === "custom"
+            ? "block"
+            : "none";
+
+    const help =
+        document.getElementById("noStraightHelp");
+
+    if (help) {
+        help.hidden = !on;
+    }
+
+}
+
+if (noStraightInput) {
+    noStraightInput.addEventListener("change", updateNoStraightFields);
+    updateNoStraightFields();
+}
 
 clrMultiplier.addEventListener("change", () => {
 
@@ -1093,7 +1136,166 @@ calculateOffsetBtn.addEventListener("click", () => {
     let elbowAngle;
     let requestedOverallLength = null;
 
-    if (offsetMode.value === "solveAngle") {
+    const noStraight =
+        Boolean(noStraightInput && noStraightInput.checked);
+
+    if (noStraight) {
+
+        /*
+         * Two identical elbows with no straight between them.
+         * With zero straight the geometry fixes both the angle and the
+         * radius, so the CLR setting is not used:
+         *
+         *   offset = 2R(1 − cos θ)      length = 2R · sin θ
+         *   ⇒ tan(θ/2) = offset ÷ length,   R = length ÷ (2 sin θ)
+         *   known angle: R = offset ÷ (2(1 − cos θ))
+         */
+        if (offsetMode.value === "solveAngle") {
+
+            requestedOverallLength =
+                parseSheetMetalMeasurement(
+                    overallLengthInput.value
+                );
+
+            if (
+                !Number.isFinite(requestedOverallLength) ||
+                requestedOverallLength <= 0
+            ) {
+
+                showOffsetProblem(
+                    "Enter the overall length",
+                    "Overall Length must be greater than zero.",
+                    [
+                        "Keep the entered duct size.",
+                        "Measure the available length from the start of the first elbow to the end of the second elbow.",
+                        "Enter that length and calculate again."
+                    ]
+                );
+
+                return;
+
+            }
+
+            if (offset >= requestedOverallLength) {
+
+                showOffsetProblem(
+                    "Offset is too large for elbows only",
+                    "With no straight between them, each elbow has to be less than 90°, so the offset must be smaller than the overall length.",
+                    [
+                        `Keep the ${formatSheetMetalMeasurement(ductWidth)} × ${formatSheetMetalMeasurement(ductDepth)} duct size.`,
+                        `Increase Overall Length to more than ${formatSheetMetalMeasurement(offset)}.`,
+                        "Or uncheck Elbows only, no straight to allow straight between the elbows."
+                    ]
+                );
+
+                return;
+
+            }
+
+            elbowAngle =
+                2 *
+                Math.atan(offset / requestedOverallLength) *
+                180 / Math.PI;
+
+            centerlineRadius =
+                requestedOverallLength /
+                (2 * Math.sin(elbowAngle * Math.PI / 180));
+
+        } else {
+
+            elbowAngle =
+                Number(elbowAngleInput.value);
+
+            if (
+                !Number.isFinite(elbowAngle) ||
+                elbowAngle <= 0 ||
+                elbowAngle >= 90
+            ) {
+
+                showOffsetProblem(
+                    "Enter a usable elbow angle",
+                    "Elbow Angle must be greater than 0° and less than 90°.",
+                    [
+                        "Keep the entered duct size.",
+                        "Enter the angle you intend to fabricate, such as 30°, 45°, or 60°.",
+                        "Calculate again."
+                    ]
+                );
+
+                return;
+
+            }
+
+            centerlineRadius =
+                offset /
+                (2 * (1 - Math.cos(elbowAngle * Math.PI / 180)));
+
+        }
+
+        // The solved radius must still leave a throat.
+        if (centerlineRadius < bendDimension / 2) {
+
+            const steps = [
+                `Keep the ${formatSheetMetalMeasurement(ductWidth)} × ${formatSheetMetalMeasurement(ductDepth)} duct size.`
+            ];
+
+            if (offsetMode.value === "solveAngle") {
+
+                // R = (L² + O²) ÷ 4O ≥ W/2  ⇒  L ≥ √(2·W·O − O²)
+                const minimumLength =
+                    roundUpToQuarter(
+                        Math.max(
+                            offset + 0.25,
+                            Math.sqrt(
+                                Math.max(
+                                    0,
+                                    2 * bendDimension * offset -
+                                    offset * offset
+                                )
+                            )
+                        )
+                    );
+
+                steps.push(
+                    `Increase Overall Length to at least ${formatSheetMetalMeasurement(minimumLength)} and calculate again.`
+                );
+
+            } else {
+
+                // R = O ÷ 2(1 − cos θ) ≥ W/2  ⇒  O ≥ W(1 − cos θ)
+                const minimumOffset =
+                    roundUpToQuarter(
+                        bendDimension *
+                        (1 - Math.cos(elbowAngle * Math.PI / 180))
+                    );
+
+                const ratio =
+                    1 - offset / bendDimension;
+
+                steps.push(
+                    `Increase Offset to at least ${formatSheetMetalMeasurement(minimumOffset)}` +
+                    (ratio > -1 && ratio < 1
+                        ? `, or use an angle of ${(Math.floor(Math.acos(ratio) * 180 / Math.PI * 100) / 100).toFixed(2)}° or less.`
+                        : ".")
+                );
+
+            }
+
+            steps.push(
+                "Or uncheck Elbows only, no straight to use a normal CLR with straight between the elbows."
+            );
+
+            showOffsetProblem(
+                "Elbows are too tight for this duct",
+                "With no straight between them, these elbows would need a centerline radius smaller than half the cheek width, which leaves no throat.",
+                steps
+            );
+
+            return;
+
+        }
+
+    } else if (offsetMode.value === "solveAngle") {
 
         requestedOverallLength =
             parseSheetMetalMeasurement(
@@ -1374,6 +1576,16 @@ calculateOffsetBtn.addEventListener("click", () => {
 
         </div>
 
+        ${noStraight ? `
+        <div class="result-row">
+
+            <span>Layout</span>
+
+            <strong>Elbows only, no straight</strong>
+
+        </div>
+        ` : ""}
+
         <div class="result-row">
 
             <span>Duct Size</span>
@@ -1589,6 +1801,7 @@ calculateOffsetBtn.addEventListener("click", () => {
     customClrInput,
     elbowAngleInput,
     offsetMode,
+    noStraightInput,
 ]
 .filter(Boolean)
 .forEach((element) => {

@@ -887,6 +887,31 @@
                 );
         }
 
+        /*
+         * Elbows only, no straight: the geometry fixes angle and radius.
+         */
+        const noStraightElement =
+            document.getElementById("noStraightElbows");
+
+        if (noStraightElement && noStraightElement.checked) {
+            if (
+                mode === "solveAngle" &&
+                overallLength > offset
+            ) {
+                elbowAngle =
+                    2 * Math.atan(offset / overallLength) *
+                    180 / Math.PI;
+
+                centerlineRadius =
+                    overallLength /
+                    (2 * Math.sin(elbowAngle * Math.PI / 180));
+            } else if (mode === "knownAngle") {
+                centerlineRadius =
+                    offset /
+                    (2 * (1 - Math.cos(elbowAngle * Math.PI / 180)));
+            }
+        }
+
         if (!Number.isFinite(elbowAngle)) {
 
             elbowAngle = 45;
