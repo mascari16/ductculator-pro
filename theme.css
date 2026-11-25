@@ -1707,8 +1707,11 @@ h1,h2,h3,h4{
 .wh-tab-t{fill:#fff;font:700 15px "Barlow Condensed", sans-serif;letter-spacing:.06em}
 .wh-tab-t-sm{font-size:11.5px}
 .wh-discg{cursor:grab}
+.wh-discg .wh-red{filter:drop-shadow(0 2px 3px rgba(0,0,0,.25))}
 .wh-disc{fill:#fff;stroke:#555;stroke-width:1.6;filter:drop-shadow(0 2px 4px rgba(0,0,0,.28))}
-.wh-fr,.wh-dd{fill:#f7f7f4;stroke:#555;stroke-width:1}
+.wh-fplate{fill:#fff;stroke:#bbb;stroke-width:1}
+.wh-winframe{fill:none;stroke:#222;stroke-width:1.6}
+.wheel-note{margin:0 0 10px}
 .wh-index{stroke:#111;stroke-width:2}
 .wh-index-head{fill:#111}
 .wh-title{fill:#111;font:800 28px "Barlow Condensed", sans-serif;letter-spacing:.02em}

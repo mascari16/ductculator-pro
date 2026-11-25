@@ -364,23 +364,25 @@
 
         <div id="afWheel" class="wheel-wrap" hidden>
             <div class="panel wheel-panel">
-                <svg id="wheelSvg" class="wheel-svg" viewBox="0 0 760 960" tabindex="0" role="img" aria-label="Duct calculator wheel. Drag the white disc to turn it; drag the red hairline to read across the scales. Arrow keys turn the disc; Alt with arrow keys moves the hairline."></svg>
+                <svg id="wheelSvg" class="wheel-svg" viewBox="0 0 760 960" tabindex="0" role="img" aria-label="Duct calculator wheel. Drag the white disc or red arc to turn them; drag the red hairline to read across the scales. Arrow keys turn the disc; Alt with arrow keys moves the hairline."></svg>
             </div>
             <div class="panel wheel-side">
                 <h3>Using the wheel</h3>
+                <p class="kv-text wheel-note">Drag the white disc or the red arc to turn them together. Drag the red hairline to read straight across.</p>
                 <ol class="wheel-steps">
-                    <li><b>Turn the disc</b> so the index at the top points at your airflow on the blue scale.</li>
-                    <li><b>Round size:</b> find your friction rate on the disc's left edge; the size is on the red scale right next to it.</li>
-                    <li><b>Velocity:</b> find the duct size on the disc's bottom edge; the velocity is on the green scale next to it.</li>
-                    <li>Drag the <b>red hairline</b> to read straight across any two scales.</li>
+                    <li><b>Friction rate:</b> line your duct size on the red up with your airflow on the blue. Read the friction rate at the arrow in the window.</li>
+                    <li><b>Duct size:</b> turn the disc until the arrow points at your friction rate. Read the size on the red opposite your airflow.</li>
+                    <li><b>Velocity:</b> set the index at the top on your airflow. Read the velocity on the green opposite the duct size.</li>
+                    <li><b>Airflow:</b> set the duct size opposite the velocity. Read the airflow at the index.</li>
                 </ol>
                 <div class="kv-list wheel-read">
-                    <div class="kv-row kv-main"><span>Airflow at the index</span><strong id="whIndex">—</strong></div>
+                    <div class="kv-row kv-main"><span>Friction at the arrow<em>in. w.c. per 100 ft</em></span><strong id="whFrArrow">—</strong></div>
+                    <div class="kv-row"><span>Airflow at the index</span><strong id="whIndex">—</strong></div>
                     <h4 class="kv-head">Under the hairline</h4>
-                    <div class="kv-row"><span>Round size<em>red scale</em></span><strong id="whDRed">—</strong></div>
-                    <div class="kv-row"><span>Friction rate<em>disc, in. w.c. per 100 ft</em></span><strong id="whFr">—</strong></div>
-                    <div class="kv-row"><span>Duct size<em>disc, bottom edge</em></span><strong id="whDDisc">—</strong></div>
-                    <div class="kv-row"><span>Velocity<em>green scale</em></span><strong id="whVel">—</strong></div>
+                    <div class="kv-row"><span>Airflow<em>blue</em></span><strong id="whQBlue">—</strong></div>
+                    <div class="kv-row"><span>Duct size<em>red, upper scale</em></span><strong id="whDUp">—</strong></div>
+                    <div class="kv-row"><span>Duct size<em>red, lower scale</em></span><strong id="whDLow">—</strong></div>
+                    <div class="kv-row"><span>Velocity<em>green</em></span><strong id="whVel">—</strong></div>
                     <div class="kv-row"><span>Rectangular equals<em>for that round size</em></span><strong id="whRect">—</strong></div>
                 </div>
                 <button type="button" class="wheel-btn" id="whFromInputs">Line up with my airflow and friction</button>
@@ -1958,7 +1960,7 @@
 <script src="js/rectFittings.js?v=20261124-3"></script>
 <script src="js/layoutMath.js?v=20261124-2"></script>
 <script src="js/takeoff.js?v=20261124-2"></script>
-<script src="js/wheel.js?v=20261125-2"></script>
+<script src="js/wheel.js?v=20261125-3"></script>
 <script src="js/navigation.js?v=20261124-2"></script>
 
 </body>

@@ -28,31 +28,32 @@
     if (!root || !svg) return;
 
     const NS = "http://www.w3.org/2000/svg";
-    const W = 760, H = 960, CX = 380, CY = 470;
+    const W = 760, H = 960, CX = 380, CY = 452;
     const LOG_K = Math.log10(0.109136);
     const LOG_V = Math.log10(183.346);
 
-    const A = 38;                                  // degrees per decade, airflow
-    const aQ = q => A * (Math.log10(q) - 3.35);
-    const RD = (5.02 / 1.9) * A;
-    const r0 = 205 - RD * Math.log10(3);
-    const rD = d => RD * Math.log10(d) + r0;
-    const SF = -A / 1.9;
-    const s0 = r0 - SF * LOG_K + A * 3.35;          // from r(D) = s(f) + a(Q)
-    const sF = f => SF * Math.log10(f) + s0;
-    const g0 = 112 - 2 * A;
-    const gV = v => A * Math.log10(v) + g0;
-    const t0 = g0 + A * 3.35 + A * LOG_V;           // from g(V) = t(D) + a(Q)
-    const tD = d => -2 * A * Math.log10(d) + t0;
+    const A = 38;                                   // degrees per decade, airflow
+    const aQ = q => A * (Math.log10(q) - 3.35);     // blue (card)
+    const R1 = (5.02 / 1.9) * A;
+    const c1 = -9 - R1 * Math.log10(48);
+    const r1 = d => R1 * Math.log10(d) + c1;        // red upper (disc): against the airflow
+    const g0 = 110 - 2 * A;
+    const gV = v => A * Math.log10(v) + g0;          // green (card)
+    const c2 = A * 3.35 + A * LOG_V + g0;
+    const r2 = d => -2 * A * Math.log10(d) + c2;     // red lower (disc): against the velocity
+    const ARROW = 75;                                // window arrow, disc angle
+    const WF = A / 1.9;
+    const w0 = ARROW - A * 3.35 - c1 - WF * LOG_K;
+    const wF = f => WF * Math.log10(f) + w0;         // friction (card, seen through the window)
 
     const RING = {
         disc: 214,
-        red: [220, 284], redMid: 250,
-        blue: [292, 356], blueMid: 322,
-        green: [220, 292], greenMid: 252
+        red: [220, 288],
+        outer: [292, 356],
+        win: [152, 198], winA: 24
     };
 
-    let phi = aQ(1000);     // disc turn (index on the airflow)
+    let phi = 0;            // disc turn
     let hair = 262;         // reading hairline, card angle
 
     const rad = d => (d * Math.PI) / 180;
@@ -150,50 +151,41 @@
     // ---------- the card (drawn once) ----------
     function drawCard() {
         base.appendChild(el("rect", { x: 6, y: 6, width: W - 12, height: H - 12, rx: 30, class: "wh-card" }));
+        const [o0, o1] = RING.outer, om = (o0 + o1) / 2 - 2;
 
-        // blue: airflow, CFM outside the line, L/s inside
-        const bq = [50, 100000];
-        base.appendChild(band(RING.blue[0], RING.blue[1], aQ(bq[0]) - 5, aQ(bq[1]) + 5, "wh-blue"));
-        scale(base, { values: ticks(bq[0], bq[1], FINE), labels: ticks(bq[0], bq[1], [[1, 2, 0.5], [2, 10, 1]]), angle: aQ, rLine: RING.blueMid, dir: 1, rText: RING.blueMid + 22,
-            isMajor: v => rank(v) <= 2, fmt: num });
-        scale(base, { values: ticks(25, 47000, FINE), labels: ticks(25, 47000, [[1, 2, 0.5], [2, 10, 1]]), angle: v => aQ(v / 0.471947), rLine: RING.blueMid, dir: -1, len: 6, lenMajor: 11, rText: RING.blueMid - 19,
+        // blue: airflow. CFM along the inner edge (faces the red), L/s outside
+        base.appendChild(band(o0, o1, aQ(50) - 5, aQ(100000) + 5, "wh-blue"));
+        scale(base, { values: ticks(50, 100000, FINE), labels: ticks(50, 100000, [[1, 2, 0.5], [2, 10, 1]]), angle: aQ, rLine: o0, dir: 1, rText: o0 + 25, isMajor: v => rank(v) <= 2, fmt: num });
+        base.appendChild(el("path", { d: arcPath(om + 8, aQ(50) - 2, aQ(100000) + 2), class: "wh-line" }));
+        scale(base, { values: ticks(25, 47000, FINE), labels: ticks(25, 47000, [[1, 2, 0.5], [2, 10, 1]]), angle: v => aQ(v / 0.471947), rLine: om + 8, dir: 1, len: 6, lenMajor: 10, rText: om + 26,
             isMajor: v => rank(v) <= 1, fmt: num, cls: "wh-num wh-num-sm" });
-        base.appendChild(el("path", { d: arcPath(RING.blueMid, aQ(bq[0]) - 2, aQ(bq[1]) + 2), class: "wh-line" }));
-        tab(base, "AIRFLOW", RING.blue[1] + 17, 0, 22);
-        unitLabel(base, "CFM", RING.blueMid + 22, aQ(bq[0]) - 9);
-        unitLabel(base, "L/s", RING.blueMid - 19, aQ(bq[0]) - 9);
+        tab(base, "AIRFLOW", o1 + 17, 0, 22);
+        unitLabel(base, "CFM", o0 + 25, aQ(50) - 9);
+        unitLabel(base, "L/s", om + 26, aQ(50) - 9);
 
-        // red: round duct diameter, inches outside, mm inside
-        base.appendChild(band(RING.red[0], RING.red[1], rD(3) - 4, rD(60) + 4, "wh-red", true));
-        scale(base, { values: ticks(3, 60, [[1, 2, 0.1], [2, 5, 0.25], [5, 10, 0.5]]), labels: [3, 3.5, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 18, 20, 22, 24, 26, 28, 30, 32, 36, 40, 42, 48, 54, 60],
-            angle: rD, rLine: RING.redMid, dir: 1, rText: RING.redMid + 20, isMajor: v => v === Math.round(v), fmt: v => String(v) });
-        const mm = [80, 90, 100, 125, 150, 175, 200, 225, 250, 280, 300, 315, 355, 400, 450, 500, 560, 630, 710, 800, 900, 1000, 1120, 1250, 1400, 1500];
-        scale(base, { values: ticks(76, 1520, [[1, 2, 0.05], [2, 5, 0.1], [5, 10, 0.25]]), labels: mm, angle: v => rD(v / 25.4), rLine: RING.redMid, dir: -1, len: 5, lenMajor: 9, rText: RING.redMid - 18,
-            isMajor: v => mm.includes(v), fmt: v => String(v), cls: "wh-num wh-num-sm" });
-        base.appendChild(el("path", { d: arcPath(RING.redMid, rD(3) - 2, rD(60) + 2), class: "wh-line" }));
-        tab(base, "ROUND DUCT DIAMETER", RING.red[1] + 17, rD(8), 50);
-        unitLabel(base, "in.", RING.redMid + 20, rD(60) + 7);
-        unitLabel(base, "mm", RING.redMid - 18, rD(60) + 7);
-
-        // green: air velocity, FPM inside, m/s outside
-        const gv = [100, 10000];
-        base.appendChild(band(RING.green[0], RING.green[1], gV(gv[0]) - 5, gV(gv[1]) + 5, "wh-green"));
-        scale(base, { values: ticks(gv[0], gv[1], FINE), labels: ticks(gv[0], gv[1], [[1, 2, 0.5], [2, 10, 1]]), angle: gV, rLine: RING.greenMid, dir: -1, rText: RING.greenMid - 21,
-            isMajor: v => rank(v) <= 2, fmt: num });
-        scale(base, { values: ticks(0.5, 50, FINE), labels: ticks(0.5, 50, [[1, 2, 0.5], [2, 10, 1]]), angle: v => gV(v * 196.85), rLine: RING.greenMid, dir: 1, len: 6, lenMajor: 11, rText: RING.greenMid + 19,
+        // green: air velocity. FPM along the inner edge (faces the red), m/s outside
+        base.appendChild(band(o0, o1, gV(100) - 5, gV(10000) + 5, "wh-green"));
+        scale(base, { values: ticks(100, 10000, FINE), labels: ticks(100, 10000, [[1, 2, 0.5], [2, 10, 1]]), angle: gV, rLine: o0, dir: 1, rText: o0 + 25, isMajor: v => rank(v) <= 2, fmt: num });
+        base.appendChild(el("path", { d: arcPath(om + 8, gV(100) - 2, gV(10000) + 2), class: "wh-line" }));
+        scale(base, { values: ticks(0.5, 50, FINE), labels: ticks(0.5, 50, [[1, 2, 0.5], [2, 10, 1]]), angle: v => gV(v * 196.85), rLine: om + 8, dir: 1, len: 6, lenMajor: 10, rText: om + 26,
             isMajor: v => rank(v) <= 1, fmt: v => String(+v.toPrecision(2)), cls: "wh-num wh-num-sm" });
-        base.appendChild(el("path", { d: arcPath(RING.greenMid, gV(gv[0]) - 2, gV(gv[1]) + 2), class: "wh-line" }));
-        tab(base, "AIR VELOCITY", RING.green[1] + 17, gV(1000), 28);
-        unitLabel(base, "FPM", RING.greenMid - 21, gV(gv[1]) + 8);
-        unitLabel(base, "m/s", RING.greenMid + 19, gV(gv[1]) + 8);
+        tab(base, "AIR VELOCITY", o1 + 17, gV(1000), 28);
+        unitLabel(base, "FPM", o0 + 25, gV(10000) + 9);
+        unitLabel(base, "m/s", om + 26, gV(10000) + 9);
+
+        // friction rate: printed on the card under the disc, read through the window
+        const fLo = 0.003, fHi = 10;
+        base.appendChild(band(RING.win[0] - 6, RING.win[1] + 6, wF(fLo) - 3, wF(fHi) + 3, "wh-fplate"));
+        scale(base, { values: ticks(fLo, fHi, [[1, 2, 0.1], [2, 5, 0.25], [5, 10, 0.5]]), labels: [0.003, 0.005, 0.01, 0.015, 0.02, 0.03, 0.05, 0.08, 0.1, 0.15, 0.2, 0.3, 0.5, 0.8, 1, 1.5, 2, 3, 5, 10],
+            angle: wF, rLine: RING.win[0] + 2, dir: 1, len: 7, lenMajor: 12, rText: RING.win[0] + 26, isMajor: v => rank(v) <= 2, fmt: dec });
 
         // conversions, lower right
         const lines = [["1 CFM", "0.4719 L/s"], ["1 L/s", "2.119 CFM"], ["1 in.", "25.4 mm"], ["1 in. w.c./100 ft", "8.17 Pa/m"], ["1 FPM", "0.00508 m/s"], ["1 m/s", "196.9 FPM"]];
-        const x = 560, y = 812;
+        const x = 560, y = 836;
         base.appendChild(el("text", { x: x + 80, y, class: "wh-conv-h", "text-anchor": "middle" }, "TO CONVERT UNITS"));
-        lines.forEach(([a, b], i) => {
-            base.appendChild(el("text", { x: x + 64, y: y + 22 + i * 18, class: "wh-conv", "text-anchor": "end" }, a));
-            base.appendChild(el("text", { x: x + 70, y: y + 22 + i * 18, class: "wh-conv" }, `= ${b}`));
+        lines.forEach(([a, b], k) => {
+            base.appendChild(el("text", { x: x + 64, y: y + 21 + k * 17, class: "wh-conv", "text-anchor": "end" }, a));
+            base.appendChild(el("text", { x: x + 70, y: y + 21 + k * 17, class: "wh-conv" }, `= ${b}`));
         });
         base.appendChild(el("text", { x: 34, y: H - 32, class: "wh-brand" }, "DUCTWORK PRO"));
         base.appendChild(el("text", { x: 34, y: H - 15, class: "wh-small" }, "Galvanized round duct, standard air (ASHRAE friction chart)"));
@@ -210,43 +202,71 @@
         g.appendChild(t);
     }
 
-    // ---------- the disc (drawn once, turned by a transform) ----------
+    // white disc with the friction window cut out of it (disc angles)
+    function discFace() {
+        const R = RING.disc, [w0r, w1r] = RING.win, wa = RING.winA;
+        const circle = `M${CX - R} ${CY}a${R} ${R} 0 1 0 ${2 * R} 0a${R} ${R} 0 1 0 ${-2 * R} 0Z`;
+        const [x0, y0] = pt(w1r, ARROW - wa), [x1, y1] = pt(w1r, ARROW + wa), [x2, y2] = pt(w0r, ARROW + wa), [x3, y3] = pt(w0r, ARROW - wa);
+        const hole = `M${x0} ${y0}A${w1r} ${w1r} 0 0 1 ${x1} ${y1}L${x2} ${y2}A${w0r} ${w0r} 0 0 0 ${x3} ${y3}Z`;
+        return el("path", { d: circle + hole, "fill-rule": "evenodd", class: "wh-disc" });
+    }
+
+    // ---------- the disc and its red arc (drawn once, turned by a transform) ----------
     function drawDisc() {
-        disc.appendChild(el("circle", { cx: CX, cy: CY, r: RING.disc, class: "wh-disc" }));
-        const [ix0, iy0] = pt(RING.disc - 4, 0), [ix1, iy1] = pt(RING.blue[1] + 4, 0);
+        // red arc: duct diameter, part of the disc
+        const [q0, q1] = RING.red, qm = q1 - 26;
+        const rA0 = r2(60) - 5, rA1 = r1(48) + 360 + 5;
+        disc.appendChild(band(q0, q1, rA0, rA1, "wh-red", true));
+        // upper: against the airflow (blue)
+        const r1n = d => r1(d) + 360;
+        scale(disc, { values: ticks(3, 48, [[1, 2, 0.1], [2, 5, 0.25], [5, 10, 0.5]]), labels: [3, 3.5, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 18, 20, 22, 24, 26, 28, 30, 32, 36, 40, 42, 48],
+            angle: r1n, rLine: q1, dir: -1, rText: q1 - 24, isMajor: v => v === Math.round(v), fmt: v => String(v) });
+        // lower: against the velocity (green)
+        scale(disc, { values: ticks(4, 60, [[1, 2, 0.1], [2, 5, 0.25], [5, 10, 0.5]]), labels: [4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 36, 40, 42, 48, 54, 60],
+            angle: r2, rLine: q1, dir: -1, rText: q1 - 24, isMajor: v => v === Math.round(v), fmt: v => String(v) });
+        const mm = [80, 100, 125, 150, 200, 250, 300, 355, 400, 450, 500, 560, 630, 710, 800, 900, 1000, 1250, 1500];
+        scale(disc, { values: [], labels: mm.filter(v => v / 25.4 <= 48), angle: v => r1n(v / 25.4), rLine: q1, dir: -1, rText: qm - 20, isMajor: () => false, fmt: v => String(v), cls: "wh-num wh-num-sm" });
+        scale(disc, { values: [], labels: mm.filter(v => v / 25.4 >= 4), angle: v => r2(v / 25.4), rLine: q1, dir: -1, rText: qm - 20, isMajor: () => false, fmt: v => String(v), cls: "wh-num wh-num-sm" });
+        tabIn(disc, "DUCT DIAMETER", (q0 + q1) / 2, (r2(4) + r1(3) + 360) / 2, 24);
+        unitLabel(disc, "in.", q1 - 24, r1n(48) + 7);
+        unitLabel(disc, "mm", qm - 20, r1n(48) + 7);
+        unitLabel(disc, "in.", q1 - 24, r2(60) - 7);
+        unitLabel(disc, "mm", qm - 20, r2(60) - 7);
+
+        // white disc with the window
+        disc.appendChild(discFace());
+        // window frame, label and arrow
+        const [w0r, w1r] = RING.win, wa = RING.winA;
+        disc.appendChild(el("path", { d: arcPath(w1r, ARROW - wa, ARROW + wa) + arcPath(w0r, ARROW - wa, ARROW + wa), class: "wh-winframe" }));
+        tabIn(disc, "FRICTION RATE  (in. w.c./100 ft)", w1r + 8, ARROW, 2 * wa + 14);
+        const [ax0, ay0] = pt(w0r - 30, ARROW), [ax1, ay1] = pt(w0r - 4, ARROW);
+        disc.appendChild(el("line", { x1: ax0, y1: ay0, x2: ax1, y2: ay1, class: "wh-index" }));
+        const [hx, hy] = pt(w0r - 2, ARROW);
+        disc.appendChild(el("path", { d: `M${hx} ${hy}l-14 -7v14z`, class: "wh-index-head", transform: `rotate(${ARROW - 90} ${hx} ${hy})` }));
+
+        // index at the top: arrow and hairline out to the airflow scale
+        const [ix0, iy0] = pt(RING.disc - 4, 0), [ix1, iy1] = pt(RING.outer[1] + 4, 0);
         disc.appendChild(el("line", { x1: ix0, y1: iy0, x2: ix1, y2: iy1, class: "wh-index" }));
         disc.appendChild(el("path", { d: `M${CX} ${CY - RING.disc + 2}l-9 -16h18z`, class: "wh-index-head" }));
-        tabIn(disc, "INDEX", RING.disc - 30, 0, 16);
-
-        // friction rate, left edge (against the red diameters)
-        disc.appendChild(band(RING.disc - 40, RING.disc, sF(10) - 4, sF(0.01) + 4, "wh-fr"));
-        scale(disc, { values: ticks(0.01, 10, [[1, 2, 0.1], [2, 5, 0.25], [5, 10, 0.5]]), labels: [0.01, 0.015, 0.02, 0.03, 0.05, 0.08, 0.1, 0.15, 0.2, 0.3, 0.5, 0.8, 1, 1.5, 2, 3, 5, 10], angle: sF, rLine: RING.disc, dir: -1, len: 7, lenMajor: 12, rText: RING.disc - 25,
-            isMajor: v => rank(v) <= 2, fmt: dec });
-        tabIn(disc, "FRICTION  (in. w.c./100 ft)", RING.disc - 54, sF(0.4), 66);
-
-        // duct diameter, bottom edge (against the green velocities)
-        disc.appendChild(band(RING.disc - 40, RING.disc, tD(60) - 4, tD(3) + 4, "wh-dd"));
-        scale(disc, { values: ticks(3, 60, [[1, 2, 0.1], [2, 5, 0.25], [5, 10, 0.5]]), labels: [3, 4, 5, 6, 7, 8, 9, 10, 12, 14, 16, 18, 20, 24, 30, 36, 42, 48, 60], angle: tD, rLine: RING.disc, dir: -1, len: 7, lenMajor: 12, rText: RING.disc - 25,
-            isMajor: v => v === Math.round(v), fmt: v => String(v) });
-        tabIn(disc, "DUCT DIAMETER  (in.)", RING.disc - 54, tD(10), 50);
+        tabIn(disc, "INDEX", RING.disc - 22, 0, 16);
 
         // title and how-to
-        disc.appendChild(el("text", { x: CX, y: CY - 128, class: "wh-title", "text-anchor": "middle" }, "DUCT CALCULATOR"));
-        disc.appendChild(el("text", { x: CX, y: CY - 101, class: "wh-sub", "text-anchor": "middle" }, "U.S. AND S.I. UNITS"));
+        disc.appendChild(el("text", { x: CX - 12, y: CY - 122, class: "wh-title", "text-anchor": "middle" }, "DUCT CALCULATOR"));
+        disc.appendChild(el("text", { x: CX - 12, y: CY - 96, class: "wh-sub", "text-anchor": "middle" }, "U.S. AND S.I. UNITS"));
         const steps = [
-            ["1. ROUND DUCT SIZE:", "set the index on the airflow. The size is on", "the red scale next to your friction rate."],
-            ["2. FRICTION RATE:", "set the index on the airflow. Read the", "friction rate on the disc next to the size."],
-            ["3. VELOCITY:", "set the index on the airflow. Read the velocity", "on the green scale next to the duct size."],
-            ["4. AIRFLOW:", "set the duct size against the velocity.", "Read the airflow at the index."]
+            ["1. FRICTION RATE:", "line the duct size (red) up with the airflow", "(blue). Read the friction rate at the arrow."],
+            ["2. DUCT SIZE:", "turn the arrow to the friction rate. Read", "the size on the red opposite the airflow."],
+            ["3. VELOCITY:", "set the index on the airflow. Read the", "velocity (green) opposite the duct size."],
+            ["4. AIRFLOW:", "set the duct size opposite the velocity.", "Read the airflow at the index."]
         ];
-        let y = CY - 72;
+        let y = CY - 68;
         for (const [h, l1, l2] of steps) {
-            disc.appendChild(el("text", { x: CX - 126, y, class: "wh-step-h" }, h));
-            disc.appendChild(el("text", { x: CX - 126, y: y + 13, class: "wh-step" }, l1));
-            disc.appendChild(el("text", { x: CX - 126, y: y + 25, class: "wh-step" }, l2));
-            y += 41;
+            disc.appendChild(el("text", { x: CX - 150, y, class: "wh-step-h" }, h));
+            disc.appendChild(el("text", { x: CX - 150, y: y + 13, class: "wh-step" }, l1));
+            disc.appendChild(el("text", { x: CX - 150, y: y + 25, class: "wh-step" }, l2));
+            y += 40;
         }
-        disc.appendChild(el("circle", { cx: CX, cy: CY + 104, r: 10, class: "wh-pivot" }));
+        disc.appendChild(el("circle", { cx: CX - 40, cy: CY + 100, r: 10, class: "wh-pivot" }));
     }
 
     // ---------- reading hairline (on top, does not turn) ----------
@@ -287,26 +307,26 @@
 
     function update() {
         disc.setAttribute("transform", `rotate(${phi} ${CX} ${CY})`);
-        const [hx0, hy0] = pt(RING.disc - 44, hair);
+        const [hx0, hy0] = pt(RING.red[0] - 6, hair), [hx1, hy1] = pt(RING.outer[1] + 4, hair);
         hairLine.setAttribute("x1", hx0); hairLine.setAttribute("y1", hy0);
-        const onBlue = Math.abs(norm(hair)) <= aQ(100000) + 5;
-        const [gx, gy] = pt(onBlue ? RING.blue[1] - 6 : RING.red[1] + 12, hair);
-        const [hx2, hy2] = pt(onBlue ? RING.blue[1] + 4 : RING.red[1] + 4, hair);
-        hairLine.setAttribute("x2", hx2); hairLine.setAttribute("y2", hy2);
+        hairLine.setAttribute("x2", hx1); hairLine.setAttribute("y2", hy1);
+        const [gx, gy] = pt(RING.outer[1] - 4, hair);
         hairGrip.setAttribute("cx", gx); hairGrip.setAttribute("cy", gy);
 
-        const Q = inv(aQ, phi, 50, 100000);
-        const dRed = inv(rD, hair, 3, 60);
-        const fr = inv(sF, hair - phi, 0.01, 10);
-        const vel = inv(gV, hair, 100, 10000);
-        const dDisc = inv(tD, hair - phi, 3, 60);
         const set = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
+        const Q = inv(aQ, norm(phi), 50, 100000);
+        const fr = inv(wF, norm(ARROW + phi), 0.003, 10);
+        const qHair = inv(aQ, norm(hair), 50, 100000);
+        const dUp = inv(d => norm(r1(d)), norm(hair - phi), 3, 48);
+        const dLow = inv(r2, ((hair - phi) % 360 + 360) % 360, 4, 60);
+        const vel = inv(gV, ((hair % 360) + 360) % 360, 100, 10000);
         set("whIndex", Q ? `${f2(Q)} CFM` : "—");
-        set("whDRed", dRed ? `${f2(dRed)}"` : "—");
-        set("whFr", fr ? `${f2(fr)}"` : "—");
+        set("whFrArrow", fr ? `${f2(fr)}"` : "—");
+        set("whQBlue", qHair ? `${f2(qHair)} CFM` : "—");
+        set("whDUp", dUp ? `${f2(dUp)}"` : "—");
+        set("whDLow", dLow ? `${f2(dLow)}"` : "—");
         set("whVel", vel ? `${f2(vel)} FPM` : "—");
-        set("whDDisc", dDisc ? `${f2(dDisc)}"` : "—");
-        const D = dRed || dDisc;
+        const D = dUp || dLow;
         set("whRect", D ? rectFor(D) || "—" : "—");
     }
 
@@ -317,8 +337,12 @@
         const y = ((e.clientY - r.top) / r.height) * H - CY;
         return { a: (Math.atan2(x, -y) * 180) / Math.PI, r: Math.hypot(x, y) };
     };
-    const PHI_MIN = aQ(50), PHI_MAX = aQ(100000);
-    const clampPhi = v => Math.max(PHI_MIN, Math.min(PHI_MAX, v));
+    const clampPhi = v => norm(v);
+    // is card angle a on the red arc (which turns with the disc)?
+    const onRed = a => {
+        const local = (((a - phi) % 360) + 360) % 360;
+        return local >= r2(60) - 5 && local <= r1(48) + 360 + 5;
+    };
     let drag = null;
     let frame = 0;
     const later = () => { if (!frame) frame = requestAnimationFrame(() => { frame = 0; update(); }); };
@@ -326,8 +350,8 @@
     svg.addEventListener("pointerdown", e => {
         const { a, r } = angleAt(e);
         if (e.target.dataset && e.target.dataset.grip) drag = { kind: "hair" };
-        else if (r <= RING.disc) drag = { kind: "disc", a, phi };
-        else if (r <= RING.blue[1] + 10) { drag = { kind: "hair" }; hair = a; later(); }
+        else if (r <= RING.disc || (r <= RING.red[1] && onRed(a))) drag = { kind: "disc", a, phi };
+        else if (r <= RING.outer[1] + 10) { drag = { kind: "hair" }; hair = a; later(); }
         else return;
         svg.setPointerCapture(e.pointerId);
         e.preventDefault();
@@ -356,8 +380,9 @@
         const Q = Number(document.getElementById("cfmInput")?.value);
         const f = Number(document.getElementById("frictionInput")?.value) || 0.08;
         if (!(Q > 0)) return;
-        phi = clampPhi(aQ(Q));
-        hair = norm(sF(f) + phi);
+        // arrow on the friction rate; hairline on the airflow, where the size reads on the red
+        phi = norm(wF(f) - ARROW);
+        hair = norm(aQ(Q));
         update();
     });
 
@@ -383,7 +408,7 @@
 
     // for checks
     window.DuctWheel = {
-        aQ, rD, sF, gV, tD,
+        aQ, r1, r2, gV, wF, ARROW,
         get phi() { return phi; }, set phi(v) { phi = v; update(); },
         get hair() { return hair; }, set hair(v) { hair = v; update(); }
     };
