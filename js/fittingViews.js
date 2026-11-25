@@ -575,11 +575,17 @@
                 .filter(d => !(small && d.type === "angle" && !d.keepOnSmall))
                 .sort((p, q) => rank(p) - rank(q));
 
-            for (const d of order) {
+            // While the view is being turned, each dimension keeps the spot it
+            // had when the drag started, so nothing jumps from side to side.
+            const keep = lock && lock.choices && lock.choices.length === order.length ? lock.choices : null;
+
+            for (const [di, d] of order.entries()) {
+                const k0 = keep ? keep[di] : 0;
+                const k1 = keep ? keep[di] + 1 : 90;
                 if (d.type === "angle") {
                     let best = null;
                     const slide = d.slide ? norm([d.slide[0], d.slide[1], 0]) : null;
-                    for (let k = 0; k < 90; k += 1) {
+                    for (let k = k0; k < k1; k += 1) {
                         // Slide the vertex along the measured edge first (same angle,
                         // parallel reference line), then grow the radius.
                         const sk = slide ? Math.min(k, 60) : 0;
@@ -610,7 +616,7 @@
                         let ok = rectFree(lb);
                         // arc ends touch the measured edges by design: test the inside only
                         for (let i = 3; ok && i < n - 3; i += 1) ok = segFree(pts[i], pts[i + 1]);
-                        best = { d, pts, lb, c: c3 };
+                        best = { d, pts, lb, c: c3, k };
                         if (ok || d.fixed) break;
                     }
                     for (let i = 0; i < best.pts.length - 1; i += 1) segMark(best.pts[i], best.pts[i + 1]);
@@ -623,7 +629,7 @@
                 const dir = d.dir || (d.off ? norm([d.off[0], d.off[1], 0]) : [0, 1, 0]);
                 const base = d.base ?? (d.off ? Math.hypot(d.off[0], d.off[1]) : 0);
                 let best = null;
-                for (let k = 0; k < 90; k += 1) {
+                for (let k = k0; k < k1; k += 1) {
                     const dist = base + (d.fixed ? 0 : k * step);
                     const a2 = [d.a[0] + dir[0] * dist, d.a[1] + dir[1] * dist];
                     const b2 = [d.b[0] + dir[0] * dist, d.b[1] + dir[1] * dist];
@@ -648,7 +654,7 @@
                         }
                     }
                     const ok = segFree(pa, pb) && rectFree(lb);
-                    best = { d, pa, pb, lb, dist, dir, a2, b2 };
+                    best = { d, pa, pb, lb, dist, dir, a2, b2, k };
                     if (ok || d.fixed) break;
                 }
                 segMark(best.pa, best.pb);
@@ -708,7 +714,7 @@
         }
 
         const u = F.u;
-        state.frame = { u: F.u, w: F.w, h: F.h, dx: F.cx - gcx, dy: F.cy - gcy, ch };
+        state.frame = { u: F.u, w: F.w, h: F.h, dx: F.cx - gcx, dy: F.cy - gcy, ch, choices: placed.map(p => p.k) };
         svg.setAttribute("viewBox", `${F.cx - F.w / 2} ${F.cy - F.h / 2} ${F.w} ${F.h}`);
 
         // Centerline extensions drawn in depth order (hidden behind the duct).
