@@ -47,7 +47,7 @@
     const eQ = q => E0 + AL * Math.log10(q);
     const G0 = E0 - AL * LOG_V - K + c * LOG_K;
     const vV = v => G0 + AL * Math.log10(v);
-    // green: two printed scales, long side on the card, short side on the disc.
+    // green: two printed scales, short side on the card (to 80"), long side on the disc (to 100").
     // Equal friction (Huebscher) isn't exactly separable, so the two scales are
     // fitted (least squares over sides 3-120", 1:1 to 4:1) so that wherever the
     // disc sits, each long side lines up with its short side to about 1%.
@@ -56,8 +56,9 @@
         const n = 81, grid = [];
         for (let i = 0; i < n; i += 1) grid.push(3 * 40 ** (i / (n - 1)));
         const pairs = [];
-        for (let i = 0; i < n; i += 1) for (let j = 0; j <= i; j += 1) {
-            if (grid[i] / grid[j] <= 4.0001) pairs.push([i, j, phiOf(DE(grid[i], grid[j]))]);
+        // i = short side (card), j = long side (disc)
+        for (let i = 0; i < n; i += 1) for (let j = i; j < n; j += 1) {
+            if (grid[j] / grid[i] <= 4.0001) pairs.push([i, j, phiOf(DE(grid[i], grid[j]))]);
         }
         const X = new Float64Array(n), Y = new Float64Array(n);
         for (let it = 0; it < 300; it += 1) {
@@ -76,12 +77,12 @@
             const f = (u - lg[k]) / (lg[k + 1] - lg[k]);
             return tab[k] + f * (tab[k + 1] - tab[k]);
         };
-        const shift = 187 - at(X, 4);
+        const shift = 179 - at(X, 4);
         return { long: a => at(X, a) + shift, short: b => at(Y, b) + shift };
     })();
-    const gA = GREEN.long;                           // card angle of a long side
-    const gB = GREEN.short;                          // disc angle of a short side
-    const GREEN_MAX = 72;
+    const gA = GREEN.long;                           // card angle of a short side
+    const gB = GREEN.short;                          // disc angle of a long side
+    const OUT_MAX = 80, IN_MAX = 100;
 
     const R = { disc: 290, rim: 252, out: [294, 352], win: [196, 240], winA: 20, green: [254, 290] };
 
@@ -171,19 +172,19 @@
         const [o0, o1] = R.out;
 
         // blue: airflow (CFM), faces the friction on the disc's blue edge
-        base.appendChild(band(o0, o1, aQ(30) - 4, aQ(60000) + 4, "wh-blue"));
-        scale(base, { values: ticks(30, 60000, FINE), labels: ticks(30, 60000, LBL), angle: aQ, rLine: o0, dir: 1, rText: o0 + 27, isMajor: v => rank(v) <= 2, fmt: num });
+        base.appendChild(band(o0, o1, aQ(50) - 3, aQ(60000) + 4, "wh-blue"));
+        scale(base, { values: ticks(50, 60000, FINE), labels: ticks(50, 60000, LBL), angle: aQ, rLine: o0, dir: 1, rText: o0 + 27, isMajor: v => rank(v) <= 2, fmt: num });
         tab(base, "AIR VOLUME – CFM", o1 + 16, aQ(1000), 30);
 
         // orange: airflow (CFM), faces the velocity on the disc's orange edge
-        base.appendChild(band(o0, o1, eQ(200) - 4, eQ(40000) + 4, "wh-orange"));
-        scale(base, { values: ticks(200, 40000, FINE), labels: ticks(200, 40000, LBL), angle: eQ, rLine: o0, dir: 1, rText: o0 + 27, isMajor: v => rank(v) <= 2, fmt: num });
+        base.appendChild(band(o0, o1, eQ(200) - 4, eQ(30000) + 4, "wh-orange"));
+        scale(base, { values: ticks(200, 30000, FINE), labels: ticks(200, 30000, LBL), angle: eQ, rLine: o0, dir: 1, rText: o0 + 27, isMajor: v => rank(v) <= 2, fmt: num });
         tab(base, "AIR VOLUME – CFM", o1 + 16, eQ(3000), 34);
 
-        // green: rectangular long side (printed on the card)
-        base.appendChild(band(o0, o1, gA(4) - 4, gA(GREEN_MAX) + 4, "wh-green"));
+        // green: rectangular short side (printed on the card)
+        base.appendChild(band(o0, o1, gA(4) - 4, gA(OUT_MAX) + 3, "wh-green"));
         base.appendChild(greenOuter);
-        tab(base, "RECTANGULAR DUCT – LONG SIDE, INCHES", o1 + 16, (gA(4) + gA(GREEN_MAX)) / 2, 62);
+        tab(base, "RECTANGULAR DUCT – SHORT SIDE, INCHES", o1 + 16, (gA(4) + gA(OUT_MAX)) / 2, 62);
 
         // round duct size, printed on the card under the disc's window
         base.appendChild(band(R.win[0] - 4, R.win[1] + 4, dD(3) - 3, dD(100) + 3, "wh-fplate"));
@@ -244,8 +245,8 @@
             ["wh-step", "    friction rate on the blue scales.", 14],
             ["wh-step", "2. Read the round duct size at the arrow in the window.", 14],
             ["wh-step", "3. Read the velocity on the orange scale opposite the airflow.", 14],
-            ["wh-step", "4. Rectangular: find the long side on the outer green; the", 13],
-            ["wh-step", "    short side is beside it on the disc (same friction as the round).", 0]
+            ["wh-step", "4. Rectangular: find the short side on the outer green; the", 13],
+            ["wh-step", "    long side is beside it on the disc (same friction as the round).", 0]
         ]);
         textBlock(disc, x - 12, CY + 92, [
             ["wh-step-h", "Notes", 14],
@@ -268,23 +269,24 @@
 
     // printed sides. Ticks every inch to 36", then every 2"; labels read along
     // the radius (like a printed wheel's dense scales) so they all fit.
-    function sideTicks(step) {
+    function sideTicks(step, max) {
         const out = [];
-        for (let v = 4; v <= GREEN_MAX; v += 1) {
+        for (let v = 4; v <= max; v += 1) {
             if (v % step) continue;
             if (v > 36 && v % 2) continue;
+            if (v > 80 && v % 5) continue;
             out.push(v);
         }
         return out;
     }
-    function sideLabels(step) {
+    function sideLabels(step, max) {
         const out = step === 1 ? [4, 5, 6, 7, 8, 9, 10, 11, 12] : [4, 6, 8, 10, 12];
-        out.push(14, 16, 18, 20, 22, 24, 28, 32, 36, 40, 44, 48, 54, 60, 66, 72);
-        return out;
+        out.push(14, 16, 18, 20, 22, 24, 28, 32, 36, 40, 44, 48, 54, 60, 66, 72, 80, 90, 100);
+        return out.filter(v => v <= max);
     }
-    function greenScale(g, { angle, rLine, dir, len, lenMajor, rText, step }) {
-        const labels = sideLabels(step);
-        for (const v of sideTicks(step)) {
+    function greenScale(g, { angle, rLine, dir, len, lenMajor, rText, step, max }) {
+        const labels = sideLabels(step, max);
+        for (const v of sideTicks(step, max)) {
             const a = angle(v), major = labels.includes(v);
             const [x0, y0] = pt(rLine, a), [x1, y1] = pt(rLine + dir * (major ? lenMajor : len), a);
             g.appendChild(el("line", { x1: x0, y1: y0, x2: x1, y2: y1, class: major ? "wh-tk wh-tk-major" : "wh-tk" }));
@@ -295,18 +297,17 @@
             if (last !== null && Math.abs(a - last) * rText * Math.PI / 180 < 9.5) continue;
             last = a;
             const [tx, ty] = pt(rText, a);
-            let r = a - 90;
-            if (Math.cos(rad(r)) < 0) r += 180;
+            const r = a + 90;   // the green sits lower left: every number reads the same way, toward the center
             g.appendChild(el("text", { x: tx, y: ty, class: "wh-num wh-num-r", transform: `rotate(${norm(r)} ${tx} ${ty})`, "text-anchor": "middle", "dominant-baseline": "central" }, String(v)));
         }
     }
     function drawGreenScales() {
         const step = typeof rectSizeStep === "function" ? rectSizeStep() : 2;
         greenOuter.replaceChildren();
-        greenScale(greenOuter, { angle: gA, rLine: R.out[0], dir: 1, len: 8, lenMajor: 13, rText: R.out[0] + 28, step });
+        greenScale(greenOuter, { angle: gA, rLine: R.out[0], dir: 1, len: 8, lenMajor: 13, rText: R.out[0] + 28, step, max: OUT_MAX });
         greenInner.replaceChildren();
-        greenInner.appendChild(band(R.rim, R.disc, gB(GREEN_MAX) - 4, gB(4) + 2, "wh-green wh-green-in"));
-        greenScale(greenInner, { angle: gB, rLine: R.disc, dir: -1, len: 7, lenMajor: 12, rText: R.disc - 24, step });
+        greenInner.appendChild(band(R.rim, R.disc, Math.min(gB(4), gB(IN_MAX)) - 2, Math.max(gB(4), gB(IN_MAX)) + 2, "wh-green wh-green-in"));
+        greenScale(greenInner, { angle: gB, rLine: R.disc, dir: -1, len: 7, lenMajor: 12, rText: R.disc - 24, step, max: IN_MAX });
     }
     window.__wheelGreen = { gA, gB, phiOf, roundOf };
 
