@@ -1,5 +1,5 @@
 // =====================================================
-// DUCTCULATOR PRO
+// DUCTWORK PRO
 // shared.js
 // Helpers shared by the newer tool screens: feet-inch-fraction
 // input, 1/16" output, result rows, error boxes, tabs and live

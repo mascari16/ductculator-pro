@@ -1,5 +1,5 @@
 // =====================================================
-// DUCTCULATOR PRO
+// DUCTWORK PRO
 // roundFittings.js
 // Round duct: two-elbow offsets (incl. rolling), laterals and
 // gored elbow layout.

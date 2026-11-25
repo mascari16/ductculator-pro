@@ -1,5 +1,5 @@
 /* =====================================================
-   DUCTCULATOR PRO — theme.css
+   DUCTWORK PRO — theme.css
    Visual layer only: loaded last, changes colour, type and
    surfaces. No layout grids, ids or behaviour live here.
 
@@ -1680,3 +1680,52 @@ h1,h2,h3,h4{
 
 /* Dogleg cut layout: bigger, sized by the page width */
 #dgLayout{max-height:none;max-width:580px;margin:0 auto}
+
+/* =====================================================
+   Manual duct sizing wheel (Airflow screen)
+===================================================== */
+.af-mode{margin:0 0 18px;max-width:360px}
+#airflowWorkspace .calculator[hidden]{display:none !important}
+.wheel-wrap{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:20px;align-items:start}
+.wheel-wrap[hidden]{display:none}
+@media (max-width:1100px){.wheel-wrap{grid-template-columns:minmax(0,1fr)}}
+.wheel-panel{padding:12px}
+.wheel-svg{display:block;width:100%;max-width:680px;margin:0 auto;height:auto;touch-action:none;user-select:none;-webkit-user-select:none;cursor:grab}
+.wheel-svg:active{cursor:grabbing}
+.wheel-svg:focus-visible{outline:2px solid var(--yellow);outline-offset:4px;border-radius:24px}
+.wh-card{fill:#eef0ec;stroke:#c9cec7}
+.wh-blue{fill:#9cc3e8}
+.wh-blue-lt{fill:#cfe2f4}
+.wh-red{fill:#ec8f80}
+.wh-red-lt{fill:#f6cdc5}
+.wh-green{fill:#a9dca0;stroke:#7fbf74}
+.wh-discface{fill:#fbfbf7;stroke:#9aa39a;stroke-width:1.2;filter:drop-shadow(0 2px 3px rgba(0,0,0,.25))}
+.wh-tk{stroke:#1d2326;stroke-width:.8}
+.wh-tk-major{stroke-width:1.4}
+.wh-num{fill:#1d2326;font:600 11px var(--font-c, "Barlow Condensed", sans-serif)}
+.wh-num-d{font-size:13px;font-weight:700}
+.wh-num-dm{font-size:9.5px;fill:#4b5357}
+.wh-cap{fill:#1d2326;font:700 11px var(--font-c, "Barlow Condensed", sans-serif);letter-spacing:.08em}
+.wh-cap-sm{font-size:9px}
+.wh-cap-dk{fill:#5a6266}
+.wh-window{fill:rgba(255,255,255,.35);stroke:#c0392b;stroke-width:1.6}
+.wh-arrow{stroke:#c0392b;stroke-width:2}
+.wh-arrow-head{fill:#c0392b}
+.wh-hair{stroke:#c0392b;stroke-width:1.4}
+.wh-hair-grip{fill:rgba(192,57,43,.18);stroke:#c0392b;stroke-width:1.6;cursor:grab}
+.wh-c-lab{fill:#2d4a2a;font:700 10px var(--font-c, "Barlow Condensed", sans-serif);letter-spacing:.1em}
+.wh-c-big{fill:#13240f;font:700 24px var(--font-c, "Barlow Condensed", sans-serif)}
+.wh-c-rect{fill:#13240f;font:600 13px var(--font-c, "Barlow Condensed", sans-serif)}
+.wheel-steps{margin:0 0 14px;padding-left:1.3em;color:var(--white);line-height:1.5}
+.wheel-steps li{margin:6px 0}
+.wheel-steps b{color:var(--yellow)}
+.wheel-btn{margin-top:14px;width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:9px;background:var(--card);color:var(--white);font:600 16px var(--font-c, sans-serif);cursor:pointer;min-height:44px}
+.wheel-btn:hover{border-color:#5d6a75}
+.wh-small .wh-num{font-size:17px}
+.wh-small .wh-num-d{font-size:19px}
+.wh-small .wh-num-dm{display:none}
+.wh-small .wh-cap{font-size:15px}
+.wh-small .wh-cap-sm{font-size:13px}
+.wh-small .wh-c-lab{font-size:14px}
+.wh-small .wh-c-big{font-size:34px}
+.wh-small .wh-c-rect{font-size:18px}

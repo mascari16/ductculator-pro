@@ -1,5 +1,5 @@
 // =====================================================
-// DUCTCULATOR PRO
+// DUCTWORK PRO
 // rectangle.js
 // Rectangle Engineering Library
 // =====================================================

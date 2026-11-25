@@ -1,5 +1,5 @@
 // =====================================================
-// DUCTCULATOR PRO
+// DUCTWORK PRO
 // fittingViews.js
 // Live 3D views for Round Fittings and Rect Fittings.
 //
@@ -415,7 +415,10 @@
                 for (let k = 0; k < N; k += 1) {
                     const k2 = (k + 1) % N;
                     const near = (vis[i - 1] && vis[i - 1][k]) || (vis[i] && vis[i][k]);
-                    if (near) line(S[i].ring[k], S[i].ring[k2], S[i].cut ? "fv-cut" : i === 0 || i === S.length - 1 ? "fv-edge" : "fv-seam");
+                    if (!near) continue;
+                    // cut lines lie on visible faces of a straight (convex) joint: draw over it
+                    if (S[i].cut) line(S[i].ring[k], S[i].ring[k2], "fv-cut", -1e9);
+                    else line(S[i].ring[k], S[i].ring[k2], i === 0 || i === S.length - 1 ? "fv-edge" : "fv-seam");
                 }
             }
 
@@ -455,7 +458,8 @@
             if (nv[1] >= -1e-6) continue;
             const a3 = P(to3(plane, m.a[0], m.a[1], m.a[2]));
             const b3 = P(to3(plane, m.b[0], m.b[1], m.b[2]));
-            items.push({ z: (a3[2] + b3[2]) / 2 - 0.8, node: el("line", { x1: a3[0].toFixed(2), y1: a3[1].toFixed(2), x2: b3[0].toFixed(2), y2: b3[1].toFixed(2), class: m.cls || "fv-cut" }) });
+            // marks sit on a face toward the viewer: draw them over the part
+            items.push({ z: -1e9, node: el("line", { x1: a3[0].toFixed(2), y1: a3[1].toFixed(2), x2: b3[0].toFixed(2), y2: b3[1].toFixed(2), class: m.cls || "fv-cut" }) });
         }
 
         // =================================================

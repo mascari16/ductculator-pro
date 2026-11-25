@@ -15,7 +15,7 @@
     <meta name="color-scheme" content="dark">
     <meta name="supported-color-schemes" content="dark">
 
-    <title>Ductculator Pro</title>
+    <title>Ductwork Pro</title>
 
     <meta name="theme-color" content="#181c1f">
     <meta name="description" content="Duct sizing and fabrication math for the shop.">
@@ -45,7 +45,7 @@
 
     <header class="hero">
 
-        <h1>Ductculator Pro</h1>
+        <h1>Ductwork Pro</h1>
 
         <p>Duct sizing and fabrication math for the shop.</p>
 
@@ -289,7 +289,7 @@
 
             </button>
 
-            <h2>Ductculator</h2>
+            <h2>Ductwork Pro</h2>
 
         </div>
         <button id="goHome">
@@ -359,6 +359,33 @@
             </p>
 
         </header>
+
+        <div class="seg af-mode" role="tablist" aria-label="How to size"><button type="button" role="tab" data-afmode="calc" class="is-on" aria-selected="true">Calculator</button><button type="button" role="tab" data-afmode="wheel" aria-selected="false">Manual wheel</button></div>
+
+        <div id="afWheel" class="wheel-wrap" hidden>
+            <div class="panel wheel-panel">
+                <svg id="wheelSvg" class="wheel-svg" viewBox="0 0 640 640" tabindex="0" role="img" aria-label="Duct sizing wheel. Drag the disc to turn it, drag the hairline to read across. Arrow keys turn the disc; Alt with arrow keys moves the hairline."></svg>
+            </div>
+            <div class="panel wheel-side">
+                <h3>Reading the wheel</h3>
+                <ol class="wheel-steps">
+                    <li>Drag the <b>hairline</b> to your airflow on the outer blue scale.</li>
+                    <li>Turn the <b>disc</b> until your friction rate on the disc's rim sits under the hairline.</li>
+                    <li>Read the <b>round size</b> at the arrow at the bottom, and the matching rectangular sizes in the center.</li>
+                    <li>For velocity, move the hairline to the same airflow on the red scale on the disc; read the velocity just inside it.</li>
+                </ol>
+                <div class="kv-list wheel-read">
+                    <div class="kv-row kv-main"><span>Round at the arrow</span><strong id="whRound">—</strong></div>
+                    <h4 class="kv-head">Under the hairline</h4>
+                    <div class="kv-row"><span>Airflow<em>outer blue</em></span><strong id="whQBlue">—</strong></div>
+                    <div class="kv-row"><span>Friction<em>disc rim, in. w.c. per 100 ft</em></span><strong id="whFr">—</strong></div>
+                    <div class="kv-row"><span>Airflow<em>red, on the disc</em></span><strong id="whQRed">—</strong></div>
+                    <div class="kv-row"><span>Velocity<em>red, inside</em></span><strong id="whVel">—</strong></div>
+                </div>
+                <button type="button" class="wheel-btn" id="whFromInputs">Line up with my airflow and friction</button>
+                <p class="kv-text">Same friction chart as the calculator (galvanized round duct, standard air). Arrow keys turn the disc; hold Shift for bigger steps.</p>
+            </div>
+        </div>
 
         <div class="calculator">
 
@@ -564,7 +591,7 @@
 
             </button>
 
-            <h2>Ductculator</h2>
+            <h2>Ductwork Pro</h2>
 
         </div>
         <button id="equivalentGoHome">
@@ -934,7 +961,7 @@
 
             </button>
 
-            <h2>Ductculator</h2>
+            <h2>Ductwork Pro</h2>
 
         </div>
         <button id="sheetMetalGoHome" type="button">
@@ -1229,7 +1256,7 @@
     <aside class="sidebar transition-sidebar">
         <div class="sidebar-top">
             <button id="toggleTransitionSidebar" class="toggle-btn" type="button">☰</button>
-            <h2>Ductculator</h2>
+            <h2>Ductwork Pro</h2>
         </div>
         <button id="transitionGoHome" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1"/><rect x="13.5" y="3.5" width="7" height="7" rx="1"/><rect x="3.5" y="13.5" width="7" height="7" rx="1"/><rect x="13.5" y="13.5" width="7" height="7" rx="1"/></svg></span><span class="text">Dashboard</span></button>
         <hr>
@@ -1371,7 +1398,7 @@
     <aside class="sidebar procalc-sidebar">
         <div class="sidebar-top">
             <button id="toggleProCalcSidebar" class="toggle-btn" type="button">☰</button>
-            <h2>Ductculator</h2>
+            <h2>Ductwork Pro</h2>
         </div>
         <button data-nav-target="dashboard" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1"/><rect x="13.5" y="3.5" width="7" height="7" rx="1"/><rect x="3.5" y="13.5" width="7" height="7" rx="1"/><rect x="13.5" y="13.5" width="7" height="7" rx="1"/></svg></span><span class="text">Dashboard</span></button>
         <hr>
@@ -1423,7 +1450,7 @@
     <aside class="sidebar">
         <div class="sidebar-top">
             <button class="toggle-btn" type="button" data-sidebar-toggle aria-label="Collapse menu">☰</button>
-            <h2>Ductculator</h2>
+            <h2>Ductwork Pro</h2>
         </div>
         <button data-nav-target="dashboard" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1"/><rect x="13.5" y="3.5" width="7" height="7" rx="1"/><rect x="3.5" y="13.5" width="7" height="7" rx="1"/><rect x="13.5" y="13.5" width="7" height="7" rx="1"/></svg></span><span class="text">Dashboard</span></button>
         <hr>
@@ -1496,7 +1523,7 @@
     <aside class="sidebar">
         <div class="sidebar-top">
             <button class="toggle-btn" type="button" data-sidebar-toggle aria-label="Collapse menu">☰</button>
-            <h2>Ductculator</h2>
+            <h2>Ductwork Pro</h2>
         </div>
         <button data-nav-target="dashboard" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1"/><rect x="13.5" y="3.5" width="7" height="7" rx="1"/><rect x="3.5" y="13.5" width="7" height="7" rx="1"/><rect x="13.5" y="13.5" width="7" height="7" rx="1"/></svg></span><span class="text">Dashboard</span></button>
         <hr>
@@ -1571,7 +1598,7 @@
     <aside class="sidebar">
         <div class="sidebar-top">
             <button class="toggle-btn" type="button" data-sidebar-toggle aria-label="Collapse menu">☰</button>
-            <h2>Ductculator</h2>
+            <h2>Ductwork Pro</h2>
         </div>
         <button data-nav-target="dashboard" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1"/><rect x="13.5" y="3.5" width="7" height="7" rx="1"/><rect x="3.5" y="13.5" width="7" height="7" rx="1"/><rect x="13.5" y="13.5" width="7" height="7" rx="1"/></svg></span><span class="text">Dashboard</span></button>
         <hr>
@@ -1669,7 +1696,7 @@
     <aside class="sidebar">
         <div class="sidebar-top">
             <button class="toggle-btn" type="button" data-sidebar-toggle aria-label="Collapse menu">☰</button>
-            <h2>Ductculator</h2>
+            <h2>Ductwork Pro</h2>
         </div>
         <button data-nav-target="dashboard" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1"/><rect x="13.5" y="3.5" width="7" height="7" rx="1"/><rect x="3.5" y="13.5" width="7" height="7" rx="1"/><rect x="13.5" y="13.5" width="7" height="7" rx="1"/></svg></span><span class="text">Dashboard</span></button>
         <hr>
@@ -1786,7 +1813,7 @@
     <aside class="sidebar">
         <div class="sidebar-top">
             <button class="toggle-btn" type="button" data-sidebar-toggle aria-label="Collapse menu">☰</button>
-            <h2>Ductculator</h2>
+            <h2>Ductwork Pro</h2>
         </div>
         <button data-nav-target="dashboard" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1"/><rect x="13.5" y="3.5" width="7" height="7" rx="1"/><rect x="3.5" y="13.5" width="7" height="7" rx="1"/><rect x="13.5" y="13.5" width="7" height="7" rx="1"/></svg></span><span class="text">Dashboard</span></button>
         <hr>
@@ -1856,7 +1883,7 @@
     <aside class="sidebar">
         <div class="sidebar-top">
             <button class="toggle-btn" type="button" data-sidebar-toggle aria-label="Collapse menu">☰</button>
-            <h2>Ductculator</h2>
+            <h2>Ductwork Pro</h2>
         </div>
         <button data-nav-target="dashboard" type="button"><span class="icon"><svg class="nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1"/><rect x="13.5" y="3.5" width="7" height="7" rx="1"/><rect x="3.5" y="13.5" width="7" height="7" rx="1"/><rect x="13.5" y="13.5" width="7" height="7" rx="1"/></svg></span><span class="text">Dashboard</span></button>
         <hr>
@@ -1930,6 +1957,7 @@
 <script src="js/rectFittings.js?v=20261124-3"></script>
 <script src="js/layoutMath.js?v=20261124-2"></script>
 <script src="js/takeoff.js?v=20261124-2"></script>
+<script src="js/wheel.js?v=20261125-1"></script>
 <script src="js/navigation.js?v=20261124-2"></script>
 
 </body>

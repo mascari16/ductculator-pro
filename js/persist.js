@@ -1,5 +1,5 @@
 // =====================================================
-// DUCTCULATOR PRO
+// DUCTWORK PRO
 // persist.js
 // Remembers inputs between visits, saved jobs, share links,
 // print and reset. Loaded FIRST so remembered values are in the
@@ -381,7 +381,7 @@
                     applyValues(shared.f, screen);
                 }
             } catch (error) {
-                console.warn("Ductculator: could not read the shared link.", error);
+                console.warn("Ductwork Pro: could not read the shared link.", error);
             }
 
             history.replaceState(null, "", location.pathname + location.search);

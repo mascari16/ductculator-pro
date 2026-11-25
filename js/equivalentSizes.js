@@ -1,5 +1,5 @@
 // =====================================================
-// DUCTCULATOR PRO
+// DUCTWORK PRO
 // equivalentSizes.js
 // Equivalent Duct Size Engine
 // =====================================================

@@ -1,6 +1,6 @@
 {
-  "name": "Ductculator Pro",
-  "short_name": "Ductculator",
+  "name": "Ductwork Pro",
+  "short_name": "Ductwork Pro",
   "description": "Duct sizing and fabrication math for the shop.",
   "start_url": "./index.html",
   "scope": "./",

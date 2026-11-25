@@ -1,5 +1,5 @@
 // =====================================================
-// DUCTCULATOR PRO
+// DUCTWORK PRO
 // equivalentUI.js
 // Equivalent Sizes Page Controls
 // =====================================================

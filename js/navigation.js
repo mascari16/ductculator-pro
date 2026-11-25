@@ -1,5 +1,5 @@
 // =====================================================
-// DUCTCULATOR PRO
+// DUCTWORK PRO
 // navigation.js
 // Shared navigation behaviour for every screen.
 // =====================================================

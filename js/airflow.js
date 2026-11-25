@@ -1,5 +1,5 @@
 // =====================================================
-// DUCTCULATOR PRO
+// DUCTWORK PRO
 // airflow.js
 // Airflow sizing engines and result builders
 // =====================================================

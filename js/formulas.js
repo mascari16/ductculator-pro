@@ -1,5 +1,5 @@
 // ==========================================
-// DUCTCULATOR PRO
+// DUCTWORK PRO
 // Engineering Formula Library
 // ==========================================
 

@@ -1,5 +1,5 @@
 // =====================================================
-// DUCTCULATOR PRO
+// DUCTWORK PRO
 // flatOval.js
 // Flat Oval Engineering Library
 // =====================================================

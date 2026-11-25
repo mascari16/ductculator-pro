@@ -1,5 +1,5 @@
 /* =====================================================
-   DUCTCULATOR PRO
+   DUCTWORK PRO
    TRANSITION SPLITTER
    File: js/transitionSplitter.js
 

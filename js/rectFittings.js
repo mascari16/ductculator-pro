@@ -1,5 +1,5 @@
 // =====================================================
-// DUCTCULATOR PRO
+// DUCTWORK PRO
 // rectFittings.js
 // Rectangular duct: mitered (straight-elbow) offsets and laterals.
 // Radius-elbow offsets live on the Elbow Offset screen.

@@ -1,11 +1,11 @@
 // =====================================================
-// DUCTCULATOR PRO — offline service worker
+// DUCTWORK PRO — offline service worker
 // Online: always fetch the newest files (and keep a copy).
 // Offline: serve the saved copy, so the app works with no signal.
 // Fonts are saved the first time they load online.
 // =====================================================
 
-const CACHE = "ductculator-v17";
+const CACHE = "ductculator-v18";
 
 const SHELL = [
   "./",
@@ -40,6 +40,7 @@ const SHELL = [
   "js/storage.js",
   "js/takeoff.js",
   "js/transitionSplitter.js",
+  "js/wheel.js",
   "js/ui.js",
 ];
 

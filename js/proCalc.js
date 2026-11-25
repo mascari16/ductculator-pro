@@ -1,5 +1,5 @@
 // =====================================================
-// DUCTCULATOR PRO
+// DUCTWORK PRO
 // proCalc.js
 // HVAC Pro Calc workspace (4090-style calculator)
 //

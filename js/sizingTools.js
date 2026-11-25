@@ -1,5 +1,5 @@
 // =====================================================
-// DUCTCULATOR PRO
+// DUCTWORK PRO
 // sizingTools.js
 // Reverse Calculator and Pressure Loss. Both reuse the app's
 // friction formula (formulas.js) and friction-equivalent

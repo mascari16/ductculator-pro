@@ -1,5 +1,5 @@
 /* =========================================================
-   DUCTCULATOR PRO
+   DUCTWORK PRO
    LIVE SINGLE RECTANGULAR RADIUS ELBOW PREVIEW
    File: offsetiso.js
 

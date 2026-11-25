@@ -1,5 +1,5 @@
 // =====================================================
-// DUCTCULATOR PRO
+// DUCTWORK PRO
 // takeoff.js
 // Material takeoff: sheet area and galvanized weight by gauge.
 // =====================================================

@@ -1,5 +1,5 @@
 // =====================================================
-// DUCTCULATOR PRO
+// DUCTWORK PRO
 // layoutMath.js
 // Shop layout math: right triangle, rolling offset, arc / rolled
 // radius and swing radius.
