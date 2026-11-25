@@ -155,6 +155,9 @@ body{background-color:light-dark(#b9bdbf,#1c1e20);background-image:radial-gradie
 .hct{font:700 20px "Barlow Condensed",sans-serif;display:flex;align-items:center;gap:8px}
 .cvchip{background:#e8c53a;color:#2a2205;border-radius:6px;padding:1px 8px;font:700 14px Barlow}
 .steps{margin:4px 0 0;padding-left:1.6em}.steps li{margin:6px 0;line-height:1.7}.steps li::marker{font-weight:700;color:var(--muted)}
+.opsym{position:absolute;left:16px;top:50%;transform:translateY(-35%);font:500 40px/1 Barlow,system-ui,sans-serif;color:#151a14;pointer-events:none}
+.opsym:empty{display:none}
+@media(max-width:420px){.opsym{font-size:32px;left:12px}}
 
 /* Ductculator Pro embed */
 .embed body{background:#181c1f;background-image:none}
@@ -173,7 +176,7 @@ body{background-color:light-dark(#b9bdbf,#1c1e20);background-image:radial-gradie
    <div class="tag">Advanced construction-math calculator for sheet metal &amp; HVAC</div>
    <div class="bezel"><div class="lcd" aria-live="polite">
     <div class="ind"><span class="lab" id="lab"></span><span id="iPar"></span><span id="iM">M</span><span id="iRcl">RCL</span><span id="iConv">CONV</span></div>
-    <div class="main" id="main">0.</div>
+    <div class="main" id="main">0.</div><div class="opsym" id="iOp" aria-live="polite"></div>
     <div class="unit" id="unit"></div>
    </div></div>
    <div class="keys" id="keys"></div>
@@ -465,7 +468,7 @@ function dispatch(k,c){
   if(!S.entry){ // convert display
    let v={...S.disp};if(v.deg)throw Err('Error');
    if(!v.d)v={v:v.v*UIN[u],d:1,u,dec:false};
-   else if(k!=='m'&&v.d===1&&v.u===u)v.dec=!v.dec;else{v.u=u;v.dec=false}
+   else if(k!=='m'&&v.d===1&&v.u===u)v.dec=(c||S.prevKey===k)?!v.dec:false;else{v.u=u;v.dec=false}
    S.disp=v;S.fresh=true;S.label='';return}
   const e=S.entry;
   if(k==='f'){if(e.digits){e.ft=pf(e.digits);e.digits='';e.last='f'}else if(e.last==='f'&&e.dim<3)e.dim++;return}
@@ -594,6 +597,7 @@ function render(){
  $('calc').classList.toggle('conv',S.conv);flip(S.conv);$('calc').classList.toggle('off',!!S.off);
  $('iConv').classList.toggle('on',S.conv);$('iRcl').classList.toggle('on',S.rcl);$('iM').classList.toggle('on',!!(S.mem.p&&S.mem.p.v));
  const op=S.toks.filter(t=>t.t==='(').length-S.toks.filter(t=>t.t===')').length;$('iPar').textContent=op>0?'('+op:'';$('iPar').classList.toggle('on',op>0);
+ {const lt=S.toks.at(-1),o=!S.err&&S.mode!=='pref'&&lt&&lt.t==='op'?lt.o:'';$('iOp').textContent=o?({'+':'+','-':'−','*':'×','/':'÷'})[o]:'';$('iOp').setAttribute('aria-label',o?({'+':'plus','-':'minus','*':'times','/':'divided by'})[o]:'')}
  let m,u,h=null;
  if(S.err){m=S.err;u='';$('lab').textContent=''}
  else if(S.mode==='pref'){m=S.prefTxt;u='';$('lab').textContent=S.label}
