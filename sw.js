@@ -5,7 +5,7 @@
 // Fonts are saved the first time they load online.
 // =====================================================
 
-const CACHE = "ductculator-v5";
+const CACHE = "ductculator-v6";
 
 const SHELL = [
   "./",

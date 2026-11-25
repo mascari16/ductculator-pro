@@ -138,6 +138,24 @@ body{background-color:light-dark(#b9bdbf,#1c1e20);background-image:radial-gradie
 .foot{display:none}
 @media(max-width:420px){.calc{border-radius:30px;padding:16px 12px 20px}.k button{height:46px;font-size:18px}.k.n button{font-size:24px}.k i{font-size:10.5px;height:14px}.lcd{min-height:128px}}
 
+.kmenu{position:fixed;z-index:50;background:#fff;color:#15181b;border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.35);padding:4px;min-width:200px}
+.kmenu button{display:block;width:100%;text-align:left;border:0;background:none;font:600 16px Barlow,system-ui,sans-serif;padding:12px 14px;border-radius:7px;cursor:pointer;color:inherit;min-height:44px}
+.kmenu button:hover,.kmenu button:focus-visible{background:#eef1f3;outline:none}
+.hmodal{position:fixed;inset:0;z-index:60;background:rgba(10,12,14,.55);display:flex;align-items:center;justify-content:center;padding:16px}
+.hmodal[hidden],.kmenu[hidden]{display:none}
+.hcard{background:var(--panel);color:var(--ink);border-radius:16px;max-width:560px;width:100%;max-height:88vh;overflow:auto;box-shadow:0 20px 60px rgba(0,0,0,.45);padding:18px 22px 22px}
+.hhead{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:8px}
+.hhead h3{margin:0;font:700 28px/1.1 "Barlow Condensed",sans-serif}
+#hClose{border:1px solid var(--line);background:none;color:var(--ink);border-radius:10px;width:44px;height:44px;font-size:18px;cursor:pointer}
+.hwhat{margin:0 0 12px;font-size:17px}
+.hsec{margin:10px 0}.hsec>b{display:block;font:700 13px Barlow;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.hf{white-space:pre-wrap;font:16px/1.6 "Share Tech Mono",ui-monospace,monospace;background:light-dark(#eef0e8,#1c1f22);border-left:3px solid #c9b52a;padding:8px 12px;border-radius:6px;overflow-x:auto}
+.hconv{margin-top:16px;border-top:1px solid var(--line);padding-top:12px}
+.hconv p{margin:6px 0}
+.hct{font:700 20px "Barlow Condensed",sans-serif;display:flex;align-items:center;gap:8px}
+.cvchip{background:#e8c53a;color:#2a2205;border-radius:6px;padding:1px 8px;font:700 14px Barlow}
+.steps{margin:4px 0 0;padding-left:1.6em}.steps li{margin:6px 0;line-height:1.7}.steps li::marker{font-weight:700;color:var(--muted)}
+
 /* Ductculator Pro embed */
 .embed body{background:#181c1f;background-image:none}
 .embed header{display:none}
@@ -148,7 +166,7 @@ body{background-color:light-dark(#b9bdbf,#1c1e20);background-image:radial-gradie
 </head>
 <body>
 <div class="wrap">
-  <header><h1>Sheet Metal / HVAC Pro calculator</h1><p class="sub">Same key layout and functions as the 4090 (ITI version). Tap <b style="color:#c99700">Conv</b> and the yellow functions flip onto the keys.</p></header>
+  <header><h1>Sheet Metal / HVAC Pro calculator</h1><p class="sub">Same key layout and functions as the 4090 (ITI version). Tap <b style="color:#c99700">Conv</b> and the yellow functions flip onto the keys. Right-click a key (or press and hold on a phone) to see how to use it.</p></header>
   <div class="stage">
   <div class="calc" id="calc">
    <div class="brand"><span>SHEET METAL / <b>HVAC PRO CALC</b></span><span>MODEL 4090-STYLE</span></div>
@@ -196,6 +214,8 @@ body{background-color:light-dark(#b9bdbf,#1c1e20);background-image:radial-gradie
   </div>
  </div>
 </div>
+<div id="kmenu" class="kmenu" role="menu" hidden><button type="button" role="menuitem" id="kmenuBtn">How to use this key</button></div>
+<div id="hmodal" class="hmodal" hidden><div class="hcard" role="dialog" aria-modal="true" aria-labelledby="hTitle"><div class="hhead"><h3 id="hTitle"></h3><button type="button" id="hClose" aria-label="Close">✕</button></div><div id="hBody"></div></div></div>
 <script>
 {
 const KEYS=[
@@ -262,10 +282,10 @@ function finalize(e){
  if(e.frac){fracIn=e.num/(pf(e.digits)||r);e.digits=''}
  if(e.m!=null||e.mm!=null){const mm=(e.m||0)*1000+(e.mm||0)+(e.digits?pf(e.digits):0);const u=e.m!=null&&e.mm==null?'m':'mm';
   val={v:(e.m!=null&&e.mm==null?e.m/0.0254:mm/25.4),d:1,u};
-  if(e.dim>1){const base=u==='m'?e.m:e.mm;val={v:base**e.dim*UIN[u]**e.dim,d:e.dim,u}}}
+  if(e.dim>1){const base=u==='m'?e.m:e.mm;val={v:base*UIN[u]**e.dim,d:e.dim,u}}}
  else if(e.ft!=null||e.inch!=null||e.frac){
   if(e.dim>1&&e.last==='f')val={v:e.ft*12**e.dim,d:e.dim,u:'ft'};
-  else if(e.dim>1&&e.last==='i')val={v:e.inch**e.dim,d:e.dim,u:'in'};
+  else if(e.dim>1&&e.last==='i')val={v:e.inch,d:e.dim,u:'in'};
   else val=L((e.ft||0)*12+(e.inch||0)+fracIn+(e.digits?pf(e.digits):0),e.ft!=null?'ft':'in');}
  else{let s=e.digits||'0';val=N(e.exp!=null?pf(s)*10**(pf(e.exp)||0):pf(s));if(e.pct)val.pct=true}
  if(e.neg)val.v=-val.v;return val;}
@@ -410,7 +430,7 @@ function press(k){
    if(n<list.length&&S.mode!=='vp'){const res=S.mode==='ofs'?list[n]():list[n];show(res[0],res[1]+'  ('+(n+1)+')');S.fresh=false;S.last=id;render();return}
   }
   if(S.mode&&!(c&&((k==='lp'&&S.mode==='ofs')||(k==='9'&&S.mode==='loc'))))S.mode=null;
-  S.colKeep=false;if(r)recall(k,c);else dispatch(k,c);S.colNext=S.colKeep;
+  S.colKeep=false;if(r)recall(k,c);else dispatch(k,c);S.colNext=S.colKeep;if(!S.entry&&S.mode!=='pref')fmt(S.disp);
  }catch(e){if(e.calc){S.err=e.message;S.entry=null;S.toks=[];S.mode=null}else{S.err='Error';console.error(e)}}
  S.last=id;render();}
 
@@ -444,8 +464,8 @@ function dispatch(k,c){
     if(c||!simple){let v=finalize(e);S.entry=null;if(v.d>=1){const same=v.u===u;v.u=u;v.dec=!!(c&&same&&v.d===1&&k!=='m')}S.disp=v;S.fresh=true;S.label='';return}}}
   if(!S.entry){ // convert display
    let v={...S.disp};if(v.deg)throw Err('Error');
-   if(!v.d)v={v:v.v*UIN[u],d:1,u};
-   if(k!=='m'&&v.d===1&&v.u===u)v.dec=!v.dec;else{v.u=u;v.dec=false}
+   if(!v.d)v={v:v.v*UIN[u],d:1,u,dec:false};
+   else if(k!=='m'&&v.d===1&&v.u===u)v.dec=!v.dec;else{v.u=u;v.dec=false}
    S.disp=v;S.fresh=true;S.label='';return}
   const e=S.entry;
   if(k==='f'){if(e.digits){e.ft=pf(e.digits);e.digits='';e.last='f'}else if(e.last==='f'&&e.dim<3)e.dim++;return}
@@ -490,7 +510,7 @@ function dispatch(k,c){
   const lt=S.toks.at(-1);if(lt.t==='op'||lt.t==='(')S.toks.push({t:'v',v:takeInput()});else S.entry=null;
   logToks(S.toks);const v=evalToks(S.toks);S.toks=[];show(v,'=',false);tp('=',v,'tot');S.fresh=true;return}
  case'lp':{if(c){S.modeList=offset();S.mode='ofs';const i=cyc('c:lp',5);const res=S.modeList[i]();show(res[0],res[1]+'  ('+(i+1)+')');S.fresh=false;return}
-  const lt=S.toks.at(-1);if(lt&&(lt.t==='v'||lt.t===')'))S.toks.push({t:'op',o:'*'});S.toks.push({t:'('});S.entry=null;return}
+  if(S.entry)pushOperand();const lt=S.toks.at(-1);if(lt&&(lt.t==='v'||lt.t===')'))S.toks.push({t:'op',o:'*'});S.toks.push({t:'('});S.entry=null;return}
  case'rp':{
   const colC=S.colNext&&(S.prevKey==='c:rp'||S.prevKey==='rp')&&!S.entry;
   if(c||(colC&&!S.toks.length)){
@@ -587,10 +607,79 @@ function renderTape(){const el=$('tape');el.innerHTML=tapeL.map(x=>x.brk?'<li cl
 $('clrTape').addEventListener('pointerdown',e=>e.preventDefault());
 $('clrTape').addEventListener('click',e=>{tapeL.length=0;renderTape();e.currentTarget.blur()});
 
-$('keys').addEventListener('pointerdown',e=>{const b=e.target.closest('button');if(!b)return;e.preventDefault();press(b.dataset.k)});
+const HELP={"0":{"t":"0","p":"Digit 0.","c":"VP◂▸FPM. A value, [Conv][0], then 1 FPM from VP, 2 VP from FPM, 3 m/s from kPa, 4 kPa from m/s.","cf":"FPM = 4005 × √VP   VP = (FPM ÷ 4005)²\nm/s = √(2 × kPa × 1000 ÷ 1.2)   kPa = 1.2 × v² ÷ 2 ÷ 1000","cex":"Type [0] [•] [0] [4] [9] (VP), press [Conv] [0], then [1]: 886.5445 FPM"},
+"1":{"t":"1","p":"Digit 1.","c":"M1: stores the display in memory 1. [Rcl] [1] recalls."},
+"2":{"t":"2","p":"Digit 2.","c":"M2: stores the display in memory 2."},
+"3":{"t":"3","p":"Digit 3.","c":"M3: stores the display in memory 3."},
+"4":{"t":"4","p":"Digit 4.","c":"A (CFM): stores a. Used as old CFM (fan laws), side a (LawCos) and end height (Offset). With nothing typed, recalls it."},
+"5":{"t":"5","p":"Digit 5.","c":"B: stores b, the old RPM/SP/BHP (fan laws) or side b (LawCos)."},
+"6":{"t":"6","p":"Digit 6.","c":"C: stores side c for LawCos."},
+"7":{"t":"7","p":"Digit 7.","c":"A new (CFM): store a value or recall the new CFM for the fan laws."},
+"8":{"t":"8","p":"Digit 8.","c":"B new: store or recall the new RPM, SP or BHP for the fan laws."},
+"9":{"t":"9","p":"Digit 9.","c":"LawCos: with sides a, b, c stored ([Conv][4] [5] [6]), gives angle A. Then press 1 A, 2 B, 3 C, 4 area, 5–7 sides.","cf":"A = acos((b² + c² − a²) ÷ 2bc)   B = acos((a² + c² − b²) ÷ 2ac)   C = 180° − A − B\narea = √(s(s−a)(s−b)(s−c)), s = (a+b+c) ÷ 2","cex":"Type [3] [8] [Feet] [5] [Inch], press [Conv] [4] (side a) | Type [2] [3] [Feet] [4] [Inch] [9] [/] [1] [6], press [Conv] [5] (side b) | Type [2] [6] [Feet] [1] [Inch] [1] [3] [/] [1] [6], press [Conv] [6] (side c) | Press [Conv] [9]: angle A 101.5734° | Press [4]: area 299.4929 sq ft"},
+"off":{"t":"Off","p":"Turns the display off and drops the problem in progress. Memory, stored pitch and settings are kept. [On/C] turns it back on."},
+"onc":{"t":"On/C","p":"Press once to clear the display and the problem in progress. Press twice to also clear x, y, r, a, b, c, the circle and the irregular pitch. Pitch, memory and settings stay. [Rcl] [On/C] clears M+. In settings, On/C exits."},
+"x":{"t":"x (Run)","p":"Type a value then press to store the run. Press with nothing typed to solve it from any two of x, y, r, θ. Also the length for Offset, the chord for Seg Radius and the run for Stair and roof work.","f":"x = √(r² − y²) = y ÷ tan θ = r × cos θ","ex":"Type [6] [Inch] [1] [/] [2], press [y] (stores a 6-1/2″ rise) | Type [1] [2] [Inch] [1] [/] [1] [6], press [r] (stores a 12-1/16″ diagonal) | Press [x] to solve the run: 10-3/16″","c":"Fan Law 1 (CFM / RPM). Store a = CFM [Conv][4], b = RPM [Conv][5], a new [Conv][7] or b new [Conv][8]; enter three, then [Conv][x] solves the missing one.","cf":"RPM₂ = RPM₁ × (CFM₂ ÷ CFM₁)","cex":"Type [1] [2] [5] [0], press [Conv] [4] (a = 1250 CFM) | Type [7] [5] [0], press [Conv] [5] (b = 750 RPM) | Type [1] [4] [0] [0], press [Conv] [7] (a new = 1400 CFM) | Press [Conv] [x]: 840 RPM"},
+"y":{"t":"y (Rise)","p":"Type a value then press to store the rise. Press with nothing typed to solve it. Also the offset for Offset, the rise for Seg Radius and Stair, and the height for Column/Cone.","f":"y = √(r² − x²) = x × tan θ = r × sin θ","ex":"Type [1] [0] [Feet], press [x] (stores a 10′ run) | Type [3] [0], press [θ] (stores 30°) | Press [y] to solve the rise: 5′ 9-5/16″","c":"Fan Law 2 (CFM / static pressure). Same registers as Fan Law 1 with b = SP.","cf":"SP₂ = SP₁ × (CFM₂ ÷ CFM₁)²","cex":"Type [1] [5] [3] [0] [0], press [Conv] [4] (a = 15300 CFM) | Type [3] [•] [2], press [Conv] [5] (b = 3.2″ SP) | Type [1] [4] [0] [0] [0], press [Conv] [7] (a new = 14000 CFM) | Press [Conv] [y]: 2.679311″ SP"},
+"diag":{"t":"r (Diag)","p":"Type a value then press to store the diagonal (hypotenuse / common rafter). Press with nothing typed to solve it. Press again for the plumb cut, then the level cut.","f":"r = √(x² + y²) = x ÷ cos θ = y ÷ sin θ\nplumb = θ   level = 90° − θ","ex":"Type [7] [Inch], press [θ] (stores a 7/12 pitch) | Type [7] [Feet] [2] [Inch], press [x] (stores a 7′ 2″ run) | Press [r]: rafter 8′ 3-9/16″ | Press [r] again: plumb cut 30.25644°. Again: level cut 59.74356°","c":"Fan Law 3 (CFM / brake horsepower). Same registers with b = BHP.","cf":"BHP₂ = BHP₁ × (CFM₂ ÷ CFM₁)³","cex":"Type [1] [5] [8] [0] [0], press [Conv] [4] (a = 15800 CFM) | Type [6] [•] [3], press [Conv] [5] (b = 6.3 BHP) | Type [2] [0] [0] [0] [0], press [Conv] [7] (a new = 20000 CFM) | Press [Conv] [r]: 12.77789 BHP"},
+"pitch":{"t":"θ (Pitch)","p":"Stores or solves the angle. Enter degrees ([3] [0] [θ]), an inch rise per 12″ ([9] [Inch] [θ] = 9/12) or a % grade ([7] [5] [Conv] [%] [θ]). Press again for % grade, slope and pitch per 12. An entered pitch is kept until Clear All.","f":"θ = atan(y ÷ x)\ngrade % = 100 × tan θ   slope = tan θ   pitch = 12 × tan θ per 12″","ex":"Type [8] [Inch], press [θ]: 33.69007° (an 8/12 pitch) | Press [θ] again: 66.66667% grade, then slope, then pitch per 12","c":"Seg Radius. With x = chord and y = rise, finds the radius. Press again for arc angle, arc length, segment area, pie area, rise and arched-wall studs. A length then [Conv][θ] instead stores a radius for Circ/Arc.","cf":"R = (c² ÷ 4 + h²) ÷ (2h)\nangle = 4 × atan(2h ÷ c)","cex":"Type [1] [5] [Feet], press [x] (stores a 15′ chord) | Type [5] [Feet], press [y] (stores a 5′ rise) | Press [Conv] [θ]: radius 8′ 1-1/2″ | Press [Conv] [θ] again: arc angle 134.76°"},
+"hip":{"t":"Hip/V","p":"Hip or valley rafter from the run (x) and pitch (θ). Press again for the hip plumb cut, level cut and check (cheek) angle.","f":"hip run = √(x² + xᵢ²)   (regular: xᵢ = x, so x√2)\nhip = √(hip run² + rise²)\nplumb = atan(rise ÷ hip run)   level = 90° − plumb   check = atan(x ÷ xᵢ)","ex":"Type [9] [Inch], press [θ] (stores a 9/12 pitch) | Type [6] [Feet], press [x] (stores a 6′ run) | Press [Hip/V]: 9′ 7-1/4″","c":"Ir/Pitch. A pitch then [Conv][Hip/V] stores the irregular-side pitch (8 [Inch] = 8/12). Hip/V and Conv Jack then use it. [On/C] [On/C] clears it.","cf":"xᵢ = rise ÷ tan(irregular pitch)","cex":"Type [9] [Inch], press [θ] (main pitch 9/12) | Type [6] [Feet] [7] [Inch], press [x] (stores a 6′ 7″ run) | Type [8] [Inch], press [Conv] [Hip/V] (irregular pitch 8/12) | Press [Hip/V]: 11′ 0-7/8″"},
+"sq":{"t":"x²","p":"Squares the display. A length becomes an area.","f":"x² = x × x","ex":"Type [1] [2], press [x²]: 144","c":"x³ (cube). A length becomes a volume.","cf":"x³ = x × x × x"},
+"sqrt":{"t":"√x","p":"Square root. An area becomes a length.","f":"√x","ex":"Type [1] [4] [4] [Inch] [Inch] (144 square inches), press [√x]: 12″","c":"∛x (cube root).","cf":"∛x","cex":"Type [1] [0] [0], press [Conv] [√x]: 4.641589"},
+"circ":{"t":"Circ","p":"A diameter then [Circ] gives the circumference. Press again for the area, then the diameter.","f":"C = π × D   A = π × D² ÷ 4","ex":"Type [1] [1] [Inch], press [Circ]: circumference 34-9/16″ | Press [Circ] again: area 95.03318 sq in","c":"Arc. With a diameter stored, an angle then [Conv][Circ] gives the arc length; a length gives the angle. Press again for chord, segment area, pie area, segment rise and arched-wall studs (AW1, AW2… at the jack spacing).","cf":"arc = π × D × θ ÷ 360   θ = arc ÷ R × 180 ÷ π\nchord = 2R sin(θ/2)   segment = R²/2 × (θ − sin θ)   pie = R²θ/2   rise = R(1 − cos θ/2)\nstud n = √(R² − (n × OC)²) − (R − rise)","cex":"Type [5] [Feet], press [Circ] (stores a 5′ diameter) | Type [8] [5], press [Conv] [Circ]: arc length 3′ 8-1/2″ for 85°"},
+"stair":{"t":"Stair","p":"Stair layout from the rise (y) and/or run (x). A rise then [Stair] also works. Keep pressing for riser height, # risers, riser over/under, tread, # treads, tread over/under, stairwell opening, stringer, incline, run, rise, then the stored riser, tread, headroom and floor thickness.","f":"risers n = round(rise ÷ desired riser)   riser = rise ÷ n   treads = n − 1\ntread = run ÷ treads (or the tread setting)\nopening = (headroom + floor) ÷ riser × tread\nstringer = √((rise − riser)² + (treads × tread)²)   incline = atan(riser ÷ tread)\n(riser and tread rounded to your fraction setting)","ex":"Type [9] [Feet] [1] [1] [Inch], press [y] (stores a 9′ 11″ rise) | Press [Stair]: riser height 7-7/16″ | Keep pressing [Stair]: 16 risers, riser over/under 0, tread 10″, 15 treads…","c":"Riser. A value then [Conv][Stair] stores the riser height you want (default 7-1/2″)."},
+"jack":{"t":"Jack","p":"Jack rafters on the regular-pitch side from run (x) and pitch (θ). Keep pressing: JK1, JK2… then the plumb, level and check cuts. A value then [Jack] sets the on-center spacing (default 16″).","f":"jack n = (x − n × OC × x ÷ xᵢ) ÷ cos θ   (regular: (x − n × OC) ÷ cos θ)","ex":"Type [9] [Inch], press [θ] (stores a 9/12 pitch) | Type [6] [Feet], press [x] (stores a 6′ run) | Press [Jack] again and again: 5′ 10″, 4′ 2″, 2′ 6″, 0′ 10″","c":"Ir/Jack. Jacks on the irregular-pitch side (needs Ir/Pitch).","cf":"OC-OC: (xᵢ − n × OC × xᵢ ÷ x) ÷ cos θᵢ\nJAC-JAC: (xᵢ − n × OC) ÷ cos θᵢ   (setting 8)"},
+"sin":{"t":"Sine","p":"Sine of the angle shown, in degrees.","f":"sin θ = opposite ÷ hypotenuse","ex":"Type [1] [2], press [Sine]: 0.207912","c":"ArcSine: angle from a ratio.","cf":"θ = asin(ratio)","cex":"Type [0] [•] [5] [7] [5] [4] [4], press [Conv] [Sine]: 35.13045°"},
+"cos":{"t":"Cos","p":"Cosine of the angle shown, in degrees.","f":"cos θ = adjacent ÷ hypotenuse","ex":"Type [3] [3], press [Cos]: 0.838671","c":"ArcCos: angle from a ratio.","cf":"θ = acos(ratio)"},
+"tan":{"t":"Tan","p":"Tangent of the angle shown, in degrees.","f":"tan θ = opposite ÷ adjacent","ex":"Type [7] [5], press [Tan]: 3.732051","c":"ArcTan: angle from a ratio.","cf":"θ = atan(ratio)"},
+"lp":{"t":"(","p":"Opens a parenthesis. A number right before it multiplies: [2] [(] [3] [+] [4] [)] [=] = 14.","c":"Offset (ogee). Store x = length, y = offset, [Conv][4] = end height a. Then [Conv][(] and 1 CR, 2 WL, 3 HEEL, 4 THRT, 5 THET (or repeat [Conv][(]).","cf":"THET = atan(y ÷ x)   each elbow turns 2 × THET\nCR = x ÷ (2 × sin 2θ)   WL = 2 × CR × 2θ (radians)\nHEEL = CR + a ÷ 2   THRT = CR − a ÷ 2","cex":"Type [1] [0] [Feet], press [x] (stores a 10′ length) | Type [5] [Feet], press [y] (stores a 5′ offset) | Type [7] [Feet], press [Conv] [4] (stores a 7′ end height) | Press [Conv] [(]: CR 6′ 3″ | Then press [2] WL 11′ 7-1/8″, [3] HEEL 9′ 9″, [4] THRT 2′ 9″, [5] THET 26.56505°","ex":"Type [2] [(] [3] [+] [4] [)] [=]: 14"},
+"rp":{"t":")","p":"Closes a parenthesis and shows the value inside.","c":"Column/Cone. Needs a diameter ([Circ]) and height in y. [Conv][)] gives column volume; press [)] for column side area, cone volume, cone side area.","cf":"column = π × (D/2)² × h   side = π × D × h\ncone = π × (D/2)² × h ÷ 3   cone side = π × r × √(r² + h²)","cex":"Type [3] [Feet] [6] [Inch], press [Circ] (stores a 3′ 6″ diameter) | Type [5] [Feet], press [y] (stores a 5′ height) | Press [Conv] [)]: column volume | Press [)] twice more: cone volume 16.03521 cu ft"},
+"m":{"t":"m","p":"Meters. Enters meters, or converts the answer to meters. Twice in entry = square meters.","f":"1 m = 39.37008″","ex":"Type [8] [Feet] [6] [Inch], press [m]: 2.591 m","c":"mm. Enters or converts to millimeters.","cf":"1″ = 25.4 mm"},
+"f":{"t":"Feet","p":"Enters feet. After an entry or answer, converts to feet-inch; press again for decimal feet. A whole number with Feet twice = square feet, three times = cubic feet.","f":"decimal ft = inches ÷ 12","ex":"Type [2] [0] [Feet] [5] [/] [1] [6] [Inch] (20′ 5/16″) | Press [Feet]: 20′ 0-5/16″ | Press [Feet] again: 20.02604 ft","c":"(Conv) Feet jumps straight to decimal feet."},
+"i":{"t":"Inch","p":"Enters inches. After an entry or answer, converts to inches; press again for decimal inches. Twice right after a whole number = square inches.","f":"inches = feet × 12","ex":"Type [2] [0] [Feet] [5] [/] [1] [6] [Inch] (20′ 5/16″) | Press [Inch]: 240-5/16″ | Press [Inch] again: 240.3125″","c":"(Conv) Inch jumps straight to decimal inches."},
+"fb":{"t":"/ (fraction bar)","p":"Enters fractions: [5] [/] [1] [6] = 5/16. With no denominator it uses your fraction setting (1/16 by default).","ex":"Type [5] [Feet] [4] [Inch] [1] [/] [2]: 5′ 4-1/2″","c":"x10ʸ (exponent): [8] [Conv] [/] [3] = 8 × 10³."},
+"bs":{"t":"← (backspace)","p":"Deletes the last digit or unit you typed."},
+"conv":{"t":"Conv","p":"Makes the next key do its yellow function. The yellow labels flip onto the keys while Conv is on. Press again to cancel."},
+"div":{"t":"÷","p":"Divide. Length ÷ length gives a plain number.","ex":"Type [3] [0] [Feet] [4] [Inch] [÷] [7] [Inch] [=]: 52 pieces","c":"1/x (reciprocal).","cf":"1 ÷ x"},
+"rcl":{"t":"Rcl","p":"Recall. [Rcl] then [M+], [1]–[3], [x], [y], [r], [θ], [Stair] (riser) or [4]–[8] (a, b, c, a new, b new) shows that value. [Rcl] [On/C] clears M+.","c":"Swap M+: swaps the display with the M+ memory."},
+"mul":{"t":"×","p":"Multiply. Length × length = area, × length again = volume.","ex":"Type [5] [Feet] [3] [Inch] [×] [1] [1] [Feet] [6] [Inch] [1] [/] [2] [=]: 60.59375 sq ft","c":"Clear All: clears everything (memory, pitch, registers) except settings."},
+"mp":{"t":"M+","p":"Adds the display to memory (M lights up). [Rcl] [M+] recalls it.","c":"M−: subtracts the display from memory."},
+"sub":{"t":"−","p":"Subtract. In settings, − steps back through the options.","c":"+/−: changes the sign."},
+"pi":{"t":"π","p":"Pi.","f":"π = 3.141593","c":"ArcK constant for arc length.","cf":"ArcK = π ÷ 180 = 0.017453\narc = angle × radius × ArcK","cex":"Type [1] [0] [0] [×] [5] [Feet] [×], press [Conv] [π], then [=]: 8′ 8-3/4″ arc (100° on a 5′ radius)"},
+"dot":{"t":"• (decimal)","p":"Decimal point.","c":"dms◂▸deg: shows the angle as degrees:minutes:seconds and back.","cex":"With 64.62307° on the screen, press [Conv] [•]: 64°37′23″"},
+"eq":{"t":"=","p":"Finishes the problem. Uses order of operations by default (setting 12).","ex":"Type [1] [0] [+] [4] [×] [5] [=]: 30","c":"Prefs (settings). [=] next setting, [+]/[−] change, [On/C] exit. 1 fraction, 2 area, 3 volume, 4 tread, 5 headroom, 6 floor, 7 jack order, 8 irregular jack spacing, 9 exponent, 10 meter decimals, 11 degree decimals, 12 math order, 13 fixed fractions."},
+"add":{"t":"+","p":"Add. Mixed units work (feet + inches + meters). In settings, + steps forward through the options.","c":"%: percent of the number before it. A number then [Conv][%] then [θ] enters a % grade.","cf":"a × b% = a × b ÷ 100   a + b% = a + a × b ÷ 100\na − b% = a − a × b ÷ 100   a ÷ b% = a ÷ (b ÷ 100)","cex":"Type [5] [0] [0] [Feet] [×] [1] [8], press [Conv] [%]: 90′"}};
+
+const kb=t=>esc(t).replace(/\[([^\]]+)\]/g,'<kbd>$1</kbd>');
+const steps=t=>{const p=t.split(' | ');return p.length>1?`<ol class="steps">${p.map(x=>`<li>${kb(x)}</li>`).join('')}</ol>`:`<div>${kb(t)}</div>`};
+function openHelp(id){const h=HELP[id];if(!h)return;const K=KEYS.find(k=>k[0]===id)||[];
+ let b=`<p class="hwhat">${kb(h.p)}</p>`;
+ if(h.f)b+=`<div class="hsec"><b>Formula</b><div class="hf">${kb(h.f)}</div></div>`;
+ if(h.ex)b+=`<div class="hsec"><b>Example</b>${steps(h.ex)}</div>`;
+ if(h.c)b+=`<div class="hconv"><div class="hct"><span class="cvchip">Conv</span> ${esc(K[2]||'')}</div><p>${kb(h.c)}</p>${h.cf?`<div class="hsec"><b>Formula</b><div class="hf">${kb(h.cf)}</div></div>`:''}${h.cex?`<div class="hsec"><b>Example</b>${steps(h.cex)}</div>`:''}</div>`;
+ $('hTitle').textContent=h.t+(K[2]?'  ·  '+K[2]:'');$('hBody').innerHTML=b;$('hmodal').hidden=false;$('hClose').focus();}
+function closeHelp(){$('hmodal').hidden=true}
+let menuKey=null;
+function openMenu(id,x,y){menuKey=id;const m=$('kmenu');const h=HELP[id];$('kmenuBtn').textContent='How to use: '+(h?h.t:id);m.hidden=false;
+ const w=m.offsetWidth||200,hh=m.offsetHeight||48;m.style.left=Math.min(x,innerWidth-w-8)+'px';m.style.top=Math.min(y,innerHeight-hh-8)+'px';}
+function closeMenu(){$('kmenu').hidden=true;menuKey=null}
+$('kmenuBtn').addEventListener('click',()=>{const k=menuKey;closeMenu();openHelp(k)});
+$('hClose').addEventListener('click',closeHelp);
+$('hmodal').addEventListener('click',e=>{if(e.target===$('hmodal'))closeHelp()});
+document.addEventListener('pointerdown',e=>{if(!$('kmenu').hidden&&!e.target.closest('#kmenu'))closeMenu()},true);
+window.addEventListener('scroll',closeMenu,{passive:true});
+$('keys').addEventListener('contextmenu',e=>{const b=e.target.closest('button');if(!b)return;e.preventDefault();openMenu(b.dataset.k,e.clientX,e.clientY)});
+let lp=null;
+$('keys').addEventListener('pointerdown',e=>{const b=e.target.closest('button');if(!b)return;e.preventDefault();
+ if(e.pointerType==='mouse'){if(e.button===0)press(b.dataset.k);return}
+ b.classList.add('hit');const x=e.clientX,y=e.clientY;lp={b,fired:false,t:setTimeout(()=>{if(lp){lp.fired=true;b.classList.remove('hit');openMenu(b.dataset.k,x,y)}},550)};});
+const lpEnd=(e,doPress)=>{if(!lp)return;clearTimeout(lp.t);lp.b.classList.remove('hit');if(doPress&&!lp.fired)press(lp.b.dataset.k);lp=null};
+$('keys').addEventListener('pointerup',e=>lpEnd(e,true));
+$('keys').addEventListener('pointercancel',e=>lpEnd(e,false));
+$('keys').addEventListener('pointerleave',e=>lpEnd(e,false));
 $('keys').addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.dataset.k){e.preventDefault();e.stopPropagation();press(e.target.dataset.k)}});
 const KB={'+':'add','-':'sub','*':'mul','/':'div','x':'x','y':'y','d':'diag','p':'pitch','s':'stair','h':'hip','j':'jack','.':'dot','Enter':'eq','=':'eq','Escape':'onc','Backspace':'bs','f':'f',"'":'f','i':'i','"':'i','\\':'fb','m':'m','c':'conv','r':'rcl','(':'lp',')':'rp'};
-document.addEventListener('keydown',e=>{if(e.ctrlKey||e.metaKey||e.altKey)return;if(e.target.closest&&e.target.closest('#keys')&&(e.key==='Enter'||e.key===' '))return;if(e.target.tagName==='SUMMARY'&&(e.key==='Enter'||e.key===' '))return;if(e.target.tagName==='BUTTON')e.target.blur();
+document.addEventListener('keydown',e=>{if(!$('hmodal').hidden||!$('kmenu').hidden){if(e.key==='Escape'){closeHelp();closeMenu();e.preventDefault()}return}if(e.ctrlKey||e.metaKey||e.altKey)return;if(e.target.closest&&e.target.closest('#keys')&&(e.key==='Enter'||e.key===' '))return;if(e.target.tagName==='SUMMARY'&&(e.key==='Enter'||e.key===' '))return;if(e.target.tagName==='BUTTON')e.target.blur();
  const k=/^[0-9]$/.test(e.key)?e.key:KB[e.key];if(!k)return;e.preventDefault();press(k);
  const b=document.querySelector(`[data-k="${k}"]`);if(b){b.classList.add('hit');setTimeout(()=>b.classList.remove('hit'),110)}});
 window.__calc={press,S,fmt};
