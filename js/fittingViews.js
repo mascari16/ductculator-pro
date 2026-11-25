@@ -626,9 +626,34 @@
             // had when the drag started, so nothing jumps from side to side.
             const keep = lock && lock.choices && lock.choices.length === order.length ? lock.choices : null;
 
+            const choices = [];
+
             for (const [di, d] of order.entries()) {
-                const k0 = keep ? keep[di] : 0;
-                const k1 = keep ? keep[di] + 1 : 90;
+                choices[di] = -1;
+                // Seen nearly end-on, a dimension can't be read: leave it off
+                // until the view turns back.
+                if (d.type !== "angle") {
+                    // how squarely the dimension (its line and its offset
+                    // direction) faces the viewer: 1 = flat on, 0 = edge-on
+                    const dd = d.dir || (d.off ? norm([d.off[0], d.off[1], 0]) : [0, 1, 0]);
+                    const pa0 = Q(d.a[0], d.a[1]), pb0 = Q(d.b[0], d.b[1]);
+                    const pd0 = Q(d.a[0] + dd[0], d.a[1] + dd[1]);
+                    const trueLen = Math.hypot(d.b[0] - d.a[0], d.b[1] - d.a[1]);
+                    const lineX = pb0[0] - pa0[0], lineY = pb0[1] - pa0[1];
+                    const offX = pd0[0] - pa0[0], offY = pd0[1] - pa0[1];
+                    const lenD = Math.hypot(dd[0], dd[1]) || 1;
+                    const face = Math.abs(lineX * offY - lineY * offX) / (trueLen * lenD * Math.abs(Math.sin(Math.atan2(dd[1], dd[0]) - Math.atan2(d.b[1] - d.a[1], d.b[0] - d.a[0]))) || 1);
+                    if (trueLen > 1e-6 && face < 0.4) continue;
+                } else {
+                    const c0 = Q(d.c[0], d.c[1]);
+                    const e0 = Q(d.c[0] + Math.cos(rad(d.a0)), d.c[1] + Math.sin(rad(d.a0)));
+                    const e1 = Q(d.c[0] + Math.cos(rad(d.a1)), d.c[1] + Math.sin(rad(d.a1)));
+                    const cr = (e0[0] - c0[0]) * (e1[1] - c0[1]) - (e0[1] - c0[1]) * (e1[0] - c0[0]);
+                    if (Math.abs(cr) < 0.4 * Math.abs(Math.sin(rad(d.a1 - d.a0)))) continue;
+                }
+                const useKeep = keep && keep[di] >= 0;
+                const k0 = useKeep ? keep[di] : 0;
+                const k1 = useKeep ? keep[di] + 1 : 90;
                 if (d.type === "angle") {
                     let best = null;
                     const slide = d.slide ? norm([d.slide[0], d.slide[1], 0]) : null;
@@ -669,6 +694,7 @@
                     for (let i = 0; i < best.pts.length - 1; i += 1) segMark(best.pts[i], best.pts[i + 1]);
                     rectMark(best.lb);
                     placed.push(best);
+                    choices[di] = best.k;
                     continue;
                 }
 
@@ -707,9 +733,11 @@
                 segMark(best.pa, best.pb);
                 rectMark(best.lb);
                 placed.push(best);
+                choices[di] = best.k;
             }
 
             placed.isDuct = isDuct;
+            placed.choices = choices;
             return placed;
         }
 
@@ -761,7 +789,7 @@
         }
 
         const u = F.u;
-        state.frame = { u: F.u, w: F.w, h: F.h, dx: F.cx - gcx, dy: F.cy - gcy, ch, choices: placed.map(p => p.k) };
+        state.frame = { u: F.u, w: F.w, h: F.h, dx: F.cx - gcx, dy: F.cy - gcy, ch, choices: placed.choices };
         svg.setAttribute("viewBox", `${F.cx - F.w / 2} ${F.cy - F.h / 2} ${F.w} ${F.h}`);
 
         // Centerline extensions drawn in depth order (hidden behind the duct).
