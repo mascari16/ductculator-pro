@@ -258,58 +258,207 @@
             ]);
         }
 
-        const edge = (d, s) => DC.fmt(d + s * t);
+        const f = DC.fmt;
+        const b = v => `<b>${v}</b>`;
+        const step = (n, html) => ({ text: `<span class="dg-step"><b class="dg-n">${n}</b><span>${html}</span></span>` });
         DC.renderRows(out, [
             { label: "Cut each joint", note: "off square, on the cheek", value: DC.deg(beta), main: true },
             { label: "Elbow angle (each)", value: DC.deg(alpha) },
-            { head: "Mark the joint (from the same end)" },
-            { label: "Cut 1", note: "top edge · centerline · bottom edge", value: `${edge(d1, 1)} · ${DC.fmt(d1)} · ${edge(d1, -1)}` },
-            { label: "Cut 2", note: "top edge · centerline · bottom edge", value: `${edge(d2, 1)} · ${DC.fmt(d2)} · ${edge(d2, -1)}` },
-            { label: "Middle piece", note: "between the cuts, every edge", value: DC.len(M) },
-            { label: "Lean across the cheek", note: "each cut runs this far along the duct", value: DC.fmt(2 * t) },
-            { text: "Square the cut across the other two sides at the top-edge and bottom-edge marks. Both cuts lean the same way." },
-            { head: "Assemble" },
-            { text: "Roll the middle piece over (turn it 180° on its length) and fasten it back between the two end pieces. Each joint becomes a " + DC.deg(alpha) + " elbow." },
-            { label: "Offset made", value: DC.fmt(O) },
+            { head: "Steps" },
+            step(1, `Hook your tape on one end of the joint. On one cheek, mark the ${b("top edge")} at ${b(f(d1 - t))} and ${b(f(d2 - t))}.`),
+            step(2, `Same cheek, same end: mark the ${b("bottom edge")} at ${b(f(d1 + t))} and ${b(f(d2 + t))}.`),
+            step(3, `Draw the cut lines: ${b(f(d1 - t))} to ${b(f(d1 + t))}, and ${b(f(d2 - t))} to ${b(f(d2 + t))}. Both lines lean the same way, ${DC.deg(beta)} off square.`),
+            step(4, `Carry the marks around: square across the top and bottom sides at those marks, and draw the same two lines on the other cheek.`),
+            step(5, `Cut on the lines. The middle piece is ${b(DC.len(M))} on every edge.`),
+            step(6, `${b("Roll the middle piece over")}: turn it 180° on its length, so its top edge becomes the bottom edge. Keep the same ends facing the end pieces.`),
+            step(7, `Fit it back between the end pieces and fasten. Each joint is now a ${DC.deg(alpha)} elbow and the duct moves over ${b(f(O))}.`),
+            { head: "Check" },
+            { label: "Offset made", value: f(O) },
             { label: "Run between the elbows", note: "centerline", value: DC.len(L) },
-            { label: "Joint gets shorter by", value: DC.fmt(shorter) },
+            { label: "Lean across the cheek", note: "each cut runs this far along the duct", value: f(2 * t) },
+            { label: "Joint gets shorter by", value: f(shorter) },
             { label: "Finished length", note: "end to end, along the duct", value: DC.len(J - shorter) },
-            { text: "No allowance is added at the cuts. Add your own for drives, cleats or tabs." }
+            { text: "No allowance is added at the cuts. Add your own for drives, cleats or tabs. Tap Finished on the 3D view to watch it fold." }
         ]);
 
         drawDogLayout({ W, J, d1, d2, t });
 
         // ---------- 3D scene ----------
         const H = DC.meas("dgH") > 0 ? DC.meas("dgH") : W * 0.5;
-        const A = d1;
-        const C = J - d2;
-        const path = DC.Fit3D.Path(-A, 0, 0)
-            .line(A, true)
-            .corner(alpha)
-            .line(M, true)
-            .corner(-alpha)
-            .line(C, true);
-        const slope = DC.rad(alpha);
-        const nrm = [-Math.sin(slope), Math.cos(slope)];
-        const lean = t;
-        const BL = [lean, -W / 2];
-        const TL = [-lean, W / 2];
-        const TR = [L - lean, O + W / 2];
-        const endBottom = [L + C, O - W / 2];
+        dgGeom = { W, H, J, O, L, M, t, d1, d2, alpha, beta, shorter };
+        return dogScene(dgGeom, dgU);
+    }
 
-        return {
-            roll: 0,
-            dimW: H / 2,
-            parts: [{ kind: "rect", w: W, h: H, path: path.points }],
-            dims: [
-                { a: [-A, -W / 2], b: [-A, W / 2], dir: [-1, 0], base: W * 0.3, label: `${DC.fmt(W)} cheek` },
-                { a: [-A, -W / 2], b: [endBottom[0], -W / 2], dir: [0, -1], base: W * 0.4, ea: [-A, -W / 2], eb: endBottom, label: `Finished ${DC.fmt(J - shorter)}` },
+    /*
+     * Dogleg pieces in joint coordinates: x along the joint (0 to J), y
+     * across the cheek (top edge +W/2), w through the depth. Each cut runs
+     * from x = d − t at the top edge to d + t at the bottom edge.
+     *
+     * u = 0 straight joint with the cuts marked, u = 1 finished offset.
+     * In between: the pieces part (0–.25), the middle piece rolls 180° on
+     * its length (.25–.6), then it swings to the elbow angle and the
+     * outlet piece follows until the cut faces meet (.6–1).
+     */
+    let dgGeom = null;
+    let dgU = 0;
+    let dgAnim = null;
+
+    const clamp01 = v => Math.max(0, Math.min(1, v));
+    const ease = v => v * v * (3 - 2 * v);
+
+    function dogScene(g, u) {
+        const { W, H, J, O, L, M, t, d1, d2, alpha, beta, shorter } = g;
+        const a = DC.rad(alpha);
+        const corners = [[1, 1], [-1, 1], [-1, -1], [1, -1]];
+        // face ring at centerline position d (lean = slanted cut)
+        const face = (d, lean) => corners.map(([cy, cw]) => [d - (lean ? t * cy : 0), cy * W / 2, cw * H / 2]);
+        const lerpRing = (r0, r1, f) => r0.map((p, k) => p.map((v, m) => v + (r1[k][m] - v) * f));
+        // rings for a piece from face f0 to face f1, split for depth sorting
+        const piece = (f0, f1, len) => {
+            const n = Math.max(1, Math.ceil(len / Math.max(W * 0.6, 4)));
+            const out = [];
+            for (let k = 0; k <= n; k += 1) out.push(lerpRing(f0, f1, k / n));
+            return out;
+        };
+        const A = piece(face(0, false), face(d1, true), d1);
+        const B = piece(face(d1, true), face(d2, true), M);
+        const C = piece(face(d2, true), face(J, false), J - d2);
+
+        const s1 = ease(clamp01(u / 0.25));
+        const s2 = ease(clamp01((u - 0.25) / 0.35));
+        const s3 = ease(clamp01((u - 0.6) / 0.4));
+        const gap = W * 0.35 * s1 * (1 - s3);
+        const phi = Math.PI * s2;
+        const th = a * s3;
+        const bLeft = [d1 + gap, 0];
+        const bRight = [bLeft[0] + M * Math.cos(th), M * Math.sin(th)];
+        const cLeft = [bRight[0] + gap, bRight[1]];
+
+        const moveB = ([x, y, w]) => {
+            // roll about the piece's own centerline, then swing about its left end
+            const yr = y * Math.cos(phi) - w * Math.sin(phi);
+            const wr = y * Math.sin(phi) + w * Math.cos(phi);
+            const px = x - d1;
+            return [bLeft[0] + px * Math.cos(th) - yr * Math.sin(th), bLeft[1] + px * Math.sin(th) + yr * Math.cos(th), wr];
+        };
+        const moveC = ([x, y, w]) => [x - d2 + cLeft[0], y + cLeft[1], w];
+        const ringsOf = (rs, f, flags) => rs.map((pts, k) => ({ pts: pts.map(f), ...(flags(k, rs.length) || {}) }));
+        const id = p => p;
+        const ends = (k, n) => (k === 0 || k === n - 1 ? { joint: true } : null);
+
+        const base = { kind: "rect", w: W, h: H };
+        let parts;
+        if (u <= 0) {
+            // one straight joint, cut lines marked
+            const rings = [
+                ...ringsOf(A, id, k => (k === 0 ? { joint: true } : null)),
+                ...ringsOf(B.slice(1), id, (k, n) => (k === 0 ? null : null)),
+                ...ringsOf(C.slice(1), id, (k, n) => (k === n - 1 ? { joint: true } : null))
+            ];
+            for (const k of [A.length - 1, A.length - 1 + B.length - 1]) Object.assign(rings[k], { cut: true, joint: true });
+            parts = [{ ...base, rings }];
+        } else if (u >= 1) {
+            const rings = [
+                ...ringsOf(A, id, k => (k === 0 ? { joint: true } : null)),
+                // rolling 180° moves each corner to the opposite one: renumber
+                // so the stitched surface doesn't twist
+                ...ringsOf(B.slice(1).map(r => [r[2], r[3], r[0], r[1]]), moveB, () => null),
+                ...ringsOf(C.slice(1), moveC, (k, n) => (k === n - 1 ? { joint: true } : null))
+            ];
+            rings[A.length - 1].joint = true;
+            rings[A.length - 1 + B.length - 1].joint = true;
+            parts = [{ ...base, rings }];
+        } else {
+            parts = [
+                { ...base, rings: ringsOf(A, id, ends) },
+                { ...base, rings: ringsOf(B, moveB, ends), tone: "main" },
+                { ...base, rings: ringsOf(C, moveC, ends) }
+            ];
+        }
+
+        let dims = [];
+        let caption;
+        if (u <= 0) {
+            const top = d => [d - t, W / 2];
+            const bot = d => [d + t, -W / 2];
+            dims = [
+                { a: [0, -W / 2], b: [0, W / 2], dir: [-1, 0], base: W * 0.3, label: `${DC.fmt(W)} cheek` },
+                { a: [0, W / 2], b: top(d1), dir: [0, 1], base: W * 0.25, ea: [0, W / 2], eb: top(d1), label: `Cut 1 top ${DC.fmt(d1 - t)}` },
+                { a: [0, W / 2], b: top(d2), dir: [0, 1], base: W * 0.25, ea: [0, W / 2], eb: top(d2), label: `Cut 2 top ${DC.fmt(d2 - t)}` },
+                { a: [0, -W / 2], b: bot(d1), dir: [0, -1], base: W * 0.25, ea: [0, -W / 2], eb: bot(d1), label: `Cut 1 bottom ${DC.fmt(d1 + t)}` },
+                { a: [0, -W / 2], b: bot(d2), dir: [0, -1], base: W * 0.25, ea: [0, -W / 2], eb: bot(d2), label: `Cut 2 bottom ${DC.fmt(d2 + t)}` }
+            ];
+            caption = `Straight joint ${DC.fmt(J)} · cut on the yellow lines, ${DC.deg(beta)} off square, both leaning the same way`;
+        } else if (u >= 1) {
+            const C0 = J - d2;
+            const BL = [d1 + t, -W / 2];
+            const TL = [d1 - t, W / 2];
+            const TR = [d1 + L - t, O + W / 2];
+            const endBottom = [d1 + L + C0, O - W / 2];
+            const slope = a;
+            const nrm = [-Math.sin(slope), Math.cos(slope)];
+            dims = [
+                { a: [0, -W / 2], b: [0, W / 2], dir: [-1, 0], base: W * 0.3, label: `${DC.fmt(W)} cheek` },
+                { a: [0, -W / 2], b: [endBottom[0], -W / 2], dir: [0, -1], base: W * 0.4, ea: [0, -W / 2], eb: endBottom, label: `Finished ${DC.fmt(J - shorter)}` },
                 { a: [endBottom[0], -W / 2], b: endBottom, dir: [1, 0], base: W * 0.35, ea: BL, eb: endBottom, label: `Offset ${DC.fmt(O)}` },
                 { a: TL, b: TR, dir: nrm, base: W * 0.3, ea: TL, eb: TR, label: `Middle ${DC.fmt(M)}` }
-            ],
-            caption: `${DC.deg(alpha)} elbows · cuts ${DC.deg(beta)} off square · middle piece rolled over · depth ${DC.fmt(H)}`
-        };
+            ];
+            caption = `${DC.deg(alpha)} elbows · middle piece rolled over · depth ${DC.fmt(H)}`;
+        } else {
+            caption = u < 0.25 ? "Cut the joint at both marks…" : u < 0.6 ? "Roll the middle piece over…" : "Fit the faces back together…";
+        }
+
+        return { roll: 0, dimW: H / 2, parts, dims, caption };
     }
+
+    // Straight joint ⇄ finished: animate the fold.
+    function setDogView(target) {
+        if (!dgGeom) return;
+        const view = DC.Fit3D.views.rectView;
+        cancelAnimationFrame(dgAnim);
+        syncDogToggle(target);
+        const reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+        const from = dgU;
+        if (reduce || from === target) {
+            dgU = target;
+            if (view) view.lock = null;
+            DC.Fit3D.render("rectView", dogScene(dgGeom, dgU));
+            return;
+        }
+        // hold the framing of the straight joint (the wider of the two) while folding
+        if (view) view.lock = dgStraightFrame || view.frame || null;
+        const dur = 2400 * Math.abs(target - from);
+        const t0 = performance.now();
+        const step = now => {
+            const f = clamp01((now - t0) / dur);
+            dgU = from + (target - from) * f;
+            if (f >= 1) {
+                dgU = target;
+                dgAnim = null;
+                if (view) view.lock = null;
+                DC.Fit3D.render("rectView", dogScene(dgGeom, dgU));
+                if (dgU === 0) dgStraightFrame = view?.frame || null;
+                return;
+            }
+            DC.Fit3D.render("rectView", dogScene(dgGeom, dgU));
+            dgAnim = requestAnimationFrame(step);
+        };
+        dgAnim = requestAnimationFrame(step);
+    }
+
+    let dgStraightFrame = null;
+
+    function syncDogToggle(target) {
+        document.querySelectorAll("#dgToggle [data-dgv]").forEach(b => {
+            const on = Number(b.dataset.dgv) === target;
+            b.classList.toggle("is-on", on);
+            b.setAttribute("aria-pressed", on ? "true" : "false");
+        });
+    }
+
+    document.querySelectorAll("#dgToggle [data-dgv]").forEach(b => {
+        b.addEventListener("click", () => setDogView(Number(b.dataset.dgv)));
+    });
 
     // Flat layout of the straight joint (cheek face) with both cuts marked.
     // Marks are running dimensions from the left end, like a tape hooked on it.
@@ -329,16 +478,16 @@
                 <path class="dm" d="M${x - 5} ${y - 3}L${x} ${y}L${x - 5} ${y + 3}" stroke-width="1.2"/>
                 <text class="fig-t fig-y" x="${x - 4}" y="${ty}" text-anchor="end">${f(d)}</text>`;
         };
-        const cut = d => `<path class="dm" d="M${X(d - t)} ${bottom}L${X(d + t)} ${top}" stroke-width="2.2"/>`;
+        const cut = d => `<path class="dm" d="M${X(d + t)} ${bottom}L${X(d - t)} ${top}" stroke-width="2.2"/>`;
         svg.setAttribute("viewBox", `0 0 ${VW} ${VH}`);
         svg.innerHTML = `
-            <polygon points="${X(d1 + t)},${top} ${X(d2 + t)},${top} ${X(d2 - t)},${bottom} ${X(d1 - t)},${bottom}" fill="rgba(110,190,230,.18)" stroke="none"/>
+            <polygon points="${X(d1 - t)},${top} ${X(d2 - t)},${top} ${X(d2 + t)},${bottom} ${X(d1 + t)},${bottom}" fill="rgba(110,190,230,.18)" stroke="none"/>
             <rect class="ln" x="${left}" y="${top}" width="${len}" height="${h}"/>
             <path class="hd" d="M${left} ${(top + bottom) / 2}H${left + len}"/>
             <path class="dm" d="M${X(0)} ${top - 40}V${bottom + 40}" stroke-width="1.2"/>
             ${cut(d1)}${cut(d2)}
-            ${run(d1 + t, top - 16, -1)}${run(d2 + t, top - 36, -1)}
-            ${run(d1 - t, bottom + 16, 1)}${run(d2 - t, bottom + 36, 1)}
+            ${run(d1 - t, top - 16, -1)}${run(d2 - t, top - 36, -1)}
+            ${run(d1 + t, bottom + 16, 1)}${run(d2 + t, bottom + 36, 1)}
             <text class="fig-t" x="${left + len}" y="${top - 8}" text-anchor="end">top edge</text>
             <text class="fig-t" x="${left + len}" y="${bottom + 16}" text-anchor="end">bottom edge</text>`;
     }
@@ -348,10 +497,19 @@
 
         const out = DC.get("rectResults");
         const tab = DC.val("rectTab") || "mitered";
+        if (dgAnim) {
+            cancelAnimationFrame(dgAnim);
+            dgAnim = null;
+            dgU = Math.round(dgU);
+            if (DC.Fit3D.views.rectView) DC.Fit3D.views.rectView.lock = null;
+        }
+        DC.show("dgToggle", tab === "dogleg");
+        syncDogToggle(dgU >= 1 ? 1 : 0);
         const scene = tab === "lateral" ? lateral(out) : tab === "dogleg" ? dogleg(out) : mitered(out);
 
         if (scene) {
             DC.Fit3D.render("rectView", scene);
+            if (tab === "dogleg" && dgU === 0) dgStraightFrame = DC.Fit3D.views.rectView?.frame || null;
         } else {
             DC.Fit3D.clear("rectView");
         }

@@ -190,6 +190,15 @@
     }
 
     function sweep(part, plane) {
+        // A part can bring its own sections: rings of [x, y, w] points in the
+        // drawing plane (used for pieces with cut ends that move freely).
+        if (part.rings) {
+            return part.rings.map(r => {
+                const ring = r.pts.map(q => to3(plane, q[0], q[1], q[2] || 0));
+                const c = mul(ring.reduce((s, p) => add(s, p), [0, 0, 0]), 1 / ring.length);
+                return { c, ring, joint: !!r.joint, cut: !!r.cut };
+            });
+        }
         const round = part.kind === "round";
         let pts = densify(part.path, Math.max(round ? part.d : Math.max(part.w, part.h), 1) * 0.6);
 
@@ -406,14 +415,20 @@
                 for (let k = 0; k < N; k += 1) {
                     const k2 = (k + 1) % N;
                     const near = (vis[i - 1] && vis[i - 1][k]) || (vis[i] && vis[i][k]);
-                    if (near) line(S[i].ring[k], S[i].ring[k2], i === 0 || i === S.length - 1 ? "fv-edge" : "fv-seam");
+                    if (near) line(S[i].ring[k], S[i].ring[k2], S[i].cut ? "fv-cut" : i === 0 || i === S.length - 1 ? "fv-edge" : "fv-seam");
                 }
             }
 
             // end caps
             for (const [i, sign] of [[0, -1], [S.length - 1, 1]]) {
                 if (i === 0 && part.tap) continue;
-                const nCap = norm(mul(norm(sub(S[i === 0 ? 1 : i].c, S[i === 0 ? 0 : i - 1].c)), sign));
+                let nCap = norm(mul(norm(sub(S[i === 0 ? 1 : i].c, S[i === 0 ? 0 : i - 1].c)), sign));
+                if (part.rings) {
+                    // slanted cut end: use the face's own normal, facing out
+                    const rg = S[i].ring;
+                    const fn = norm(cross(sub(rg[2], rg[0]), sub(rg[3], rg[1])));
+                    nCap = dot(fn, nCap) < 0 ? mul(fn, -1) : fn;
+                }
                 const nv = cam(nCap);
                 if (nv[1] >= 0) continue;
                 const sp = S[i].ring.map(P);

@@ -1497,6 +1497,45 @@ h1,h2,h3,h4{
     color:var(--white);
 }
 
+/* Dogleg: straight joint / finished toggle */
+.live-view-head{flex-wrap:wrap;gap:8px}
+.dg-toggle{
+    display:inline-flex;
+    margin-left:auto;
+    padding:3px;
+    border:1px solid var(--border);
+    border-radius:9px;
+    background:var(--sunk);
+}
+.dg-toggle[hidden]{display:none}
+.dg-toggle button{
+    padding:6px 12px;
+    border:0;
+    border-radius:6px;
+    background:none;
+    color:#cfd6db;
+    font:600 15px/1.1 var(--font-c);
+    cursor:pointer;
+    min-height:32px;
+}
+.dg-toggle button:hover{color:var(--white)}
+.dg-toggle button.is-on{background:var(--yellow);color:#1a1405}
+.dg-toggle button:focus-visible{outline:2px solid var(--yellow);outline-offset:2px}
+
+/* Dogleg: numbered steps */
+.dg-step{display:grid;grid-template-columns:30px 1fr;gap:10px;align-items:start;color:var(--white);line-height:1.5}
+.dg-n{
+    display:inline-grid;
+    place-items:center;
+    width:26px;
+    height:26px;
+    border-radius:50%;
+    background:var(--yellow);
+    color:#1a1405;
+    font:700 15px/1 var(--font-c);
+}
+.dg-step b:not(.dg-n){color:var(--yellow);font-weight:700}
+
 .fv-svg{
     display:block;
     width:100%;
@@ -1533,6 +1572,14 @@ h1,h2,h3,h4{
 .fv-edge{
     stroke:var(--cyan);
     stroke-linecap:round;
+}
+
+.fv-cut{
+    stroke:#ffd23a;
+    stroke-width:2.2;
+    stroke-dasharray:7 4;
+    stroke-linecap:round;
+    vector-effect:non-scaling-stroke;
 }
 
 .fv-seam{
@@ -1615,4 +1662,10 @@ h1,h2,h3,h4{
     padding:8px 14px 0;
     color:#cfd6db;
     font-size:13.5px;
+}
+
+.kv-text:has(.dg-step){margin-top:12px;font-size:15.5px}
+@media (max-width:520px){
+    .dg-toggle{order:3;width:100%;margin-left:0}
+    .dg-toggle button{flex:1}
 }
