@@ -1044,59 +1044,6 @@
 
         <h3>Offset Inputs</h3>
 
-        <label for="offsetMode">
-
-            Calculation Mode
-
-        </label>
-
-        <select id="offsetMode">
-
-            <option value="solveAngle" selected>
-
-                Solve Elbow Angle
-
-            </option>
-
-            <option value="knownAngle">
-
-                Known Elbow Angle
-
-            </option>
-
-        </select>
-
-        <label for="offsetInput">
-    Offset
-</label>
-
-<input
-    id="offsetInput"
-    type="text"
-    inputmode="decimal"
-    value="46 1/4">
-
-<label for="overallLengthInput">
-    Overall Length
-</label>
-
-<input
-    id="overallLengthInput"
-    type="text"
-    inputmode="decimal"
-    value="69">
-
-<div id="snapAngleGroup">
-    <label class="check-row" for="snapStandardAngle">
-        <input id="snapStandardAngle" type="checkbox">
-        <span>Snap to standard angle</span>
-    </label>
-    <p class="input-help snap-help">
-        Rounds to the nearest of 11¼°, 15°, 22½°, 30°, 45° or 60° that fits.
-        The offset stays the same and the overall length adjusts.
-    </p>
-</div>
-
 <label for="ductWidthInput">
     Width (Cheek)
 </label>
@@ -1116,6 +1063,37 @@
     type="text"
     inputmode="decimal"
     value="24">    
+
+<label for="overallLengthInput">
+    Overall Length
+</label>
+
+<input
+    id="overallLengthInput"
+    type="text"
+    inputmode="decimal"
+    value="69">
+
+        <label for="offsetInput">
+    Offset
+</label>
+
+<input
+    id="offsetInput"
+    type="text"
+    inputmode="decimal"
+    value="46 1/4">
+
+<div id="snapAngleGroup">
+    <label class="check-row" for="snapStandardAngle">
+        <input id="snapStandardAngle" type="checkbox">
+        <span>Snap to standard angle</span>
+    </label>
+    <p class="input-help snap-help">
+        Rounds to the nearest of 11¼°, 15°, 22½°, 30°, 45° or 60° that fits.
+        The offset stays the same and the overall length adjusts.
+    </p>
+</div>
 
         <label class="check-row" for="noStraightElbows">
             <input id="noStraightElbows" type="checkbox">
@@ -1185,6 +1163,28 @@
                 placeholder="34">
 
         </div>
+
+        <label for="offsetMode">
+
+            Calculation Mode
+
+        </label>
+
+        <select id="offsetMode">
+
+            <option value="solveAngle" selected>
+
+                Solve Elbow Angle
+
+            </option>
+
+            <option value="knownAngle">
+
+                Known Elbow Angle
+
+            </option>
+
+        </select>
 
         <div
             id="knownAngleGroup"
