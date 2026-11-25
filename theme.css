@@ -1548,11 +1548,21 @@ h1,h2,h3,h4{
 
 .fv-label,
 .fv-note{
-    paint-order:stroke;
-    stroke:#14181b;
-    stroke-linejoin:round;
+    stroke:none;
     font-family:var(--font-c);
     font-weight:600;
+}
+
+.fv-tag{
+    fill:#14181b;
+    fill-opacity:.94;
+    stroke:rgba(242,194,48,.45);
+    stroke-width:.6;
+    vector-effect:non-scaling-stroke;
+}
+
+.fv-tag-note{
+    stroke:rgba(160,175,186,.35);
 }
 
 .fv-label{

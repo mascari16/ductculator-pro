@@ -450,7 +450,21 @@
         // then grow the fit to include the label text and fit again.
         const box = svg.getBoundingClientRect();
         const cw = box.width || 600;
-        const ch = box.height || 380;
+        let ch = box.height || 380;
+
+        // Phones: size the view to the drawing so wide fittings aren't
+        // shrunk into a tall, mostly empty box.
+        if (cw && cw < 700) {
+            const aspect = (maxY - minY + 1) / (maxX - minX + 1);
+            const want = Math.round(Math.max(210, Math.min(380, cw * aspect * 1.25 + 120)));
+            if (Math.abs(want - ch) > 2) {
+                svg.style.height = `${want}px`;
+                ch = want;
+            }
+        } else if (svg.style.height) {
+            svg.style.height = "";
+            ch = svg.getBoundingClientRect().height || ch;
+        }
         const padX = Math.min(70, cw * 0.12);
         const padY = Math.min(60, ch * 0.12);
 
@@ -528,30 +542,55 @@
             }
 
             // label on the outside of the line, kept upright
-            const size = 14 * u;
+            const size = (cw < 520 ? 15 : 14) * u;
             dims.appendChild(el("text", {
                 x: d.lx,
                 y: d.ly + size * 0.35,
                 "text-anchor": "middle",
                 class: "fv-label",
-                "font-size": size,
-                "stroke-width": 4 * u
+                "font-size": size
             }, d.label));
         }
 
         for (const n of noteGeo) {
-            const size = 12.5 * u;
+            const size = (cw < 520 ? 14 : 12.5) * u;
             dims.appendChild(el("text", {
                 x: n.p[0],
                 y: n.p[1] + size * 0.35,
                 "text-anchor": "middle",
                 class: "fv-note",
-                "font-size": size,
-                "stroke-width": 4 * u
+                "font-size": size
             }, n.text));
         }
 
         svg.appendChild(dims);
+
+        // Put every label on a solid dark tag (no text outlines: phone
+        // dark modes recolor outlines and made labels unreadable).
+        for (const t of [...dims.querySelectorAll("text")]) {
+            let b;
+            try {
+                b = t.getBBox();
+            } catch (error) {
+                b = null;
+            }
+            const size = Number(t.getAttribute("font-size"));
+            if (!b || !b.width) {
+                const w = String(t.textContent).length * size * 0.56;
+                b = { x: Number(t.getAttribute("x")) - w / 2, y: Number(t.getAttribute("y")) - size * 0.85, width: w, height: size * 1.1 };
+            }
+            const padX = 5 * u;
+            const padY = 2.5 * u;
+            const tag = el("rect", {
+                x: b.x - padX,
+                y: b.y - padY,
+                width: b.width + 2 * padX,
+                height: b.height + 2 * padY,
+                rx: 4 * u,
+                class: t.classList.contains("fv-note") ? "fv-tag fv-tag-note" : "fv-tag"
+            });
+            dims.insertBefore(tag, t);
+        }
     }
 
     function clear(viewId, message) {

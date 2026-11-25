@@ -1496,21 +1496,38 @@
                     "middle"
             }, label);
 
+        // Solid dark tag behind the label, sized from the text.
+        const fontSize =
+            parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--offset-iso-label-size")) ||
+            (window.matchMedia("(max-width: 700px)").matches ? 19 : 18);
+        const tagWidth = String(label).length * fontSize * 0.6 + 12;
+        const tagHeight = fontSize * 1.35;
+        const tag =
+            svg("rect", {
+                x: middle.x + (options.dx || 0) - tagWidth / 2,
+                y: middle.y + (options.dy || 0) - tagHeight / 2,
+                width: tagWidth,
+                height: tagHeight,
+                rx: 5,
+                class: "offset-iso-label-tag"
+            });
+
         if (options.rotate) {
 
-            text.setAttribute(
-                "transform",
-                `rotate(${
-                    options.rotate
-                } ${
-                    middle.x
-                } ${
-                    middle.y
-                })`
-            );
+            const turn = `rotate(${
+                options.rotate
+            } ${
+                middle.x
+            } ${
+                middle.y
+            })`;
+
+            text.setAttribute("transform", turn);
+            tag.setAttribute("transform", turn);
 
         }
 
+        group.appendChild(tag);
         group.appendChild(text);
 
     }

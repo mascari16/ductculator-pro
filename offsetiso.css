@@ -147,10 +147,7 @@
     text-anchor: middle;
     dominant-baseline: middle;
 
-    paint-order: stroke;
-    stroke: #181c1f;
-    stroke-width: 6px;
-    stroke-linejoin: round;
+    stroke: none;
 }
 
 .offset-iso-size-text {
@@ -162,10 +159,7 @@
 
     text-anchor: middle;
 
-    paint-order: stroke;
-    stroke: #181c1f;
-    stroke-width: 6px;
-    stroke-linejoin: round;
+    stroke: none;
 }
 
 .offset-iso-title-text {
@@ -327,7 +321,7 @@
     .offset-iso-size-text {
         font-size: 19px;
         font-weight: 750;
-        stroke-width: 6px;
+        stroke: none;
     }
 
     .offset-iso-problem-overlay {
@@ -349,4 +343,12 @@
     .offset-iso-problem-steps {
         font-size: 13px;
     }
+}
+/* Solid dark tag behind dimension labels (replaces text outlines,
+   which phone dark modes recolor). */
+.offset-iso-label-tag {
+    fill: #14181b;
+    fill-opacity: 0.94;
+    stroke: rgba(242, 194, 48, 0.45);
+    stroke-width: 1px;
 }
