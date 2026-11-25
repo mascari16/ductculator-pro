@@ -1748,3 +1748,23 @@ h1,h2,h3,h4{
 .wheel-opts{display:flex;flex-wrap:wrap;gap:6px 22px;margin:4px 0 0}
 .wh-hair-row[hidden]{display:none !important}
 #calculateOffsetBtn[hidden]{display:none !important}
+
+/* =====================================================
+   Results lists: every other row shaded, so the eye can follow
+   each label across to its value.
+===================================================== */
+.kv-list > .kv-row:not(.kv-main),
+#offsetResults .result-row{
+    padding-left:12px;
+    padding-right:12px;
+    border-radius:6px;
+}
+.kv-list > .kv-row:not(.kv-main):nth-of-type(even),
+#offsetResults .result-row:nth-of-type(even){
+    background:rgba(255,255,255,.045);
+    border-bottom-color:transparent;
+}
+.equivalent-table tbody tr:nth-child(even),
+.options-table tbody tr:nth-child(even){
+    background:rgba(255,255,255,.045);
+}
