@@ -5,7 +5,7 @@
 // Fonts are saved the first time they load online.
 // =====================================================
 
-const CACHE = "ductculator-v2";
+const CACHE = "ductculator-v3";
 
 const SHELL = [
   "./",
@@ -23,6 +23,7 @@ const SHELL = [
   "js/airflow.js",
   "js/equivalent.js",
   "js/equivalentSizes.js",
+  "js/fittingViews.js",
   "js/equivalentUI.js",
   "js/flatOval.js",
   "js/formulas.js",

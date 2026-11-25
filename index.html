@@ -1609,7 +1609,9 @@
 <input id="rfAngle" type="number" inputmode="decimal" value="45" step="any" min="1" max="89.9">
 </div><label for="rfClr">CLR (× diameter)</label>
 <input id="rfClr" type="number" inputmode="decimal" value="1.5" step="0.05" min="0.5"><label for="rfGores">Gores per elbow</label>
-<input id="rfGores" type="number" inputmode="decimal" value="5" step="1" min="2" max="20"></div><div data-panel="lateral" hidden><label for="rlD">Branch diameter</label>
+<input id="rfGores" type="number" inputmode="decimal" value="5" step="1" min="2" max="20"></div><div data-panel="lateral" hidden><label for="rlMainD">Main diameter</label>
+<input id="rlMainD" type="text" inputmode="decimal" value="16">
+<label for="rlD">Branch diameter</label>
 <input id="rlD" type="text" inputmode="decimal" value="10"><label for="rlAngle">Lateral angle</label>
 <input id="rlAngle" type="number" inputmode="decimal" value="45" step="any" min="1" max="89"><label for="rlOrient">Branch ends up</label>
 <select id="rlOrient"><option value="parallel" selected>Parallel to the main</option><option value="perpendicular">Square to the main</option></select><div id="rlOffsetGroup">
@@ -1631,8 +1633,17 @@
 
             <div class="panel tool-output">
                 <h3>Results</h3>
+                <div class="live-view" id="roundView">
+                    <div class="live-view-head">
+                        <h4>Live 3D view</h4>
+                        <button type="button" class="live-view-reset" data-view-reset>Reset view</button>
+                    </div>
+                    <svg class="fv-svg" tabindex="0" role="img" aria-label="3D view of the fitting. Drag or use the arrow keys to turn it."></svg>
+                    <p class="live-view-msg" hidden></p>
+                    <p class="live-view-hint">Drag or use the arrow keys to turn the view.</p>
+                </div>
                 <div id="roundResults" class="kv-list" aria-live="polite"></div>
-                <figure class="tool-figure" data-panel="offset"><svg class="tool-drawing fig-drawing" viewBox="0 0 320 150" role="img" aria-label="Diagram of the measurements"><path class="ln" d="M10 112H96C116 112 121 107 128 97L182 55C189 45 195 40 214 40H310"/><path class="hd" d="M96 112V60M214 40V128"/><path class="dm" d="M298 40V112M293 40h10M293 112h10"/><text class="fig-t fig-y" x="286" y="80" text-anchor="end">Rise</text><path class="dm" d="M96 132H214M96 127v10M214 127v10"/><text class="fig-t fig-y" x="155" y="146" text-anchor="middle">Length (run)</text><text class="fig-t" x="150" y="66" text-anchor="middle">travel</text><text class="fig-t" x="10" y="30" text-anchor="start">Roll = sideways part of the offset (into the page)</text></svg></figure><figure class="tool-figure" data-panel="lateral"><svg class="tool-drawing fig-drawing" viewBox="0 0 320 150" role="img" aria-label="Diagram of the measurements"><path class="ln" d="M10 118H310"/><path class="ln" d="M70 118L140 48C146 42 152 40 160 40H310"/><path class="dm" d="M296 40V118M291 40h10M291 118h10"/><text class="fig-t fig-y" x="286" y="82" text-anchor="end">Offset</text><path class="dm" d="M98 118A28 28 0 0 0 90 98"/><text class="fig-t fig-y" x="108" y="108" text-anchor="start">angle</text><circle class="ln" cx="70" cy="118" r="3"/><text class="fig-t" x="70" y="138" text-anchor="start">branch meets main centerline</text><text class="fig-t" x="10" y="30" text-anchor="start">Parallel shown. "Square to the main" turns the branch up instead.</text></svg></figure><figure class="tool-figure" data-panel="gored"><svg class="tool-drawing fig-drawing" viewBox="0 0 160 90" role="img" aria-label="Diagram of the measurements"><path class="ln" d="M22.0 18.0 L34.9 19.3 L58.7 29.1 L76.9 47.3 L86.7 71.1 L88.0 84.0"/><path class="ln" d="M22.0 50.0 L28.6 50.7 L40.9 55.7 L50.3 65.1 L55.3 77.4 L56.0 84.0"/><path class="hd" d="M34.9 19.3L28.6 50.7M58.7 29.1L40.9 55.7M76.9 47.3L50.3 65.1M86.7 71.1L55.3 77.4"/><path class="ln" d="M88.0 84L56.0 84M22 18L22 50"/><path class="dm" d="M120 84h28M120 52h28"/><path class="dm" d="M144 52v32M140 52h8M140 84h8"/><text class="dm-t" x="126" y="73">Ø</text></svg><figcaption>End gores are half the size of full gores.</figcaption></figure>
+                
             </div>
         </div>
     </section>
@@ -1684,10 +1695,18 @@
             <div class="panel tool-inputs">
                 <h3>Inputs</h3>
                 <div data-panel="mitered"><label for="moW">Width (cheek)</label>
-<input id="moW" type="text" inputmode="decimal" value="24"><label for="moO">Offset</label>
+<input id="moW" type="text" inputmode="decimal" value="24"><label for="moH">Depth</label>
+<input id="moH" type="text" inputmode="decimal" value="12">
+<p class="input-help">Depth is only used for the 3D view.</p>
+<label for="moO">Offset</label>
 <input id="moO" type="text" inputmode="decimal" value="12"><label for="moL">Length (miter to miter)</label>
-<input id="moL" type="text" inputmode="decimal" value="30"><p class="input-help">Two straight (mitered) elbows. For radius elbows, use Elbow Offset.</p></div><div data-panel="lateral" hidden><label for="xlW">Branch width (cheek)</label>
-<input id="xlW" type="text" inputmode="decimal" value="12"><label for="xlAngle">Lateral angle</label>
+<input id="moL" type="text" inputmode="decimal" value="30"><p class="input-help">Two straight (mitered) elbows. For radius elbows, use Elbow Offset.</p></div><div data-panel="lateral" hidden><label for="xlMainW">Main width</label>
+<input id="xlMainW" type="text" inputmode="decimal" value="24">
+<label for="xlW">Branch width (cheek)</label>
+<input id="xlW" type="text" inputmode="decimal" value="12"><label for="xlH">Depth</label>
+<input id="xlH" type="text" inputmode="decimal" value="12">
+<p class="input-help">Main width and depth are only used for the 3D view.</p>
+<label for="xlAngle">Lateral angle</label>
 <input id="xlAngle" type="number" inputmode="decimal" value="45" step="any" min="1" max="89"><label for="xlOrient">Branch ends up</label>
 <select id="xlOrient"><option value="parallel" selected>Parallel to the main</option><option value="perpendicular">Square to the main</option></select><div id="xlOffsetGroup">
 <label for="xlOffset">Offset from main centerline</label>
@@ -1704,8 +1723,17 @@
 
             <div class="panel tool-output">
                 <h3>Results</h3>
+                <div class="live-view" id="rectView">
+                    <div class="live-view-head">
+                        <h4>Live 3D view</h4>
+                        <button type="button" class="live-view-reset" data-view-reset>Reset view</button>
+                    </div>
+                    <svg class="fv-svg" tabindex="0" role="img" aria-label="3D view of the fitting. Drag or use the arrow keys to turn it."></svg>
+                    <p class="live-view-msg" hidden></p>
+                    <p class="live-view-hint">Drag or use the arrow keys to turn the view.</p>
+                </div>
                 <div id="rectResults" class="kv-list" aria-live="polite"></div>
-                <figure class="tool-figure" data-panel="mitered"><svg class="tool-drawing fig-drawing" viewBox="0 0 320 160" role="img" aria-label="Diagram of the measurements"><path class="ln" d="M10 104H120L196 44H310"/><path class="ln" d="M10 126H130L206 66H310"/><path class="dm" d="M120 104L130 126M196 44L206 66" stroke-dasharray="4 3"/><path class="dm" d="M296 55V115M291 55h10M291 115h10"/><text class="fig-t fig-y" x="286" y="90" text-anchor="end">Offset</text><path class="dm" d="M125 140H201M125 135v10M201 135v10"/><text class="fig-t fig-y" x="163" y="153" text-anchor="middle">Length</text><text class="fig-t" x="60" y="96" text-anchor="middle">Width (cheek)</text><text class="fig-t" x="10" y="24" text-anchor="start">Dashed lines are the miter joints.</text></svg></figure><figure class="tool-figure" data-panel="lateral"><svg class="tool-drawing fig-drawing" viewBox="0 0 320 150" role="img" aria-label="Diagram of the measurements"><path class="ln" d="M10 118H310"/><path class="ln" d="M70 118L140 48C146 42 152 40 160 40H310"/><path class="dm" d="M296 40V118M291 40h10M291 118h10"/><text class="fig-t fig-y" x="286" y="82" text-anchor="end">Offset</text><path class="dm" d="M98 118A28 28 0 0 0 90 98"/><text class="fig-t fig-y" x="108" y="108" text-anchor="start">angle</text><circle class="ln" cx="70" cy="118" r="3"/><text class="fig-t" x="70" y="138" text-anchor="start">branch meets main centerline</text><text class="fig-t" x="10" y="30" text-anchor="start">Parallel shown. "Square to the main" turns the branch up instead.</text></svg></figure>
+                
             </div>
         </div>
     </section>
@@ -1862,8 +1890,9 @@
 <script src="js/proCalc.js?v=20261124-1"></script>
 <script src="js/shared.js?v=20261124-2"></script>
 <script src="js/sizingTools.js?v=20261124-2"></script>
-<script src="js/roundFittings.js?v=20261124-2"></script>
-<script src="js/rectFittings.js?v=20261124-2"></script>
+<script src="js/fittingViews.js?v=20261124-3"></script>
+<script src="js/roundFittings.js?v=20261124-3"></script>
+<script src="js/rectFittings.js?v=20261124-3"></script>
 <script src="js/layoutMath.js?v=20261124-2"></script>
 <script src="js/takeoff.js?v=20261124-2"></script>
 <script src="js/navigation.js?v=20261124-2"></script>

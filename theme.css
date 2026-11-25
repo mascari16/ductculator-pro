@@ -1446,3 +1446,132 @@ h1,h2,h3,h4{
         display:none !important;
     }
 }
+
+/* =====================================================
+   Live 3D views (Round Fittings, Rect Fittings)
+===================================================== */
+
+.live-view{
+    margin-bottom:18px;
+    border:1px solid var(--border);
+    border-radius:10px;
+    background-color:var(--sunk);
+    background-image:var(--grid);
+    background-size:var(--grid-size);
+    overflow:hidden;
+}
+
+.live-view-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:10px 14px;
+    border-bottom:1px solid var(--border);
+    background:rgba(33,39,44,.85);
+}
+
+.live-view-head h4{
+    font-size:19px;
+    font-weight:600;
+}
+
+.live-view-reset{
+    padding:6px 12px;
+    border:1px solid var(--border);
+    border-radius:7px;
+    background:var(--card);
+    color:#cfd6db;
+    font:600 15px/1.1 var(--font-c);
+    cursor:pointer;
+}
+
+.live-view-reset:hover{
+    border-color:#5d6a75;
+    color:var(--white);
+}
+
+.fv-svg{
+    display:block;
+    width:100%;
+    height:clamp(260px, 34vw, 430px);
+    cursor:grab;
+    touch-action:none;
+    user-select:none;
+}
+
+.live-view.is-dragging .fv-svg{cursor:grabbing}
+
+.fv-svg:focus-visible{
+    outline:2px solid var(--yellow);
+    outline-offset:-2px;
+}
+
+.live-view.is-empty .fv-svg{
+    height:140px;
+}
+
+.live-view-msg{
+    margin:-90px 0 50px;
+    color:var(--gray);
+    font-size:14px;
+    text-align:center;
+}
+
+.live-view-hint{
+    padding:0 14px 10px;
+    color:var(--gray);
+    font-size:12.5px;
+}
+
+.fv-edge{
+    stroke:var(--cyan);
+    stroke-linecap:round;
+}
+
+.fv-seam{
+    stroke:#d2eefa;
+    stroke-opacity:.9;
+    stroke-linecap:round;
+}
+
+.fv-dim{
+    stroke:var(--yellow);
+    stroke-linecap:round;
+}
+
+.fv-ext{
+    stroke:var(--yellow);
+    stroke-opacity:.55;
+    stroke-dasharray:3 3;
+    vector-effect:non-scaling-stroke;
+}
+
+.fv-label,
+.fv-note{
+    paint-order:stroke;
+    stroke:#14181b;
+    stroke-linejoin:round;
+    font-family:var(--font-c);
+    font-weight:600;
+}
+
+.fv-label{
+    fill:var(--yellow);
+}
+
+.fv-note{
+    fill:#dbe3e8;
+}
+
+@media (max-width:900px){
+    .fv-svg{
+        height:min(72vw, 360px);
+    }
+}
+
+@media print{
+    .live-view-reset,
+    .live-view-hint{
+        display:none !important;
+    }
+}

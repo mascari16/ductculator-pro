@@ -56,6 +56,30 @@
             { label: "O × W ÷ L", note: "W × tan(angle): shop quick check", value: DC.fmt(O * W / L) },
             { label: "Slope", value: `${DC.fmt(12 * O / L)} per 12" · ${(100 * O / L).toFixed(1)}%` }
         ]);
+
+        // ---------- 3D scene ----------
+        const H = DC.meas("moH") > 0 ? DC.meas("moH") : W * 0.5;
+        const lead = Math.max(W * 0.9, 6);
+        const gap = W * 0.8 + 3;
+        const path = DC.Fit3D.Path(-lead, 0, 0)
+            .line(lead, true)
+            .corner(alpha)
+            .line(Math.hypot(O, L), true)
+            .corner(-alpha)
+            .line(lead, true);
+
+        return {
+            roll: 0,
+            parts: [{ kind: "rect", w: W, h: H, path: path.points }],
+            dims: [
+                { a: [-lead, -W / 2], b: [-lead, W / 2], off: [-gap, 0], label: `${DC.fmt(W)} cheek` },
+                { a: [0, 0], b: [L, 0], off: [0, -(W / 2 + gap)], eb: [L, O], label: `Length ${DC.fmt(L)}` },
+                { a: [L + lead + gap, 0], b: [L + lead + gap, O], ea: null, eb: [L + lead, O], label: `Offset ${DC.fmt(O)}` }
+            ],
+            notes: [
+                { at: [L / 2, O + W / 2 + gap * 0.9], text: `Both miters ${DC.deg(alpha / 2)}` }
+            ]
+        };
     }
 
     function lateral(out) {
@@ -125,19 +149,39 @@
             type === "radius" && { label: "Throat / heel radius", value: `${DC.fmt(R - W / 2)} / ${DC.fmt(R + W / 2)}` },
             { text: "Straight is measured from where the branch centerline crosses the main centerline. Subtract your lateral fitting's own length." }
         ]);
+
+        // ---------- 3D scene ----------
+        const Wm = DC.meas("xlMainW") > 0 ? DC.meas("xlMainW") : W * 1.5;
+        const H = DC.meas("xlH") > 0 ? DC.meas("xlH") : W * 0.6;
+
+        return DC.lateralScene({
+            kind: "rect",
+            main: Wm,
+            size: W,
+            depth: H,
+            angle,
+            r,
+            R,
+            smooth: type === "radius",
+            roll: 0,
+            label: s => `${DC.fmt(s)} main`
+        });
     }
 
     function compute() {
         syncFields();
 
         const out = DC.get("rectResults");
+        const scene = (DC.val("rectTab") || "mitered") === "lateral" ? lateral(out) : mitered(out);
 
-        if ((DC.val("rectTab") || "mitered") === "lateral") {
-            lateral(out);
+        if (scene) {
+            DC.Fit3D.render("rectView", scene);
         } else {
-            mitered(out);
+            DC.Fit3D.clear("rectView");
         }
     }
+
+    DC.Fit3D.bindView("rectView");
 
     DC.tabs(SCREEN, compute);
     DC.live(SCREEN, compute);

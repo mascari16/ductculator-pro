@@ -22,6 +22,73 @@
         DC.show("rlAdvanceGroup", perpendicular);
     }
 
+    /*
+     * 3D scene for a lateral: main along the run, branch leaving the
+     * main centerline at the lateral angle, one elbow, then a tail.
+     * Shared with Rect Fittings through DC.lateralScene.
+     */
+    function lateralScene({ kind, main, size, depth, angle, r, R, smooth, roll, label }) {
+        const a = DC.rad(angle);
+        const gap = Math.max(main, size) * 0.8 + 3;
+        const tail = size * 1.6;
+        // where the branch clears the main (drawing starts there)
+        const clear = (main / 2) / Math.sin(a) + (size / 2) / Math.tan(a);
+        const start = Math.min(clear, r.straight);
+        const turn = r.orient === "parallel" ? -r.elbow : r.elbow;
+        const path = DC.Fit3D.Path(start * Math.cos(a), start * Math.sin(a), angle).line(r.straight - start, true);
+
+        if (smooth) {
+            path.arc(R, turn, 24);
+        } else {
+            path.corner(turn);
+        }
+
+        path.line(tail, true);
+
+        const end = path.points[path.points.length - 1];
+        const elbowEnd = path.points[path.points.length - 2];
+        const mainLeft = -main * 1.6 - (size / 2) / Math.tan(a);
+        const mainRight = Math.max(end.x, elbowEnd.x + size) + (r.orient === "parallel" ? 0 : main * 1.4);
+        const mainPath = DC.Fit3D.Path(mainLeft, 0, 0).line(mainRight - mainLeft, true);
+        const section = kind === "round" ? { d: main } : { w: main, h: depth };
+        const branch = kind === "round" ? { d: size } : { w: size, h: depth };
+        const mid = r.straight / 2;
+        const dims = [
+            { a: [mainLeft, -main / 2], b: [mainLeft, main / 2], off: [-gap, 0], label: label(main) }
+        ];
+        const notes = [
+            { at: [Math.cos(a / 2) * (main * 0.5 + gap * 1.1), Math.sin(a / 2) * (main * 0.5 + gap * 1.1) + main / 2], text: DC.deg(angle) },
+            r.straight > 0.01 && {
+                at: [mid * Math.cos(a) - Math.sin(a) * (size / 2 + gap * 0.8), mid * Math.sin(a) + Math.cos(a) * (size / 2 + gap * 0.8)],
+                text: `Straight ${DC.fmt(r.straight)}`
+            }
+        ];
+
+        if (r.orient === "parallel") {
+            const T = r.trueOffset;
+            dims.push({ a: [end.x + gap, 0], b: [end.x + gap, T], ea: [mainRight, 0], eb: [end.x, end.y], label: `${roll ? "True offset" : "Offset"} ${DC.fmt(T)}` });
+        } else {
+            const A = elbowEnd.x;
+            dims.push({ a: [0, 0], b: [A, 0], off: [0, -(main / 2 + gap)], eb: [end.x, end.y], label: `Along main ${DC.fmt(A)}` });
+        }
+
+        if (roll) {
+            notes.push({ at: [end.x, end.y + size / 2 + gap], text: `Rolled ${roll.toFixed(1)}° from vertical` });
+        }
+
+        return {
+            roll: roll || 0,
+            parts: [
+                { kind, ...section, path: mainPath.points, tone: "main" },
+                { kind, ...branch, path: path.points }
+            ],
+            dims,
+            notes: notes.filter(Boolean)
+        };
+    }
+
+    DC.lateralScene = lateralScene;
+
     // ---------- offset (two elbows, optional roll) ----------
 
     function offset(out) {
@@ -131,6 +198,39 @@
         ];
 
         DC.renderRows(out, rows);
+
+        // ---------- 3D scene ----------
+        const lead = Math.max(D * 1.2, 6);
+        const gap = D * 0.9 + 3;
+        const path = DC.Fit3D.Path(-lead, 0, 0)
+            .line(lead, true)
+            .gored(R, angle, gores)
+            .line(Math.max(0, straight), true)
+            .gored(R, -angle, gores)
+            .line(lead, true);
+        const half = DC.rad(angle / 2);
+        const elbowMid = [R * Math.sin(half), R - R * Math.cos(half)];
+        const out1 = [Math.sin(half), -Math.cos(half)];
+        const rollDeg = roll > 0 ? (rise > 0 ? DC.degOf(Math.atan(roll / rise)) : 90) : 0;
+        const slopeMid = [
+            (R * Math.sin(DC.rad(angle)) + length - R * Math.sin(DC.rad(angle))) / 2,
+            T / 2
+        ];
+
+        return {
+            roll: rollDeg,
+            parts: [{ kind: "round", d: D, path: path.points }],
+            dims: [
+                { a: [-lead, -D / 2], b: [-lead, D / 2], off: [-gap, 0], label: `Ø ${DC.fmt(D)}` },
+                { a: [0, 0], b: [length, 0], off: [0, -(D / 2 + gap)], eb: [length, T], label: `Length ${DC.fmt(length)}` },
+                { a: [length + lead + gap, 0], b: [length + lead + gap, T], ea: null, eb: [length + lead, T], label: `${roll > 0 ? "True offset" : "Offset"} ${DC.fmt(T)}` }
+            ],
+            notes: [
+                { at: [elbowMid[0] + out1[0] * (D / 2 + gap * 0.45), elbowMid[1] + out1[1] * (D / 2 + gap * 0.45)], text: DC.deg(angle) },
+                straight > 0.01 && { at: [slopeMid[0] - Math.sin(DC.rad(angle)) * (D / 2 + gap * 0.7), slopeMid[1] + Math.cos(DC.rad(angle)) * (D / 2 + gap * 0.7)], text: `Straight ${DC.fmt(straight)}` },
+                roll > 0 && { at: [length + lead, T + D / 2 + gap], text: `Rolled ${rollDeg.toFixed(1)}° from vertical` }
+            ].filter(Boolean)
+        };
     }
 
     // ---------- lateral ----------
@@ -203,6 +303,20 @@
         ];
 
         DC.renderRows(out, rows);
+
+        // ---------- 3D scene ----------
+        const Dm = DC.meas("rlMainD") > 0 ? DC.meas("rlMainD") : D * 1.5;
+        return lateralScene({
+            kind: "round",
+            main: Dm,
+            size: D,
+            angle,
+            r,
+            R,
+            smooth: true,
+            roll: r.rollAngle || 0,
+            label: s => `Ø ${DC.fmt(s)}`
+        });
     }
 
     // ---------- gored elbow ----------
@@ -249,6 +363,26 @@
             { label: "Stretchout (π × D)", value: DC.len(g.stretchout) },
             { label: "Centerline length", note: "tan(miter) × CLR × (2n − 2)", value: DC.len(g.totalCenterline) }
         ]);
+
+        // ---------- 3D scene ----------
+        const lead = D * 0.9;
+        const gap = D * 0.9 + 3;
+        const path = DC.Fit3D.Path(-lead, 0, 0).line(lead, true).gored(R, angle, gores).line(lead, true);
+        const half = DC.rad(angle / 2);
+        const mid = [R * Math.sin(half), R - R * Math.cos(half)];
+
+        return {
+            roll: 0,
+            parts: [{ kind: "round", d: D, path: path.points }],
+            dims: [
+                { a: [-lead, -D / 2], b: [-lead, D / 2], off: [-gap, 0], label: `Ø ${DC.fmt(D)}` },
+                { a: [0, R], b: mid, ea: null, eb: null, label: `CLR ${DC.fmt(R)}` }
+            ],
+            notes: [
+                { at: [mid[0] + Math.sin(half) * (D / 2 + gap * 0.45), mid[1] - Math.cos(half) * (D / 2 + gap * 0.45)], text: `${DC.deg(angle)} · ${gores} gores` },
+                { at: [-lead, D / 2 + gap * 0.9], text: `Miter ${DC.deg(g.miter)}` }
+            ]
+        };
     }
 
     function compute() {
@@ -256,15 +390,19 @@
 
         const tab = DC.val("roundTab") || "offset";
         const out = DC.get("roundResults");
-
-        if (tab === "lateral") {
-            lateral(out);
-        } else if (tab === "gored") {
-            gored(out);
-        } else {
+        const scene =
+            tab === "lateral" ? lateral(out) :
+            tab === "gored" ? gored(out) :
             offset(out);
+
+        if (scene) {
+            DC.Fit3D.render("roundView", scene);
+        } else {
+            DC.Fit3D.clear("roundView");
         }
     }
+
+    DC.Fit3D.bindView("roundView");
 
     DC.tabs(SCREEN, compute);
     DC.live(SCREEN, compute);
