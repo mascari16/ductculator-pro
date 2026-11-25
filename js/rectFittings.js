@@ -16,6 +16,9 @@
         DC.show("xlOffsetGroup", !perpendicular);
         DC.show("xlAdvanceGroup", perpendicular);
         DC.show("xlClrGroup", DC.val("xlType") === "radius");
+        const byRun = DC.val("dgMode") === "run";
+        DC.show("dgAngleGroup", !byRun);
+        DC.show("dgRunGroup", byRun);
     }
 
     /*
@@ -186,11 +189,166 @@
         });
     }
 
+    /*
+     * Field dogleg from a straight joint.
+     *   Two parallel cuts across the joint, each β = α/2 off square on the
+     *   cheek. Rolling the middle piece over (180° about its length) flips
+     *   the lean of its ends, so each joint becomes an α elbow, one each way.
+     *   middle piece M (centerline; both edges are M too, the cuts being parallel)
+     *   offset  O = M · sin α          run between elbows  L = M · cos α
+     *   lean    t = (W/2) · tan β      (each cut runs 2t along the duct)
+     *   the joint gets shorter by M · (1 − cos α)
+     */
+    function dogleg(out) {
+        const W = DC.meas("dgW");
+        const O = DC.meas("dgO");
+        const J = DC.meas("dgJ");
+        const byRun = DC.val("dgMode") === "run";
+
+        if (!(W > 0)) {
+            return DC.renderProblem(out, "Enter the cheek width", "Width is the side of the duct the offset moves across.");
+        }
+        if (!(O > 0)) {
+            return DC.renderProblem(out, "Enter the offset", "Measure the offset in the field: how far the duct has to move over.");
+        }
+        if (!(J > 0)) {
+            return DC.renderProblem(out, "Enter the joint length", "The length of the straight joint you're cutting (for example 48 or 60).");
+        }
+
+        let alpha;
+        if (byRun) {
+            const run = DC.meas("dgRun");
+            if (!(run > 0)) {
+                return DC.renderProblem(out, "Enter the run", "Run is along the duct, from one elbow's centerline point to the other's.");
+            }
+            alpha = DC.degOf(Math.atan(O / run));
+        } else {
+            alpha = DC.num("dgAngle");
+            if (!(alpha > 0 && alpha < 90)) {
+                return DC.renderProblem(out, "Enter the elbow angle", "Elbow angle must be greater than 0° and less than 90° (45° or 30° is typical).");
+            }
+        }
+
+        const a = DC.rad(alpha);
+        const beta = alpha / 2;
+        const M = O / Math.sin(a);
+        const L = M * Math.cos(a);
+        const t = (W / 2) * Math.tan(DC.rad(beta));
+        const startText = String(DC.val("dgStart") || "").trim();
+        const d1 = startText ? DC.meas("dgStart") : (J - M) / 2;
+        const d2 = d1 + M;
+        const shorter = M - L;
+
+        if (startText && !(d1 >= 0)) {
+            return DC.renderProblem(out, "Check the first cut", "Enter the first cut's distance from the end of the joint, or leave it blank to center the offset.");
+        }
+
+        if (J < M + 2 * t + 0.001) {
+            const need = DC.quarterUp(M + 2 * t);
+            return DC.renderProblem(out, "The joint is too short", "Both cuts don't fit on this joint.", [
+                `Use a joint at least ${DC.fmt(need)} long (${DC.fmtFt(need)}).`,
+                byRun ? "Or use a shorter run (a steeper offset)." : "Or try a different elbow angle."
+            ]);
+        }
+
+        if (d1 - t < -0.001 || d2 + t > J + 0.001) {
+            return DC.renderProblem(out, "The cuts run off the joint", "At this first-cut position a cut runs past the end of the joint.", [
+                `Put the first cut between ${DC.fmt(DC.quarterUp(t))} and ${DC.fmt(Math.floor((J - M - t) * 4) / 4)} from the end.`,
+                "Or leave it blank to center the offset."
+            ]);
+        }
+
+        const edge = (d, s) => DC.fmt(d + s * t);
+        DC.renderRows(out, [
+            { label: "Cut each joint", note: "off square, on the cheek", value: DC.deg(beta), main: true },
+            { label: "Elbow angle (each)", value: DC.deg(alpha) },
+            { head: "Mark the joint (from the same end)" },
+            { label: "Cut 1", note: "top edge · centerline · bottom edge", value: `${edge(d1, 1)} · ${DC.fmt(d1)} · ${edge(d1, -1)}` },
+            { label: "Cut 2", note: "top edge · centerline · bottom edge", value: `${edge(d2, 1)} · ${DC.fmt(d2)} · ${edge(d2, -1)}` },
+            { label: "Middle piece", note: "between the cuts, every edge", value: DC.len(M) },
+            { label: "Lean across the cheek", note: "each cut runs this far along the duct", value: DC.fmt(2 * t) },
+            { text: "Square the cut across the other two sides at the top-edge and bottom-edge marks. Both cuts lean the same way." },
+            { head: "Assemble" },
+            { text: "Roll the middle piece over (turn it 180° on its length) and fasten it back between the two end pieces. Each joint becomes a " + DC.deg(alpha) + " elbow." },
+            { label: "Offset made", value: DC.fmt(O) },
+            { label: "Run between the elbows", note: "centerline", value: DC.len(L) },
+            { label: "Joint gets shorter by", value: DC.fmt(shorter) },
+            { label: "Finished length", note: "end to end, along the duct", value: DC.len(J - shorter) },
+            { text: "No allowance is added at the cuts. Add your own for drives, cleats or tabs." }
+        ]);
+
+        drawDogLayout({ W, J, d1, d2, t });
+
+        // ---------- 3D scene ----------
+        const H = DC.meas("dgH") > 0 ? DC.meas("dgH") : W * 0.5;
+        const A = d1;
+        const C = J - d2;
+        const path = DC.Fit3D.Path(-A, 0, 0)
+            .line(A, true)
+            .corner(alpha)
+            .line(M, true)
+            .corner(-alpha)
+            .line(C, true);
+        const slope = DC.rad(alpha);
+        const nrm = [-Math.sin(slope), Math.cos(slope)];
+        const lean = t;
+        const BL = [lean, -W / 2];
+        const TL = [-lean, W / 2];
+        const TR = [L - lean, O + W / 2];
+        const endBottom = [L + C, O - W / 2];
+
+        return {
+            roll: 0,
+            dimW: H / 2,
+            parts: [{ kind: "rect", w: W, h: H, path: path.points }],
+            dims: [
+                { a: [-A, -W / 2], b: [-A, W / 2], dir: [-1, 0], base: W * 0.3, label: `${DC.fmt(W)} cheek` },
+                { a: [-A, -W / 2], b: [endBottom[0], -W / 2], dir: [0, -1], base: W * 0.4, ea: [-A, -W / 2], eb: endBottom, label: `Finished ${DC.fmt(J - shorter)}` },
+                { a: [endBottom[0], -W / 2], b: endBottom, dir: [1, 0], base: W * 0.35, ea: BL, eb: endBottom, label: `Offset ${DC.fmt(O)}` },
+                { a: TL, b: TR, dir: nrm, base: W * 0.3, ea: TL, eb: TR, label: `Middle ${DC.fmt(M)}` }
+            ],
+            caption: `${DC.deg(alpha)} elbows · cuts ${DC.deg(beta)} off square · middle piece rolled over · depth ${DC.fmt(H)}`
+        };
+    }
+
+    // Flat layout of the straight joint (cheek face) with both cuts marked.
+    // Marks are running dimensions from the left end, like a tape hooked on it.
+    function drawDogLayout({ W, J, d1, d2, t }) {
+        const svg = DC.get("dgLayout");
+        if (!svg) return;
+        const VW = 340, VH = 210;
+        const s = Math.min((VW - 40) / J, 92 / W);
+        const len = J * s, h = W * s;
+        const left = (VW - len) / 2, top = 64, bottom = top + h;
+        const X = d => left + d * s;
+        const f = v => DC.fmt(v);
+        const run = (d, y, side) => {
+            const x = X(d), xa = X(0), up = side < 0;
+            const ty = up ? y - 6 : y + 15;
+            return `<path class="dm" d="M${xa} ${y}H${x}M${x} ${up ? y - 4 : y + 4}V${up ? top : bottom}" stroke-width="1.2"/>
+                <path class="dm" d="M${x - 5} ${y - 3}L${x} ${y}L${x - 5} ${y + 3}" stroke-width="1.2"/>
+                <text class="fig-t fig-y" x="${x - 4}" y="${ty}" text-anchor="end">${f(d)}</text>`;
+        };
+        const cut = d => `<path class="dm" d="M${X(d - t)} ${bottom}L${X(d + t)} ${top}" stroke-width="2.2"/>`;
+        svg.setAttribute("viewBox", `0 0 ${VW} ${VH}`);
+        svg.innerHTML = `
+            <polygon points="${X(d1 + t)},${top} ${X(d2 + t)},${top} ${X(d2 - t)},${bottom} ${X(d1 - t)},${bottom}" fill="rgba(110,190,230,.18)" stroke="none"/>
+            <rect class="ln" x="${left}" y="${top}" width="${len}" height="${h}"/>
+            <path class="hd" d="M${left} ${(top + bottom) / 2}H${left + len}"/>
+            <path class="dm" d="M${X(0)} ${top - 40}V${bottom + 40}" stroke-width="1.2"/>
+            ${cut(d1)}${cut(d2)}
+            ${run(d1 + t, top - 16, -1)}${run(d2 + t, top - 36, -1)}
+            ${run(d1 - t, bottom + 16, 1)}${run(d2 - t, bottom + 36, 1)}
+            <text class="fig-t" x="${left + len}" y="${top - 8}" text-anchor="end">top edge</text>
+            <text class="fig-t" x="${left + len}" y="${bottom + 16}" text-anchor="end">bottom edge</text>`;
+    }
+
     function compute() {
         syncFields();
 
         const out = DC.get("rectResults");
-        const scene = (DC.val("rectTab") || "mitered") === "lateral" ? lateral(out) : mitered(out);
+        const tab = DC.val("rectTab") || "mitered";
+        const scene = tab === "lateral" ? lateral(out) : tab === "dogleg" ? dogleg(out) : mitered(out);
 
         if (scene) {
             DC.Fit3D.render("rectView", scene);

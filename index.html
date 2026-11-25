@@ -178,7 +178,7 @@
     <h3>Rect Fittings</h3>
 
     <p>
-        Mitered offsets, O × W ÷ L<br>Laterals, radius or straight elbows<br>Miter cuts and lean
+        Mitered offsets, O × W ÷ L<br>Laterals, radius or straight elbows<br>Field doglegs from a straight joint
     </p>
 
     <button type="button">Open calculator</button>
@@ -1693,10 +1693,10 @@
     <section class="content">
         <header>
             <h1>Rect Fittings</h1>
-            <p>Mitered offsets and laterals for rectangular duct.</p>
+            <p>Mitered offsets, laterals and field doglegs for rectangular duct.</p>
         </header>
 
-        <div class="seg" role="tablist" aria-label="Choose a calculation" data-tabs="rectTab"><button type="button" role="tab" data-tab="mitered">Mitered offset</button><button type="button" role="tab" data-tab="lateral">Lateral</button></div>
+        <div class="seg" role="tablist" aria-label="Choose a calculation" data-tabs="rectTab"><button type="button" role="tab" data-tab="mitered">Mitered offset</button><button type="button" role="tab" data-tab="lateral">Lateral</button><button type="button" role="tab" data-tab="dogleg">Dogleg (field)</button></div>
 <input type="hidden" id="rectTab" value="mitered">
 
         <div class="calculator tool-calc">
@@ -1726,7 +1726,29 @@
 <select id="xlType"><option value="radius" selected>Radius elbow</option><option value="straight">Straight (mitered) elbow</option></select><div id="xlClrGroup">
 <label for="xlClr">Elbow CLR (× width)</label>
 <input id="xlClr" type="number" inputmode="decimal" value="1" step="0.05" min="0.5">
-</div></div>
+</div></div><div data-panel="dogleg" hidden>
+<p class="input-help">Field dogleg: make two parallel cuts across a straight joint, roll the middle piece over and fasten it back on. Each cut becomes an elbow.</p>
+<label for="dgW">Width (cheek)</label>
+<input id="dgW" type="text" inputmode="decimal" value="24">
+<label for="dgH">Depth</label>
+<input id="dgH" type="text" inputmode="decimal" value="12">
+<p class="input-help">Width is the side the offset moves across. Depth is only used for the 3D view.</p>
+<label for="dgO">Offset (field measure)</label>
+<input id="dgO" type="text" inputmode="decimal" value="10">
+<label for="dgMode">Set the elbows by</label>
+<select id="dgMode"><option value="angle" selected>Elbow angle</option><option value="run">Run between the elbows</option></select><div id="dgAngleGroup">
+<label for="dgAngle">Elbow angle</label>
+<input id="dgAngle" type="number" inputmode="decimal" value="45" step="any" min="1" max="89">
+</div><div id="dgRunGroup" hidden>
+<label for="dgRun">Run between the elbows</label>
+<input id="dgRun" type="text" inputmode="decimal" value="18">
+<p class="input-help">Along the duct, from one elbow's centerline point to the other's.</p>
+</div><label for="dgJ">Joint length</label>
+<input id="dgJ" type="text" inputmode="decimal" value="60">
+<label for="dgStart">First cut from the end (optional)</label>
+<input id="dgStart" type="text" inputmode="decimal" value="" placeholder="Centered">
+<p class="input-help">On the centerline, from the end of the joint. Leave blank to center the offset in the joint.</p>
+</div>
             </div>
 
             <div class="panel tool-output">
@@ -1742,6 +1764,7 @@
                     <p class="live-view-hint">Drag or use the arrow keys to turn the view.</p>
                 </div>
                 <div id="rectResults" class="kv-list" aria-live="polite"></div>
+                <figure class="tool-figure" data-panel="dogleg" hidden><svg id="dgLayout" class="tool-drawing fig-drawing" viewBox="0 0 340 170" role="img" aria-label="Cut layout on the straight joint"></svg><figcaption>Cheek face of the joint, marks measured from the left end. Both cuts lean the same way; the shaded middle piece gets rolled over.</figcaption></figure>
                 
             </div>
         </div>
