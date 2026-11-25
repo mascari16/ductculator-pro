@@ -603,6 +603,7 @@
 
             const size = labelPx * u;
             const labelBox = (text, x, y) => {
+                if (!text) return { x, y, w: 0, h: 0, cx: x, cy: y };
                 const w = String(text).length * size * 0.56 + 12 * u;
                 const h = size * 1.45;
                 return { x: x - w / 2, y: y - h / 2, w, h, cx: x, cy: y };
@@ -839,6 +840,7 @@
             dims.appendChild(el("path", { d: `M${tip[0]} ${tip[1]}L${bx - uy * W} ${by + ux * W}L${bx + uy * W} ${by - ux * W}Z`, class: "fv-arrow" }));
         };
         const tag = (lb, text) => {
+            if (!text) return;   // unlabeled dimension (part of a chain)
             dims.appendChild(el("rect", { x: lb.x, y: lb.y, width: lb.w, height: lb.h, rx: 4 * u, class: "fv-tag" }));
             dims.appendChild(el("text", { x: lb.cx, y: lb.cy + labelPx * u * 0.36, "text-anchor": "middle", class: "fv-label", "font-size": labelPx * u }, text));
         };
@@ -899,6 +901,15 @@
             line(p.pa, p.pb, "fv-dim", 1.3);
             if (!p.d.radius) arrow(p.pa, p.pb);
             arrow(p.pb, p.pa);
+            // intermediate points of a chain: extension line and arrows both ways
+            for (const q of p.d.mid || []) {
+                const q2 = [q[0] + p.dir[0] * p.dist, q[1] + p.dir[1] * p.dist];
+                const s0 = Q(q[0], q[1]), s1 = Q(q2[0], q2[1]);
+                const dx = s1[0] - s0[0], dy = s1[1] - s0[1], l = Math.hypot(dx, dy) || 1;
+                line([s0[0] + (dx / l) * 3 * u, s0[1] + (dy / l) * 3 * u], [s1[0] + (dx / l) * 4 * u, s1[1] + (dy / l) * 4 * u], "fv-ext", 0.9);
+                arrow(s1, p.pa);
+                arrow(s1, p.pb);
+            }
             tag(p.lb, p.d.label);
         }
 

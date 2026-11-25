@@ -1995,8 +1995,15 @@
             { a: [L, -W / 2], b: [L, O - W / 2], dir: [1, 0], base: W * 0.35, ea: [0, -W / 2], eb: [L, O - W / 2], label: `Offset ${fmt(O)}` }
         ];
         if (S > 0.05) {
-            dims.push({ a: top(e1), b: top(e2), dir: nrm, base: W * 0.3, ea: top(e1), eb: top(e2), label: `Straight ${fmt(S)}` });
+            // straight on each elbow (close in), the total straight outside it
+            const m = [e1[0] + (S / 2) * Math.cos(a), e1[1] + (S / 2) * Math.sin(a)];
+            // one chain of two equal pieces, labeled once
+            dims.push({ a: top(e1), b: top(e2), dir: nrm, base: W * 0.25, ea: top(e1), eb: top(e2), mid: [top(m)], label: `${fmt(S / 2)} each elbow` });
+            dims.push({ a: top(e1), b: top(e2), dir: nrm, base: W * 0.25 + Math.max(W * 0.3, 12), ea: top(e1), eb: top(e2), label: `Straight ${fmt(S)}` });
         }
+        // centerline radius of the first elbow, from its center to the centerline
+        const midArc = [R * Math.sin(a / 2), R - R * Math.cos(a / 2)];
+        dims.push({ a: [0, R], b: midArc, fixed: true, radius: true, label: `CLR ${fmt(R)}` });
 
         return {
             roll: 0,
