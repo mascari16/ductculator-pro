@@ -97,6 +97,22 @@
         }
     });
 
+    // Startup is done: let the dashboard drawings sketch in on an idle page.
+    const releaseSketch = () => requestAnimationFrame(() => requestAnimationFrame(() => {
+        document.documentElement.classList.remove("anim-wait");
+    }));
+    // Also wait (briefly) for the web fonts, so the font swap doesn't
+    // redraw the page in the middle of the sketch.
+    const whenFonts = () => Promise.race([
+        document.fonts ? document.fonts.ready : Promise.resolve(),
+        new Promise(done => setTimeout(done, 700))
+    ]).then(releaseSketch, releaseSketch);
+    if (document.readyState === "complete") {
+        whenFonts();
+    } else {
+        window.addEventListener("load", whenFonts, { once: true });
+    }
+
     // Works offline once it has been opened online (served over http/https).
     if ("serviceWorker" in navigator && /^https?:$/.test(location.protocol)) {
         window.addEventListener("load", () => {

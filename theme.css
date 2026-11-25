@@ -145,6 +145,9 @@ h1,h2,h3,h4{
     height:100%;
     max-width:260px;
     overflow:visible;
+    /* own layer: each frame of the sketch repaints just the lines */
+    will-change:transform;
+    transform:translateZ(0);
 }
 
 .tool-drawing .ln{fill:none;stroke:var(--cyan);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
@@ -160,15 +163,19 @@ h1,h2,h3,h4{
 .tool-drawing .ln{
     stroke-dasharray:1;
     stroke-dashoffset:0;
-    animation:ductculator-draw 1s cubic-bezier(.3,.7,.3,1) both;
+    animation:ductculator-draw 1.15s cubic-bezier(.45,.05,.25,1) both;
 }
 
-.tool-card:nth-child(2) .tool-drawing .ln{animation-delay:.06s}
-.tool-card:nth-child(3) .tool-drawing .ln{animation-delay:.12s}
-.tool-card:nth-child(4) .tool-drawing .ln{animation-delay:.18s}
-.tool-card:nth-child(5) .tool-drawing .ln{animation-delay:.24s}
-.tool-card:nth-child(6) .tool-drawing .ln{animation-delay:.30s}
-.tool-card:nth-child(7) .tool-drawing .ln{animation-delay:.36s}
+/* Wait until the app has finished starting up, so the sketch plays on an
+   idle page instead of stuttering through the startup work. */
+.anim-wait .tool-drawing .ln{animation-play-state:paused}
+
+.tool-card:nth-child(2) .tool-drawing .ln{animation-delay:.07s}
+.tool-card:nth-child(3) .tool-drawing .ln{animation-delay:.14s}
+.tool-card:nth-child(4) .tool-drawing .ln{animation-delay:.21s}
+.tool-card:nth-child(5) .tool-drawing .ln{animation-delay:.28s}
+.tool-card:nth-child(6) .tool-drawing .ln{animation-delay:.35s}
+.tool-card:nth-child(7) .tool-drawing .ln{animation-delay:.42s}
 
 @keyframes ductculator-draw{
     from{stroke-dashoffset:1}

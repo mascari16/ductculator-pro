@@ -244,6 +244,19 @@
 
     const views = {};
 
+    // Draws a view's waiting scene as soon as the view gets a size.
+    const watched = new Set();
+    function watchVisible(viewId, root) {
+        if (watched.has(viewId) || typeof ResizeObserver === "undefined") return;
+        watched.add(viewId);
+        new ResizeObserver(() => {
+            const state = views[viewId];
+            if (state && state.pending && state.scene && root.offsetParent !== null) {
+                render(viewId, state.scene);
+            }
+        }).observe(root);
+    }
+
     function viewState(id) {
         if (!views[id]) {
             views[id] = { yaw: -32, pitch: 22, scene: null };
@@ -301,6 +314,15 @@
         const state = viewState(viewId);
         state.scene = scene;
         root.classList.remove("is-empty");
+
+        // Hidden screen (e.g. the app is starting up on the dashboard): keep
+        // the scene and draw it the moment the view becomes visible.
+        if (root.offsetParent === null) {
+            state.pending = true;
+            watchVisible(viewId, root);
+            return;
+        }
+        state.pending = false;
         const msg = root.querySelector(".live-view-msg");
         if (msg) msg.hidden = true;
 
