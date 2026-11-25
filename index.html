@@ -1219,24 +1219,18 @@
 
     </div>
 
-    <div class="offset-iso-card">
-
-    <div class="offset-iso-header">
-
-        <h3>Live Isometric Preview</h3>
-
-        <p class="offset-iso-note">
-            Preview updates live. Geometry corrections appear over the elbow.
-        </p>
-
+    <div id="offsetIsoContainer" class="offset-iso-container offset-view-host">
+        <div class="live-view" id="offsetView">
+            <div class="live-view-head">
+                <h4>Live 3D view</h4>
+                <button type="button" class="live-view-reset" data-view-reset>Reset view</button>
+            </div>
+            <svg class="fv-svg" tabindex="0" role="img" aria-label="3D view of the elbow offset. Drag or use the arrow keys to turn it."></svg>
+            <p class="live-view-msg" hidden></p>
+            <p class="live-view-caption" hidden></p>
+            <p class="live-view-hint">Drag or use the arrow keys to turn the view.</p>
+        </div>
     </div>
-
-    <div
-        id="offsetIsoContainer"
-        class="offset-iso-container">
-    </div>
-
-</div>
 
 </div>
 
@@ -1949,7 +1943,7 @@
 <script src="js/equivalentSizes.js?v=20260812-6"></script>
 <script src="js/airflow.js?v=20260812-6"></script>
 <script src="app.js?v=20260812-6"></script>
-<script src="offsetiso.js?v=20260812-6"></script>
+<script src="offsetiso.js?v=20261125-1"></script>
 <script src="js/equivalentUI.js?v=20260812-6"></script>
 <script src="js/transitionSplitter.js?v=20260812-6"></script>
 <script src="js/proCalc.js?v=20261124-1"></script>

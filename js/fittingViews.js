@@ -917,6 +917,8 @@
         if (!root) return;
         root.classList.add("is-empty");
         root.querySelector("svg")?.replaceChildren();
+        const cap = root.querySelector(".live-view-caption");
+        if (cap) cap.hidden = true;
         const msg = root.querySelector(".live-view-msg");
         if (msg) {
             msg.textContent = message || "Fix the inputs to see the fitting.";

@@ -1957,6 +1957,57 @@
 
     let lastOffsetIsoLayoutMode = null;
 
+    /*
+     * The preview is the shared live 3D view (DC.Fit3D), the same as Round
+     * and Rect Fittings: a rectangular duct with two radius elbows, the
+     * straight between them, and drafting dimensions.
+     */
+    function offsetScene(model) {
+        const W = model.ductWidth;
+        const H = model.ductDepth;
+        const O = model.offset;
+        const R = model.centerlineRadius;
+        const angle = model.elbowAngle;
+        const S = Math.max(0, model.totalStraight || 0);
+        const a = angle * Math.PI / 180;
+        const L = O / Math.tan(a) + 2 * R * Math.tan(a / 2);
+        const lead = Math.max(W * 0.6, 6);
+        const path = DC.Fit3D.Path(-lead, 0, 0).line(lead, true).arc(R, angle, 28);
+        if (S > 0.01) path.line(S, true);
+        path.arc(R, -angle, 28).line(lead, true);
+
+        const nrm = [-Math.sin(a), Math.cos(a)];
+        const e1 = [R * Math.sin(a), R * (1 - Math.cos(a))];
+        const e2 = [e1[0] + S * Math.cos(a), e1[1] + S * Math.sin(a)];
+        const top = p => [p[0] + nrm[0] * W / 2, p[1] + nrm[1] * W / 2];
+        const fmt = formatMeasurement;
+
+        const dims = [
+            { a: [-lead, -W / 2], b: [-lead, W / 2], dir: [-1, 0], base: W * 0.3, label: `${fmt(W)} cheek` },
+            { a: [0, -W / 2], b: [L, -W / 2], dir: [0, -1], base: W * 0.4, ea: [0, -W / 2], eb: [L, O - W / 2], label: `Length ${fmt(L)}` },
+            { a: [L + lead, -W / 2], b: [L + lead, O - W / 2], dir: [1, 0], base: W * 0.35, ea: [0, -W / 2], eb: [L + lead, O - W / 2], label: `Offset ${fmt(O)}` }
+        ];
+        if (S > 0.05) {
+            dims.push({ a: top(e1), b: top(e2), dir: nrm, base: W * 0.3, ea: top(e1), eb: top(e2), label: `Straight ${fmt(S)}` });
+        }
+
+        return {
+            roll: 0,
+            dimW: H / 2,
+            parts: [{ kind: "rect", w: W, h: H, path: path.points }],
+            dims,
+            caption: [
+                `Two ${angle.toFixed(2)}° elbows`,
+                `CLR ${fmt(R)}`,
+                `throat ${fmt(R - W / 2)}`,
+                S > 0.05 ? `straight ${fmt(S)}` : "no straight",
+                `depth ${fmt(H)}`
+            ].join(" · ")
+        };
+    }
+
+    let viewBound = false;
+
     function render() {
 
         const container =
@@ -1964,787 +2015,43 @@
                 ids.container
             );
 
-        if (!container) {
+        if (!container || !window.DC || !DC.Fit3D) {
 
             return;
 
         }
 
-        lastOffsetIsoLayoutMode =
-            getOffsetIsoLayoutMode(container);
-
-        container.innerHTML = "";
-        container.classList.remove(
-            "has-offset-error"
-        );
-
-        const model =
-            getModel();
-
-        const profile =
-            buildElbowProfile(model);
-
-        /*
-         * The isometric extrusion is proportional to the real
-         * non-bending duct dimension.
-         */
-        const depthVector = {
-            x:
-                Math.max(
-                    3,
-                    model.elbowDepth
-                ) * 0.62,
-            y:
-                Math.max(
-                    3,
-                    model.elbowDepth
-                ) * 0.34
-        };
-
-        const farThroat =
-            shift(
-                profile.nearThroat,
-                depthVector
-            );
-
-        const farHeel =
-            shift(
-                profile.nearHeel,
-                depthVector
-            );
-
-        const farCenter =
-            shift(
-                profile.centerline,
-                depthVector
-            );
-
-        const allPoints = [
-            ...profile.nearThroat,
-            ...profile.nearHeel,
-            ...farThroat,
-            ...farHeel
-        ];
-
-        /*
-         * Use a stacked layout on phones so the elbow and
-         * fabrication data remain large enough to read.
-         */
-        /*
-         * Detect the actual browser viewport instead of the
-         * SVG container. The container can briefly report a
-         * small or zero width while the desktop page is
-         * rendering, which incorrectly triggered mobile mode.
-         */
-        const isMobile =
-            window.matchMedia(
-                "(max-width: 700px)"
-            ).matches;
-
-        const layoutMode =
-            getOffsetIsoLayoutMode(container);
-
-        /*
-         * Compact desktop layout: the full 1750-unit layout is scaled
-         * down to ~40% inside a typical laptop results panel, which made
-         * the fabrication data unreadable (≈6px labels). The compact
-         * layout keeps the side-by-side arrangement but uses a 1000-unit
-         * canvas and the phone-sized panel text, so it renders at about
-         * the same scale as the phone layout.
-         */
-        const isCompact =
-            layoutMode === "compact";
-
-        const viewWidth =
-            isMobile ? 500 : isCompact ? 1000 : 1750;
-
-        const viewHeight =
-            isMobile ? 1310 : isCompact ? 680 : 660;
-
-        const drawingArea =
-            isMobile
-                ? {
-                    x: 8,
-                    y: 35,
-                    width: 484,
-                    height: 570
-                }
-                : isCompact
-                ? {
-                    x: 15,
-                    y: 40,
-                    width: 500,
-                    height: 600
-                }
-                : {
-                    x: 45,
-                    y: 20,
-                    width: 900,
-                    height: 550
-                };
-
-        const dataPanelLayout =
-            isMobile
-                ? {
-                    x: 4,
-                    y: 635,
-                    width: 492,
-                    height: 640,
-                    mobile: true
-                }
-                : isCompact
-                ? {
-                    x: 535,
-                    y: 20,
-                    width: 455,
-                    height: 640,
-                    mobile: true
-                }
-                : {
-                    x: 1100,
-                    y: 20,
-                    width: 560,
-                    height: 620,
-                    mobile: false
-                };
-
-        const transform =
-            createTransform(
-                allPoints,
-                drawingArea
-            );
-
-        const nearThroat =
-            transformPoints(
-                profile.nearThroat,
-                transform
-            );
-
-        const nearHeel =
-            transformPoints(
-                profile.nearHeel,
-                transform
-            );
-
-        const center =
-            transformPoints(
-                profile.centerline,
-                transform
-            );
-
-        const farThroatT =
-            transformPoints(
-                farThroat,
-                transform
-            );
-
-        const farHeelT =
-            transformPoints(
-                farHeel,
-                transform
-            );
-
-        const farCenterT =
-            transformPoints(
-                farCenter,
-                transform
-            );
-
-        container.replaceChildren();
-
-        const drawing =
-            svg("svg", {
-                class:
-                    isMobile
-                        ? "offset-iso-svg offset-iso-svg-mobile"
-                        : "offset-iso-svg",
-                width: "100%",
-                viewBox:
-                    `0 0 ${
-                        viewWidth
-                    } ${
-                        viewHeight
-                    }`,
-                preserveAspectRatio:
-                    "xMidYMid meet",
-                role: "img",
-                "aria-label":
-                    "Isometric rectangular radius elbow fabrication preview"
-            });
-
-        addDefinitions(drawing);
-
-        /*
-         * Far side face.
-         */
-        drawing.appendChild(
-            svg("path", {
-                d: path([
-                    ...farHeelT,
-                    ...farThroatT
-                        .slice()
-                        .reverse()
-                ], true),
-                class:
-                    "offset-iso-back-panel",
-                stroke: "none"
-            })
-        );
-
-
-
-        /*
- * Heel surface.
- */
-drawing.appendChild(
-    svg("path", {
-        d: path([
-            ...nearHeel,
-            ...farHeelT
-                .slice()
-                .reverse()
-        ], true),
-        class:
-            "offset-iso-top-panel",
-        fill: "#5b6974",
-        stroke: "none"
-    })
-);
-
-/*
- * Throat surface.
- */
-drawing.appendChild(
-    svg("path", {
-        d: path([
-            ...nearThroat,
-            ...farThroatT
-                .slice()
-                .reverse()
-        ], true),
-        class:
-            "offset-iso-bottom-panel",
-        fill: "#4c5761",
-        stroke: "none"
-    })
-);
-
-        /*
-         * Near cheek/side profile.
-         */
-        drawing.appendChild(
-            svg("path", {
-                d: path([
-                    ...nearHeel,
-                    ...nearThroat
-                        .slice()
-                        .reverse()
-                ], true),
-                class:
-                    "offset-iso-side-panel",
-                stroke: "none"
-            })
-        );
-
-        /*
-         * Explicit visible linework only.
-         * These two near-side edges are the edges actually facing the viewer.
-         */
-        drawing.appendChild(
-            svg("path", {
-                d: path(nearHeel),
-                fill: "none",
-                stroke: "#8cc8e4",
-                "stroke-width": 2,
-                "stroke-linecap": "round",
-                "stroke-linejoin": "round"
-            })
-        );
-
-        drawing.appendChild(
-            svg("path", {
-                d: path(nearThroat),
-                fill: "none",
-                stroke: "#8cc8e4",
-                "stroke-width": 2,
-                "stroke-linecap": "round",
-                "stroke-linejoin": "round"
-            })
-        );
-
-        /*
-         * Hidden far-side edges.
-         * Draw only the middle curved portions as dashed lines. The ends are
-         * omitted because the inlet and outlet faces already define them.
-         */
-        const hiddenStart = 12;
-        const hiddenEnd =
-            Math.max(
-                hiddenStart + 2,
-                farHeelT.length - 12
-            );
-
-        drawing.appendChild(
-            svg("path", {
-                d: path(
-                    farHeelT.slice(
-                        hiddenStart,
-                        hiddenEnd
-                    )
-                ),
-                fill: "none",
-                stroke: "#abb6be",
-                "stroke-width": 1.15,
-                "stroke-dasharray": "5 8",
-                "stroke-linecap": "round",
-                opacity: 0.34
-            })
-        );
-
-        drawing.appendChild(
-            svg("path", {
-                d: path(
-                    farThroatT.slice(
-                        hiddenStart,
-                        hiddenEnd
-                    )
-                ),
-                fill: "none",
-                stroke: "#abb6be",
-                "stroke-width": 1.15,
-                "stroke-dasharray": "5 8",
-                "stroke-linecap": "round",
-                opacity: 0.34
-            })
-        );
-
-        const last =
-            nearHeel.length - 1;
-
-        /*
-         * Inlet and outlet faces.
-         */
-        drawing.appendChild(
-            svg("polygon", {
-                points: [
-                    nearHeel[0],
-                    farHeelT[0],
-                    farThroatT[0],
-                    nearThroat[0]
-                ]
-                    .map(
-                        point =>
-                            `${point.x},${point.y}`
-                    )
-                    .join(" "),
-                class:
-                    "offset-iso-end-face"
-            })
-        );
-
-        drawing.appendChild(
-            svg("polygon", {
-                points: [
-                    nearHeel[last],
-                    farHeelT[last],
-                    farThroatT[last],
-                    nearThroat[last]
-                ]
-                    .map(
-                        point =>
-                            `${point.x},${point.y}`
-                    )
-                    .join(" "),
-                class:
-                    "offset-iso-end-face"
-            })
-        );
-
-        /*
-         * Subtle near centerline only.
-         */
-        drawing.appendChild(
-            svg("path", {
-                d: path(center),
-                fill:"none",
-                stroke:"#b5bfc6",
-                "stroke-width":1.0,
-                "stroke-dasharray":"10 5 2 5",
-                opacity:0.24
-            })
-        );
-
-        /*
-         * Tangent/seam lines where the radius begins and ends.
-         */
-        const tangentStartIndex = 1;
-        const tangentEndIndex =
-            nearHeel.length - 2;
-
-        [
-            tangentStartIndex,
-            tangentEndIndex
-        ].forEach(index => {
-
-            drawing.appendChild(
-                svg("line", {
-                    x1: nearHeel[index].x,
-                    y1: nearHeel[index].y,
-                    x2: nearThroat[index].x,
-                    y2: nearThroat[index].y,
-                    class:
-                        "offset-iso-joint-line"
-                })
-            );
-
-
-        });
-
-        /*
-         * Dimensions.
-         */
-        const dimensionGroup =
-            svg("g");
-
-        /*
-         * Width (cheek), depth, CLR, and throat radius are shown
-         * in the data panel. Keeping them off the fitting prevents
-         * overlapping annotations on smaller screens.
-         */
-
-        if (model.straightPerElbow > 0.01) {
-
-            const straightStart =
-                transform(
-                    profile.tangentEnd.heel
-                );
-
-            const straightEnd =
-                nearHeel[last];
-
-            /*
-             * Offset the dimension line perpendicular to the straight.
-             * Both ends are projected directly from the tangent seam and
-             * the outlet edge, so the dimension terminates at the end face
-             * instead of drifting past it as the elbow angle changes.
-             */
-            const straightDx =
-                straightEnd.x -
-                straightStart.x;
-
-            const straightDy =
-                straightEnd.y -
-                straightStart.y;
-
-            const straightLength =
-                Math.hypot(
-                    straightDx,
-                    straightDy
-                ) || 1;
-
-            const normal = {
-                x:
-                    -straightDy /
-                    straightLength,
-                y:
-                    straightDx /
-                    straightLength
-            };
-
-            /*
-             * Keep the annotation on the outside/left side of the elbow.
-             */
-            const preferredNormal =
-                normal.x <= 0
-                    ? normal
-                    : {
-                        x: -normal.x,
-                        y: -normal.y
-                    };
-
-            const dimensionOffset = 34;
-
-            const dimensionStart = {
-                x:
-                    straightStart.x +
-                    preferredNormal.x *
-                    dimensionOffset,
-                y:
-                    straightStart.y +
-                    preferredNormal.y *
-                    dimensionOffset
-            };
-
-            const dimensionEnd = {
-                x:
-                    straightEnd.x +
-                    preferredNormal.x *
-                    dimensionOffset,
-                y:
-                    straightEnd.y +
-                    preferredNormal.y *
-                    dimensionOffset
-            };
-
-            /*
-             * Extension lines tie the dimension exactly to the tangent seam
-             * and the final outlet edge.
-             */
-            dimensionGroup.appendChild(
-                svg("line", {
-                    x1: straightStart.x,
-                    y1: straightStart.y,
-                    x2: dimensionStart.x,
-                    y2: dimensionStart.y,
-                    class:
-                        "offset-iso-extension-line"
-                })
-            );
-
-            dimensionGroup.appendChild(
-                svg("line", {
-                    x1: straightEnd.x,
-                    y1: straightEnd.y,
-                    x2: dimensionEnd.x,
-                    y2: dimensionEnd.y,
-                    class:
-                        "offset-iso-extension-line"
-                })
-            );
-
-            const straightLabelAngle =
-                Math.atan2(
-                    straightDy,
-                    straightDx
-                ) *
-                180 /
-                Math.PI;
-
-            addDimension(
-                dimensionGroup,
-                dimensionStart,
-                dimensionEnd,
-                `Straight: ${
-                    formatMeasurement(
-                        model.straightPerElbow
-                    )
-                }`,
-                {
-                    dy: -14,
-                    rotate:
-                        straightLabelAngle
-                }
-            );
-
+        if (!viewBound) {
+            DC.Fit3D.bindView("offsetView");
+            viewBound = true;
         }
 
-
-        /*
-         * WIDTH (CHEEK)
-         * Dimensioned directly under the near inlet cheek.
-         * It always spans the visible cheek width and stays centered.
-         */
-        const widthLeft =
-            nearThroat[0];
-
-        const widthRight =
-            nearHeel[0];
-
-        const widthDimensionY =
-            Math.max(
-                widthLeft.y,
-                widthRight.y
-            ) + 34;
-
-        const widthStart = {
-            x: widthLeft.x,
-            y: widthDimensionY
-        };
-
-        const widthEnd = {
-            x: widthRight.x,
-            y: widthDimensionY
-        };
-
-        dimensionGroup.appendChild(
-            svg("line", {
-                x1: widthLeft.x,
-                y1: widthLeft.y,
-                x2: widthStart.x,
-                y2: widthStart.y,
-                class:
-                    "offset-iso-extension-line"
-            })
-        );
-
-        dimensionGroup.appendChild(
-            svg("line", {
-                x1: widthRight.x,
-                y1: widthRight.y,
-                x2: widthEnd.x,
-                y2: widthEnd.y,
-                class:
-                    "offset-iso-extension-line"
-            })
-        );
-
-        addDimension(
-            dimensionGroup,
-            widthStart,
-            widthEnd,
-            `Width: ${
-                formatMeasurement(
-                    model.ductWidth
-                )
-            }`,
-            {
-                dy: 18
-            }
-        );
-
-        /*
-         * DEPTH
-         * Dimensioned along the isometric extrusion under the throat.
-         * It always starts at the near throat corner and ends at the
-         * matching far throat corner.
-         */
-        const depthNear =
-            nearThroat[0];
-
-        const depthFar =
-            farThroatT[0];
-
-        const depthDx =
-            depthFar.x -
-            depthNear.x;
-
-        const depthDy =
-            depthFar.y -
-            depthNear.y;
-
-        const depthLength =
-            Math.hypot(
-                depthDx,
-                depthDy
-            ) || 1;
-
-        const depthNormal = {
-            x:
-                -depthDy /
-                depthLength,
-            y:
-                depthDx /
-                depthLength
-        };
-
-        /*
-         * Put the depth annotation below the throat.
-         */
-        const chosenDepthNormal =
-            depthNormal.y >= 0
-                ? depthNormal
-                : {
-                    x: -depthNormal.x,
-                    y: -depthNormal.y
-                };
-
-        const depthOffset = 38;
-
-        const depthStart = {
-            x:
-                depthNear.x +
-                chosenDepthNormal.x *
-                depthOffset,
-            y:
-                depthNear.y +
-                chosenDepthNormal.y *
-                depthOffset
-        };
-
-        const depthEnd = {
-            x:
-                depthFar.x +
-                chosenDepthNormal.x *
-                depthOffset,
-            y:
-                depthFar.y +
-                chosenDepthNormal.y *
-                depthOffset
-        };
-
-        dimensionGroup.appendChild(
-            svg("line", {
-                x1: depthNear.x,
-                y1: depthNear.y,
-                x2: depthStart.x,
-                y2: depthStart.y,
-                class:
-                    "offset-iso-extension-line"
-            })
-        );
-
-        dimensionGroup.appendChild(
-            svg("line", {
-                x1: depthFar.x,
-                y1: depthFar.y,
-                x2: depthEnd.x,
-                y2: depthEnd.y,
-                class:
-                    "offset-iso-extension-line"
-            })
-        );
-
-        const depthLabelAngle =
-            Math.atan2(
-                depthDy,
-                depthDx
-            ) *
-            180 /
-            Math.PI;
-
-        addDimension(
-            dimensionGroup,
-            depthStart,
-            depthEnd,
-            `Depth: ${
-                formatMeasurement(
-                    model.ductDepth
-                )
-            }`,
-            {
-                dy: 17,
-                rotate:
-                    depthLabelAngle
-            }
-        );
-
-        drawing.appendChild(
-            dimensionGroup
-        );
-
-
-
-        addDataPanel(
-            drawing,
-            model,
-            dataPanelLayout
-        );
-
-        container.appendChild(
-            drawing
-        );
+        // Drop the previous warning or problem card (the 3D view stays).
+        container
+            .querySelectorAll(".offset-iso-problem-overlay, .offset-iso-clr-warning")
+            .forEach(node => node.remove());
+        container.classList.remove("has-offset-error");
 
         if (activeOffsetError) {
-            addOffsetProblemOverlay(
-                container,
-                activeOffsetError
-            );
-        } else {
-            addClrWarning(
-                container,
-                model
-            );
+            DC.Fit3D.clear("offsetView", "");
+            addOffsetProblemOverlay(container, activeOffsetError);
+            return;
         }
+
+        const model = getModel();
+
+        if (
+            !(model.ductWidth > 0) ||
+            !(model.offset > 0) ||
+            !(model.centerlineRadius > 0) ||
+            !Number.isFinite(model.elbowAngle)
+        ) {
+            DC.Fit3D.clear("offsetView", "Enter the offset dimensions to see the elbows.");
+            return;
+        }
+
+        DC.Fit3D.render("offsetView", offsetScene(model));
+        addClrWarning(container, model);
 
     }
 

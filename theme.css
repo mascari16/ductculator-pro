@@ -1730,3 +1730,10 @@ h1,h2,h3,h4{
 .wheel-steps b{color:var(--yellow)}
 .wheel-btn{margin-top:14px;width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:9px;background:var(--card);color:var(--white);font:600 16px var(--font-c, sans-serif);cursor:pointer;min-height:44px}
 .wheel-btn:hover{border-color:#5d6a75}
+
+/* Elbow Offset: the shared live 3D view replaces the old isometric box */
+.offset-iso-container.offset-view-host{display:block;min-height:0;margin-top:20px;background:none;border:0;border-radius:0;overflow:visible}
+.offset-view-host.has-offset-error{min-height:440px}
+.offset-view-host.has-offset-error .live-view{min-height:440px}
+.offset-view-host .offset-iso-clr-warning{z-index:5}
+#offsetIsoContainer.offset-view-host .offset-iso-clr-warning{position:relative;top:auto;left:auto;right:auto;margin:10px 0 0}
