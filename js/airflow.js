@@ -151,8 +151,8 @@ function buildResults(data) {
                 ${buildAreaOptionsTable("Flat Oval", "⬭", ovals)}
             </div>
             <p class="options-legend">
-                Each size is the smallest with at least the required area, so velocity
-                stays at or below the target, squarest first, in ${rectSizeStep()}" steps.
+                Each size is the closest match to the required area, squarest first,
+                in ${rectSizeStep()}" steps. Area Δ: <strong>+</strong> is bigger (slower), <strong>−</strong> smaller (faster).
             </p>
 
             <details class="engineering-breakdown">
@@ -420,9 +420,9 @@ function buildEqualFrictionResults(data) {
                 ${buildFrictionOptionsTable("Flat Oval", "⬭", ovals)}
             </div>
             <p class="options-legend">
-                Each size is the smallest that keeps friction at or below the target
-                (equal friction with the exact round), squarest first, in ${rectSizeStep()}" steps.
-                Friction Δ shows how far below the target it runs.
+                Each size is the closest match to the exact round (equal friction), the
+                same as reading the wheel, squarest first, in ${rectSizeStep()}" steps.
+                Friction Δ: <strong>+</strong> runs a little over the target, <strong>−</strong> a little under.
             </p>
 
             <details class="engineering-breakdown">

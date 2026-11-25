@@ -154,9 +154,9 @@ function flatOvalEquivalentRound(width, height) {
 }
 
 function ovalsForRound(round, options) {
-    return sizesAtOrAbove((w, h) => w > h && flatOvalEquivalentRound(w, h) >= round - 1e-9, { minShort: 3, strictlyLonger: true, ...options });
+    return sizesClosest((w, h) => flatOvalEquivalentRound(Math.max(w, h + 1e-6), h), round, { minShort: 3, strictlyLonger: true, ...options });
 }
 
 function ovalsForArea(areaSqFt, options) {
-    return sizesAtOrAbove((w, h) => w > h && flatOvalAreaSqIn(w, h) / 144 >= areaSqFt - 1e-12, { minShort: 3, strictlyLonger: true, ...options });
+    return sizesClosest((w, h) => flatOvalAreaSqIn(Math.max(w, h + 1e-6), h) / 144, areaSqFt, { minShort: 3, strictlyLonger: true, ...options });
 }

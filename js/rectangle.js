@@ -147,11 +147,11 @@ return unique.slice(0, 5);
 // Sizes at or above a target (shared by the calculator and the wheel)
 // ------------------------------------
 //
-// For each short side (in the chosen step), the smallest long side (same
-// step) that meets the target: equal friction means the equivalent round
-// (Huebscher) is at least the target round, so friction never exceeds the
-// design rate; equal area means the area is at least the required area, so
-// velocity never exceeds the target. Shapes past 4:1 are left out, and the
+// For each short side (in the chosen step), the long side (same step) that
+// comes CLOSEST to the target, the way a duct wheel is read: equal friction
+// matches the equivalent round (Huebscher) to the target round, equal area
+// matches the required area. A size can run a little over or under the
+// target; the tables show by how much. Shapes past 4:1 are left out, and the
 // list runs squarest first.
 
 const RECT_MAX_ASPECT = 4;
@@ -184,27 +184,43 @@ function smallestLongSide(shortSide, step, meets, maxLong, minLong) {
     return w;
 }
 
-function sizesAtOrAbove(meets, { step = rectSizeStep(), minShort = 4, maxShort = 120, maxLong = 300, maxAspect = RECT_MAX_ASPECT, count = 5, strictlyLonger = false } = {}) {
+// value(w, h) grows with w; returns the closest long side in the step
+function closestLongSide(shortSide, step, value, target, minLong, maxLong) {
+    if (value(maxLong, shortSide) < target) return null;
+    let lo = 0.01, hi = maxLong;
+    for (let i = 0; i < 60; i += 1) {
+        const mid = (lo + hi) / 2;
+        if (value(mid, shortSide) < target) lo = mid; else hi = mid;
+    }
+    const exact = hi;
+    if (exact < minLong - step / 2) return { width: minLong, tooBig: true };
+    const down = Math.max(minLong, Math.floor(exact / step + 1e-9) * step);
+    const up = Math.max(minLong, down + step);
+    const err = w => Math.abs(Math.log(value(w, shortSide) / target));
+    return { width: err(down) <= err(up) ? down : up, tooBig: false };
+}
+
+function sizesClosest(value, target, { step = rectSizeStep(), minShort = 4, maxShort = 120, maxLong = 300, maxAspect = RECT_MAX_ASPECT, count = 5, strictlyLonger = false } = {}) {
     const out = [];
     const start = Math.ceil(minShort / step) * step;
     for (let h = start; h <= maxShort; h += step) {
         const minLong = strictlyLonger ? h + step : h;
-        const w = smallestLongSide(h, step, meets, maxLong, minLong);
-        if (w === null || w > maxLong) continue;
+        const r = closestLongSide(h, step, value, target, minLong, maxLong);
+        if (r === null) continue;
+        if (r.tooBig) break;   // even the squarest size at this short side is past the target
+        const w = r.width;
         if (w / h <= maxAspect + 1e-9) out.push({ width: w, height: h, aspectRatio: w / h });
         if (w === minLong) break;   // the squarest size: larger short sides only get bigger
     }
-    // drop sizes another size beats on both sides (e.g. 14 × 14 when 14 × 13 already works)
-    const lean = out.filter(o => !out.some(p => p !== o && p.width <= o.width && p.height <= o.height));
-    return lean.sort((a, b) => a.aspectRatio - b.aspectRatio).slice(0, count);
+    return out.sort((a, b) => a.aspectRatio - b.aspectRatio).slice(0, count);
 }
 
-// equal friction with a round of diameter `round` (friction at or below its rate)
+// equal friction with a round of diameter `round` (closest match)
 function rectanglesForRound(round, options) {
-    return sizesAtOrAbove((w, h) => rectEquivalentRound(w, h) >= round - 1e-9, options);
+    return sizesClosest((w, h) => rectEquivalentRound(w, h), round, options);
 }
 
-// equal area: at least `areaSqFt` (velocity at or below target)
+// equal area: closest to `areaSqFt`
 function rectanglesForArea(areaSqFt, options) {
-    return sizesAtOrAbove((w, h) => (w * h) / 144 >= areaSqFt - 1e-12, options);
+    return sizesClosest((w, h) => (w * h) / 144, areaSqFt, options);
 }
