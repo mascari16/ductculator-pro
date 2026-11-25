@@ -158,8 +158,8 @@ const RECT_MAX_ASPECT = 4;
 
 // 1" steps unless the screen's setting says 2"
 function rectSizeStep() {
-    const select = document.getElementById("rectStep");
-    return select && select.value === "2" ? 2 : 1;
+    const select = document.getElementById("rectStepSize");
+    return select && select.value === "1" ? 1 : 2;
 }
 
 function rectEquivalentRound(width, height) {

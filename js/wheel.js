@@ -412,7 +412,7 @@
     roundField?.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); fromField(); roundField.blur(); } });
     document.getElementById("whHair")?.addEventListener("change", update);
     // 1" / 2" steps: redraw the wheel's pairs and recalculate the calculator
-    document.getElementById("rectStep")?.addEventListener("change", () => {
+    document.getElementById("rectStepSize")?.addEventListener("change", () => {
         lastD = null;
         update();
         if (typeof updateCalculator === "function") updateCalculator();
