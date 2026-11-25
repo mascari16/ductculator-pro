@@ -1737,3 +1737,7 @@ h1,h2,h3,h4{
 .offset-view-host.has-offset-error .live-view{min-height:440px}
 .offset-view-host .offset-iso-clr-warning{z-index:5}
 #offsetIsoContainer.offset-view-host .offset-iso-clr-warning{position:relative;top:auto;left:auto;right:auto;margin:10px 0 0}
+.wh-orange{fill:#f8b48f;stroke:#2c3e50;stroke-width:1.6}
+.wh-discg .wh-orange,.wh-discg .wh-blue{stroke-width:1.2}
+.wh-green-in{fill:#d9f6bd}
+.wh-title2{fill:#111;font:800 34px "Barlow", "Arial", sans-serif;letter-spacing:-.01em}

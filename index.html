@@ -364,26 +364,25 @@
 
         <div id="afWheel" class="wheel-wrap" hidden>
             <div class="panel wheel-panel">
-                <svg id="wheelSvg" class="wheel-svg" viewBox="0 0 760 960" tabindex="0" role="img" aria-label="Duct calculator wheel. Drag the white disc or red arc to turn them; drag the red hairline to read across the scales. Arrow keys turn the disc; Alt with arrow keys moves the hairline."></svg>
+                <svg id="wheelSvg" class="wheel-svg" viewBox="0 0 760 880" tabindex="0" role="img" aria-label="Air duct calculator wheel. Drag the white disc to turn it; drag the red hairline to read across the scales. Arrow keys turn the disc; Alt with arrow keys moves the hairline."></svg>
             </div>
             <div class="panel wheel-side">
                 <h3>Using the wheel</h3>
-                <p class="kv-text wheel-note">Drag the white disc or the red arc to turn them together. Drag the red hairline to read straight across.</p>
+                <p class="kv-text wheel-note">Drag the white disc to turn it. Drag the red hairline to read straight across.</p>
                 <ol class="wheel-steps">
-                    <li><b>Friction rate:</b> line your duct size on the red up with your airflow on the blue. Read the friction rate at the arrow in the window.</li>
-                    <li><b>Duct size:</b> turn the disc until the arrow points at your friction rate. Read the size on the red opposite your airflow.</li>
-                    <li><b>Velocity:</b> set the index at the top on your airflow. Read the velocity on the green opposite the duct size.</li>
-                    <li><b>Airflow:</b> set the duct size opposite the velocity. Read the airflow at the index.</li>
+                    <li><b>Line up</b> your airflow (outer blue) with your friction rate (blue edge of the disc).</li>
+                    <li><b>Round size:</b> read it at the arrow in the window on the left.</li>
+                    <li><b>Velocity:</b> find your airflow on the outer orange scale; the velocity is on the disc's orange edge beside it.</li>
+                    <li><b>Rectangular:</b> on the green, each outer size pairs with the inner size next to it.</li>
                 </ol>
                 <div class="kv-list wheel-read">
-                    <div class="kv-row kv-main"><span>Friction at the arrow<em>in. w.c. per 100 ft</em></span><strong id="whFrArrow">—</strong></div>
-                    <div class="kv-row"><span>Airflow at the index</span><strong id="whIndex">—</strong></div>
+                    <div class="kv-row kv-main"><span>Round size at the arrow</span><strong id="whRound">—</strong></div>
                     <h4 class="kv-head">Under the hairline</h4>
-                    <div class="kv-row"><span>Airflow<em>blue</em></span><strong id="whQBlue">—</strong></div>
-                    <div class="kv-row"><span>Duct size<em>red, upper scale</em></span><strong id="whDUp">—</strong></div>
-                    <div class="kv-row"><span>Duct size<em>red, lower scale</em></span><strong id="whDLow">—</strong></div>
-                    <div class="kv-row"><span>Velocity<em>green</em></span><strong id="whVel">—</strong></div>
-                    <div class="kv-row"><span>Rectangular equals<em>for that round size</em></span><strong id="whRect">—</strong></div>
+                    <div class="kv-row"><span>Airflow<em>outer blue</em></span><strong id="whQBlue">—</strong></div>
+                    <div class="kv-row"><span>Friction rate<em>disc, in. w.g. per 100 ft</em></span><strong id="whFr">—</strong></div>
+                    <div class="kv-row"><span>Airflow<em>outer orange</em></span><strong id="whQOr">—</strong></div>
+                    <div class="kv-row"><span>Velocity<em>disc, orange edge</em></span><strong id="whVel">—</strong></div>
+                    <div class="kv-row"><span>Rectangular equals<em>same friction as the round size</em></span><strong id="whRect">—</strong></div>
                 </div>
                 <button type="button" class="wheel-btn" id="whFromInputs">Line up with my airflow and friction</button>
                 <p class="kv-text">Same friction chart as the calculator. Arrow keys turn the disc; hold Shift for bigger steps.</p>
@@ -1954,7 +1953,7 @@
 <script src="js/rectFittings.js?v=20261124-3"></script>
 <script src="js/layoutMath.js?v=20261124-2"></script>
 <script src="js/takeoff.js?v=20261124-2"></script>
-<script src="js/wheel.js?v=20261125-3"></script>
+<script src="js/wheel.js?v=20261125-4"></script>
 <script src="js/navigation.js?v=20261124-2"></script>
 
 </body>
