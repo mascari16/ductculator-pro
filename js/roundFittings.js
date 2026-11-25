@@ -31,9 +31,9 @@
         const a = DC.rad(angle);
         const gap = Math.max(main, size) * 0.8 + 3;
         const tail = size * 1.6;
-        // where the branch clears the main (drawing starts there)
-        const clear = (main / 2) / Math.sin(a) + (size / 2) / Math.tan(a);
-        const start = Math.min(clear, r.straight);
+        // The branch starts on the main's surface (centerline point) and
+        // its first ring is cut to the main: flat for rect, saddle for round.
+        const start = Math.min((main / 2) / Math.sin(a), Math.max(0, r.straight));
         const turn = r.orient === "parallel" ? -r.elbow : r.elbow;
         const path = DC.Fit3D.Path(start * Math.cos(a), start * Math.sin(a), angle).line(r.straight - start, true);
 
@@ -80,7 +80,7 @@
             roll: roll || 0,
             parts: [
                 { kind, ...section, path: mainPath.points, tone: "main" },
-                { kind, ...branch, path: path.points }
+                { kind, ...branch, path: path.points, tap: { kind, half: main / 2, angle } }
             ],
             dims,
             notes: notes.filter(Boolean)

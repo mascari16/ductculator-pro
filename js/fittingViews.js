@@ -128,10 +128,79 @@
         return add(add(mul(plane.X, x), mul(plane.U, y)), mul(plane.Wn, w));
     }
 
+    /*
+     * Break long straight runs into shorter pieces so the painter's
+     * sort layers parts correctly (e.g. a tap sitting on a long main).
+     */
+    function densify(points, maxSeg) {
+        const out = [points[0]];
+
+        for (let i = 1; i < points.length; i += 1) {
+            const a = points[i - 1];
+            const b = points[i];
+            const len = Math.hypot(b.x - a.x, b.y - a.y);
+            const n = Math.floor(len / maxSeg);
+
+            for (let k = 1; k <= n; k += 1) {
+                const t = k / (n + 1);
+                out.push({ x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t, joint: false, dense: true });
+            }
+
+            out.push(b);
+        }
+
+        return out;
+    }
+
+    /*
+     * Ring where a branch meets the main's surface (a "tap").
+     * Branch heading θ leaves the main centerline; for a point on the
+     * branch section at (a, b) — a in the bend plane, b across it — the
+     * distance s along the branch where it reaches the main surface is
+     *   s = (ySurface(b) − a·cosθ) ÷ sinθ
+     * ySurface = main half-width (rect) or √(R² − b²) (round saddle).
+     */
+    function tapRing(part, plane) {
+        const t = part.tap;
+        const th = rad(t.angle);
+        const ring = [];
+        const local = [];
+
+        if (part.kind === "round") {
+            const r = part.d / 2;
+            for (let k = 0; k < 32; k += 1) {
+                const q = (2 * Math.PI * k) / 32;
+                local.push([r * Math.cos(q), r * Math.sin(q)]);
+            }
+        } else {
+            const a = part.w / 2;
+            const b = part.h / 2;
+            local.push([a, b], [-a, b], [-a, -b], [a, -b]);
+        }
+
+        for (const [a, b] of local) {
+            const ys = t.kind === "round"
+                ? Math.sqrt(Math.max(0, t.half * t.half - b * b))
+                : t.half;
+            const sAlong = (ys - a * Math.cos(th)) / Math.sin(th);
+            ring.push(to3(plane, sAlong * Math.cos(th) - a * Math.sin(th), sAlong * Math.sin(th) + a * Math.cos(th), b));
+        }
+
+        return ring;
+    }
+
     function sweep(part, plane) {
-        const pts = part.path;
-        const sections = [];
         const round = part.kind === "round";
+        let pts = densify(part.path, Math.max(round ? part.d : Math.max(part.w, part.h), 1) * 0.6);
+
+        // Keep added pieces clear of the slanted tap cut.
+        if (part.tap) {
+            const th = rad(part.tap.angle);
+            const s0 = Math.hypot(pts[0].x, pts[0].y);
+            const reach = (part.tap.half + (round ? part.d / 2 : part.w / 2) * Math.abs(Math.cos(th))) / Math.sin(th) - s0;
+            pts = pts.filter((p, i) => i === 0 || !p.dense || Math.hypot(p.x - pts[0].x, p.y - pts[0].y) > reach + 0.5);
+        }
+        const sections = [];
         const ringN = round ? 32 : 4;
 
         for (let i = 0; i < pts.length; i += 1) {
@@ -163,7 +232,7 @@
                 ring.push(add(c, add(mul(nIn, a), mul(plane.Wn, -b))));
             }
 
-            sections.push({ c, ring, joint: p.joint || i === 0 || i === pts.length - 1, t3: to3(plane, t2[0], t2[1]) });
+            sections.push({ c, ring: i === 0 && part.tap ? tapRing(part, plane) : ring, joint: p.joint || i === 0 || i === pts.length - 1, t3: to3(plane, t2[0], t2[1]) });
         }
 
         return sections;
@@ -319,6 +388,7 @@
 
             // end caps
             for (const [i, sign] of [[0, -1], [S.length - 1, 1]]) {
+                if (i === 0 && part.tap) continue;
                 const nCap = norm(mul(norm(sub(S[i === 0 ? 1 : i].c, S[i === 0 ? 0 : i - 1].c)), sign));
                 const nv = cam(nCap);
                 if (nv[1] >= 0) continue;
