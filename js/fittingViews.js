@@ -519,7 +519,11 @@
         // Dimensions go on the face plane toward the viewer (rect parts),
         // so they measure visible edges and clear the part quickly.
         const dw = (scene.dimW || 0) * (cam(plane.Wn)[1] < 0 ? 1 : -1);
-        const Q = (x, y) => P(to3(plane, x, y, dw));
+        // A dimension can sit on the side face instead (d.side = [xNear, xFar]
+        // choices of plane x): its points are then [depth, y].
+        let curD = null;
+        const sideX = d => (cam(plane.X)[1] < 0 ? d.side[1] : d.side[0]);
+        const Q = (x, y) => (curD && curD.side ? P(to3(plane, sideX(curD), y, x)) : P(to3(plane, x, y, dw)));
 
         function place(u) {
             // Occupancy grid of the drawn duct, in screen units.
@@ -635,6 +639,7 @@
 
             for (const [di, d] of order.entries()) {
                 choices[di] = -1;
+                curD = d;
                 // Seen nearly end-on, a dimension can't be read: leave it off
                 // until the view turns back.
                 if (d.type !== "angle") {
@@ -748,6 +753,7 @@
                 choices[di] = best.k;
             }
 
+            curD = null;
             placed.isDuct = isDuct;
             placed.choices = choices;
             return placed;
@@ -784,10 +790,12 @@
             const pad = (small ? 8 : 16) * uu;
             // Phones: the view grows to the content's height, so only width must fit.
             const flexible = cw < 700;
-            const fits = x1 - x0 + 2 * pad <= cw * uu && (flexible || y1 - y0 + 2 * pad <= ch * uu);
+            // ...but not past a tall limit: a tall fitting steps the drawing down instead
+            const maxH = scene.maxH || 560;
+            const fits = x1 - x0 + 2 * pad <= cw * uu && (flexible ? y1 - y0 + 2 * pad <= maxH * uu : y1 - y0 + 2 * pad <= ch * uu);
             placed = result;
             if (flexible) {
-                const hPx = Math.round(Math.max(190, Math.min(560, (y1 - y0) / uu + 2 * (pad / uu) + 8)));
+                const hPx = Math.round(Math.max(190, Math.min(maxH, (y1 - y0) / uu + 2 * (pad / uu) + 8)));
                 svg.style.height = `${hPx}px`;
                 ch = hPx;
             }
@@ -806,6 +814,7 @@
 
         // Centerline extensions drawn in depth order (hidden behind the duct).
         for (const p of placed) {
+            curD = p.d;
             if (!p.d.cl) continue;
             for (const [from, end] of [[p.d.ea, p.a2], [p.d.eb, p.b2]]) {
                 if (!from || from === null || !end) continue;
@@ -823,6 +832,7 @@
             }
         }
 
+        curD = null;
         items.sort((a, b) => b.z - a.z);
 
         svg.replaceChildren();
@@ -853,6 +863,7 @@
         };
 
         for (const p of placed) {
+            curD = p.d;
             if (p.pts) {
                 // angular dimension: extension rays from the vertex, arc, arrows
                 if (!p.d.noRays) {
@@ -921,6 +932,7 @@
             tag(p.lb, p.d.label);
         }
 
+        curD = null;
         svg.appendChild(dims);
 
         // Caption under the view (notes that don't belong in the drawing).

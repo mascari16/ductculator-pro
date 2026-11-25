@@ -892,54 +892,88 @@
             row("Each piece", formatMeasurement(each), `${n} fittings, equal lengths`, true) +
             row("Original length", formatMeasurement(result.length)) +
             row(n > 2 ? "Breaks at" : "Break at", breaks.join(", "), "measured from the inlet") +
-            row("Sizes at the breaks",
+            row("Offset width", `${formatMeasurement(result.offsetWidth || 0)} ${widthModeLabel(result.offsetWidthMode)}`, "whole transition") +
+            row("Offset depth", `${formatMeasurement(result.offsetDepth || 0)} ${depthModeLabel(result.offsetDepthMode)}`, "whole transition") +
+            row("Size at each break",
                 result.stations.slice(1, -1).map(st => `${formatMeasurement(cleanNumber(st.width))} × ${formatMeasurement(cleanNumber(st.depth))}`).join(", "));
     }
 
     /*
-     * Live 3D view (same renderer as the other fitting screens). x runs
-     * along the length, y across the width, w through the depth. Each break
-     * is a seam ring.
+     * Live 3D view (same renderer as the other fitting screens), standing
+     * up: inlet at the bottom, outlet at the top, like the top and right
+     * views. x runs across the width, y up the length, w through the depth.
+     * Each break is a seam with its size called out.
      */
     function transitionScene(result) {
         const L = result.length;
         const Wi = result.widthIn;
         const Di = result.depthIn;
+        const fmt = formatMeasurement;
         const corners = st => {
-            const yl = Wi / 2 - st.left;
-            const yr = yl - st.width;
+            const xl = -Wi / 2 + st.left;
+            const xr = xl + st.width;
             const wb = -Di / 2 + st.bottom;
             const wt = wb + st.depth;
-            return { yl, yr, wb, wt };
+            return { xl, xr, wb, wt, y: st.lengthPosition };
         };
-        const rings = result.stations.map(st => {
-            const x = st.lengthPosition;
-            const c = corners(st);
-            return { pts: [[x, c.yl, c.wt], [x, c.yr, c.wt], [x, c.yr, c.wb], [x, c.yl, c.wb]], joint: true };
-        });
-        const first = corners(result.stations[0]);
-        const last = corners(result.stations[result.stations.length - 1]);
-        const yMin = Math.min(first.yr, last.yr);
-        const size = Math.max(Wi, result.widthOut, 6);
+        const C = result.stations.map(corners);
+        const rings = C.map(c => ({ pts: [[c.xl, c.y, c.wt], [c.xr, c.y, c.wt], [c.xr, c.y, c.wb], [c.xl, c.y, c.wb]], joint: true }));
+        const c0 = C[0];
+        const c1 = C[C.length - 1];
+        const xMin = Math.min(...C.map(c => c.xl));
+        const xMax = Math.max(...C.map(c => c.xr));
+        const wMin = Math.min(...C.map(c => c.wb));
+        const size = Math.max(Wi, Di, result.widthOut, result.depthOut, 6);
         const n = result.splitCount;
         const each = L / n;
-        const mids = result.stations.slice(1, -1).map(st => [st.lengthPosition, yMin, st.lengthPosition, corners(st).yr]);
-        const fmt = formatMeasurement;
+        const side = [xMin, xMax];
+
+        const dims = [
+            // front face: widths, length with the breaks, width offset
+            { a: [c0.xl, 0], b: [c0.xr, 0], dir: [0, -1], base: size * 0.22, label: `Width in ${fmt(Wi)}` },
+            { a: [c1.xl, L], b: [c1.xr, L], dir: [0, 1], base: size * 0.22, label: `Width out ${fmt(result.widthOut)}` },
+            { a: [xMin, 0], b: [xMin, L], dir: [-1, 0], base: size * 0.3, ea: [c0.xl, 0], eb: [c1.xl, L],
+              mid: C.slice(1, -1).map(c => [xMin, c.y, c.xl, c.y]),
+              label: n > 1 ? `Length ${fmt(L)} (${fmt(each)} each)` : `Length ${fmt(L)}` },
+            // side face: depths
+            { side, a: [c0.wb, 0], b: [c0.wt, 0], dir: [0, -1], base: size * 0.22, label: `Depth in ${fmt(Di)}` },
+            { side, a: [c1.wb, L], b: [c1.wt, L], dir: [0, 1], base: size * 0.22, label: `Depth out ${fmt(result.depthOut)}` }
+        ];
+
+        // Offsets: measured between the edges the direction names, at the outlet
+        const wMode = result.offsetWidthMode || "leftIn";
+        const dMode = result.offsetDepthMode || "topUp";
+        const wLeft = /^left/.test(wMode);
+        const ex0 = wLeft ? c0.xl : c0.xr, ex1 = wLeft ? c1.xl : c1.xr;
+        if (Math.abs(ex1 - ex0) > 0.01) {
+            dims.push({ a: [ex0, L], b: [ex1, L], dir: [0, 1], base: size * 0.55, ea: [ex0, 0], eb: [ex1, L],
+                label: `Offset ${fmt(Math.abs(ex1 - ex0))} (${widthModeLabel(wMode).toLowerCase()})` });
+        }
+        const dTop = /^top/.test(dMode);
+        const ez0 = dTop ? c0.wt : c0.wb, ez1 = dTop ? c1.wt : c1.wb;
+        if (Math.abs(ez1 - ez0) > 0.01) {
+            dims.push({ side, a: [ez0, L], b: [ez1, L], dir: [0, 1], base: size * 0.55, ea: [ez0, 0], eb: [ez1, L],
+                label: `Offset ${fmt(Math.abs(ez1 - ez0))} (${depthModeLabel(dMode).toLowerCase()})` });
+        }
+
+        // size at each break, called out off the right edge of the seam
+        C.slice(1, -1).forEach((c, k) => {
+            const st = result.stations[k + 1];
+            dims.push({ a: [c.xr + size * 0.45, c.y], b: [c.xr, c.y], fixed: true, radius: true,
+                label: `${fmt(cleanNumber(st.width))} × ${fmt(cleanNumber(st.depth))}` });
+        });
 
         return {
             roll: 0,
+            maxH: 620,
             dimW: Di / 2,
             parts: [{ kind: "rect", w: Wi, h: Di, rings }],
-            dims: [
-                { a: [0, first.yr], b: [0, first.yl], dir: [-1, 0], base: size * 0.3, label: `${fmt(Wi)} in` },
-                { a: [L, last.yr], b: [L, last.yl], dir: [1, 0], base: size * 0.3, label: `${fmt(result.widthOut)} out` },
-                { a: [0, yMin], b: [L, yMin], dir: [0, -1], base: size * 0.35, ea: [0, first.yr], eb: [L, last.yr], mid: mids,
-                  label: n > 1 ? `Length ${fmt(L)} (${fmt(each)} each)` : `Length ${fmt(L)}` }
-            ],
+            dims,
             caption: [
-                `${n} fittings`,
+                `${n} fittings, ${fmt(each)} each`,
                 `${fmt(Wi)} × ${fmt(Di)} to ${fmt(result.widthOut)} × ${fmt(result.depthOut)}`,
-                `depth ${fmt(Di)} to ${fmt(result.depthOut)}`
+                `offset width ${fmt(result.offsetWidth || 0)} ${widthModeLabel(wMode).toLowerCase()}`,
+                `offset depth ${fmt(result.offsetDepth || 0)} ${depthModeLabel(dMode).toLowerCase()}`
             ].join(" · ")
         };
     }
