@@ -284,11 +284,46 @@
     }
     const f2 = v => (v == null ? "—" : v >= 100 ? Math.round(v).toLocaleString() : v >= 10 ? v.toFixed(1) : v.toFixed(v < 1 ? 3 : 2));
 
+    // ---------- clicks: a tick at every 1/2" of round size ----------
+    let audio = null;
+    const soundOn = () => document.getElementById("whClick")?.checked !== false;
+    function click() {
+        if (navigator.vibrate) { try { navigator.vibrate(6); } catch (e) { /* not allowed */ } }
+        if (!soundOn()) return;
+        try {
+            audio = audio || new (window.AudioContext || window.webkitAudioContext)();
+            const t = audio.currentTime;
+            const len = Math.floor(audio.sampleRate * 0.012);
+            const buf = audio.createBuffer(1, len, audio.sampleRate);
+            const data = buf.getChannelData(0);
+            for (let i = 0; i < len; i += 1) data[i] = (Math.random() * 2 - 1) * (1 - i / len) ** 3;
+            const src = audio.createBufferSource();
+            const bp = audio.createBiquadFilter();
+            const gain = audio.createGain();
+            bp.type = "bandpass"; bp.frequency.value = 2400; bp.Q.value = 1.2;
+            gain.gain.value = 0.35;
+            src.buffer = buf;
+            src.connect(bp).connect(gain).connect(audio.destination);
+            src.start(t);
+        } catch (e) { /* no audio */ }
+    }
+    const notch = D => Math.round(D * 2);   // half-inch steps
+    let lastNotch = null;
+
+    const hairOn = () => !!document.getElementById("whHair")?.checked;
+
     let lastD = null;
     function update() {
         disc.setAttribute("transform", `rotate(${phi} ${CX} ${CY})`);
         const D = roundOf(phi);
         if (lastD === null || Math.abs(D - lastD) > 0.01) { drawGreenRow(D); lastD = D; }
+        const n = notch(D);
+        if (drag && drag.kind === "disc" && lastNotch !== null && n !== lastNotch) click();
+        lastNotch = n;
+        const field = document.getElementById("whRoundInput");
+        if (field && document.activeElement !== field) field.value = (Math.round(D * 16) / 16).toFixed(D < 10 ? 2 : 1).replace(/\.?0+$/, "");
+        over.style.display = hairOn() ? "" : "none";
+        document.querySelectorAll(".wh-hair-row").forEach(r => { r.hidden = !hairOn(); });
 
         const [hx0, hy0] = pt(R.rim - 4, hair), [hx1, hy1] = pt(R.out[1] + 4, hair);
         hairLine.setAttribute("x1", hx0); hairLine.setAttribute("y1", hy0);
@@ -324,7 +359,7 @@
         const { a, r } = angleAt(e);
         if (e.target.dataset && e.target.dataset.grip) drag = { kind: "hair" };
         else if (r <= R.disc) drag = { kind: "disc", a, phi };
-        else if (r <= R.out[1] + 10) { drag = { kind: "hair" }; hair = a; later(); }
+        else if (hairOn() && r <= R.out[1] + 10) { drag = { kind: "hair" }; hair = a; later(); }
         else return;
         svg.setPointerCapture(e.pointerId);
         e.preventDefault();
@@ -336,7 +371,24 @@
         else phi = clampPhi(drag.phi + norm(a - drag.a));
         later();
     });
-    const end = () => { drag = null; };
+    // letting go settles the disc onto the nearest 1/2" when it's close (a detent)
+    const end = () => {
+        if (drag && drag.kind === "disc") {
+            const D = roundOf(phi), Dn = Math.round(D * 2) / 2;
+            if (Math.abs(D - Dn) < 0.12) settle(clampPhi(phiOf(Dn)));
+        }
+        drag = null;
+    };
+    function settle(target) {
+        const from = phi, t0 = performance.now();
+        const stepF = now => {
+            const k = Math.min(1, (now - t0) / 120);
+            phi = from + (target - from) * (1 - (1 - k) ** 3);
+            update();
+            if (k < 1) requestAnimationFrame(stepF);
+        };
+        requestAnimationFrame(stepF);
+    }
     svg.addEventListener("pointerup", end);
     svg.addEventListener("pointercancel", end);
     svg.addEventListener("keydown", e => {
@@ -347,6 +399,17 @@
         if (e.altKey) hair += k * 4; else phi = clampPhi(phi + k);
         update();
     });
+
+    // Round size field: type a size and the disc turns to it.
+    const roundField = document.getElementById("whRoundInput");
+    const fromField = () => {
+        const D = (window.DC && DC.parse) ? DC.parse(roundField.value) : parseFloat(roundField.value);
+        if (!(D >= 3 && D <= 100)) return;
+        settle(clampPhi(phiOf(D)));
+    };
+    roundField?.addEventListener("change", fromField);
+    roundField?.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); fromField(); roundField.blur(); } });
+    document.getElementById("whHair")?.addEventListener("change", update);
 
     // Line the wheel up with the calculator's airflow and friction.
     document.getElementById("whFromInputs")?.addEventListener("click", () => {

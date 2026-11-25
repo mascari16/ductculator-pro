@@ -1741,3 +1741,8 @@ h1,h2,h3,h4{
 .wh-discg .wh-orange,.wh-discg .wh-blue{stroke-width:1.2}
 .wh-green-in{fill:#d9f6bd}
 .wh-title2{fill:#111;font:800 34px "Barlow", "Arial", sans-serif;letter-spacing:-.01em}
+.wheel-round{display:flex;align-items:center;gap:12px;margin:4px 0 6px;padding:12px 16px;border:1px solid rgba(242,194,48,.55);border-radius:12px;background:rgba(242,194,48,.08)}
+.wheel-round span{flex:1;color:var(--white);font-size:17px}
+.wheel-round input{width:110px;margin:0;text-align:right;font:700 26px var(--font-c, sans-serif);color:var(--yellow);background:var(--sunk)}
+.wheel-round em{font-style:normal;color:var(--gray)}
+.wheel-opts{display:flex;flex-wrap:wrap;gap:6px 22px;margin:4px 0 0}
