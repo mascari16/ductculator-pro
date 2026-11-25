@@ -62,7 +62,7 @@
                 return api;
             },
             // Smooth arc: turn > 0 bends toward +y (left).
-            arc(R, turnDeg, segments = 28) {
+            arc(R, turnDeg, segments = 28, jointEnd = true) {
                 const turn = rad(turnDeg);
                 const side = Math.sign(turn) || 1;
                 const ox = cx - side * R * Math.sin(h);
@@ -71,7 +71,7 @@
 
                 for (let i = 1; i <= segments; i += 1) {
                     const a = start + (turn * i) / segments;
-                    pts.push({ x: ox + R * Math.cos(a), y: oy + R * Math.sin(a), joint: i === segments });
+                    pts.push({ x: ox + R * Math.cos(a), y: oy + R * Math.sin(a), joint: jointEnd && i === segments });
                 }
 
                 h += turn;

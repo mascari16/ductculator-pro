@@ -1971,10 +1971,17 @@
         const S = Math.max(0, model.totalStraight || 0);
         const a = angle * Math.PI / 180;
         const L = O / Math.tan(a) + 2 * R * Math.tan(a / 2);
-        const lead = Math.max(W * 0.6, 6);
-        const path = DC.Fit3D.Path(-lead, 0, 0).line(lead, true).arc(R, angle, 28);
-        if (S > 0.01) path.line(S, true);
-        path.arc(R, -angle, 28).line(lead, true);
+        // Two elbows, each carrying half the straight; they meet in the
+        // middle (the only seam between the ends).
+        const path = DC.Fit3D.Path(0, 0, 0).arc(R, angle, 28, false);
+        if (S > 0.01) {
+            path.line(S / 2, true);
+            path.line(S / 2, false);
+        } else {
+            path.points[path.points.length - 1].joint = true;
+        }
+        path.arc(R, -angle, 28, false);
+        path.points[path.points.length - 1].joint = true;
 
         const nrm = [-Math.sin(a), Math.cos(a)];
         const e1 = [R * Math.sin(a), R * (1 - Math.cos(a))];
@@ -1983,9 +1990,9 @@
         const fmt = formatMeasurement;
 
         const dims = [
-            { a: [-lead, -W / 2], b: [-lead, W / 2], dir: [-1, 0], base: W * 0.3, label: `${fmt(W)} cheek` },
+            { a: [0, -W / 2], b: [0, W / 2], dir: [-1, 0], base: W * 0.3, label: `${fmt(W)} cheek` },
             { a: [0, -W / 2], b: [L, -W / 2], dir: [0, -1], base: W * 0.4, ea: [0, -W / 2], eb: [L, O - W / 2], label: `Length ${fmt(L)}` },
-            { a: [L + lead, -W / 2], b: [L + lead, O - W / 2], dir: [1, 0], base: W * 0.35, ea: [0, -W / 2], eb: [L + lead, O - W / 2], label: `Offset ${fmt(O)}` }
+            { a: [L, -W / 2], b: [L, O - W / 2], dir: [1, 0], base: W * 0.35, ea: [0, -W / 2], eb: [L, O - W / 2], label: `Offset ${fmt(O)}` }
         ];
         if (S > 0.05) {
             dims.push({ a: top(e1), b: top(e2), dir: nrm, base: W * 0.3, ea: top(e1), eb: top(e2), label: `Straight ${fmt(S)}` });
@@ -2000,7 +2007,7 @@
                 `Two ${angle.toFixed(2)}° elbows`,
                 `CLR ${fmt(R)}`,
                 `throat ${fmt(R - W / 2)}`,
-                S > 0.05 ? `straight ${fmt(S)}` : "no straight",
+                S > 0.05 ? `${fmt(S / 2)} straight on each elbow` : "no straight",
                 `depth ${fmt(H)}`
             ].join(" · ")
         };
