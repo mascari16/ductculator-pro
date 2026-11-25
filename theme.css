@@ -1582,6 +1582,14 @@ h1,h2,h3,h4{
     vector-effect:non-scaling-stroke;
 }
 
+.fv-bend{
+    stroke:#9fd8f0;
+    stroke-width:1.6;
+    stroke-dasharray:2 4;
+    stroke-linecap:round;
+    vector-effect:non-scaling-stroke;
+}
+
 .fv-seam{
     stroke:#d2eefa;
     stroke-opacity:.9;

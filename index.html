@@ -1727,7 +1727,9 @@
 <label for="xlClr">Elbow CLR (× width)</label>
 <input id="xlClr" type="number" inputmode="decimal" value="1" step="0.05" min="0.5">
 </div></div><div data-panel="dogleg" hidden>
-<p class="input-help">Field dogleg: make two parallel cuts across a straight joint, roll the middle piece over and fasten it back on. Each cut becomes an elbow.</p>
+<label for="dgMethod">Method</label>
+<select id="dgMethod"><option value="notch" selected>Cut out wedges, bend and fasten</option><option value="roll">Cut apart, roll the middle piece</option></select>
+<p class="input-help" id="dgMethodHelp">Cut a wedge out of the cheeks at each bend, leave the other side as a hinge, bend it closed and fasten.</p>
 <label for="dgW">Width (cheek)</label>
 <input id="dgW" type="text" inputmode="decimal" value="24">
 <label for="dgH">Depth</label>
@@ -1745,9 +1747,9 @@
 <p class="input-help">Along the duct, from one elbow's centerline point to the other's.</p>
 </div><label for="dgJ">Joint length</label>
 <input id="dgJ" type="text" inputmode="decimal" value="60">
-<label for="dgStart">First cut from the end (optional)</label>
+<label for="dgStart" id="dgStartLabel">First wedge point from the end (optional)</label>
 <input id="dgStart" type="text" inputmode="decimal" value="" placeholder="Centered">
-<p class="input-help">On the centerline, from the end of the joint. Leave blank to center the offset in the joint.</p>
+<p class="input-help" id="dgStartHelp">The point of the first wedge, on the hinge edge, from the end of the joint. Leave blank to center the offset in the joint.</p>
 </div>
             </div>
 
@@ -1765,7 +1767,7 @@
                     <p class="live-view-hint">Drag or use the arrow keys to turn the view.</p>
                 </div>
                 <div id="rectResults" class="kv-list" aria-live="polite"></div>
-                <figure class="tool-figure" data-panel="dogleg" hidden><svg id="dgLayout" class="tool-drawing fig-drawing" viewBox="0 0 340 170" role="img" aria-label="Cut layout on the straight joint"></svg><figcaption>Cheek face of the joint, marks measured from the left end. Both cuts lean the same way; the shaded middle piece gets rolled over.</figcaption></figure>
+                <figure class="tool-figure" data-panel="dogleg" hidden><svg id="dgLayout" class="tool-drawing fig-drawing" viewBox="0 0 340 170" role="img" aria-label="Cut layout on the straight joint"></svg><figcaption id="dgFigCap">Cheek face of the joint, marks measured from the left end.</figcaption></figure>
                 
             </div>
         </div>

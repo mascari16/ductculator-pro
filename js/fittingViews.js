@@ -448,6 +448,16 @@
             }
         }
 
+        // Marking lines drawn on a face (e.g. cut lines on a cheek); shown
+        // only when that face is toward the viewer.
+        for (const m of scene.marks || []) {
+            const nv = cam(to3(plane, m.n[0], m.n[1], m.n[2]));
+            if (nv[1] >= -1e-6) continue;
+            const a3 = P(to3(plane, m.a[0], m.a[1], m.a[2]));
+            const b3 = P(to3(plane, m.b[0], m.b[1], m.b[2]));
+            items.push({ z: (a3[2] + b3[2]) / 2 - 0.8, node: el("line", { x1: a3[0].toFixed(2), y1: a3[1].toFixed(2), x2: b3[0].toFixed(2), y2: b3[1].toFixed(2), class: m.cls || "fv-cut" }) });
+        }
+
         // =================================================
         // Dimensions: placed clear of the duct and of each other.
         // =================================================

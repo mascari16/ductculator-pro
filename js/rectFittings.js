@@ -16,6 +16,18 @@
         DC.show("xlOffsetGroup", !perpendicular);
         DC.show("xlAdvanceGroup", perpendicular);
         DC.show("xlClrGroup", DC.val("xlType") === "radius");
+        const notch = DC.val("dgMethod") !== "roll";
+        const set = (id, text) => { const e = DC.get(id); if (e) e.textContent = text; };
+        set("dgMethodHelp", notch
+            ? "Cut a wedge out of the cheeks at each bend, leave the other side as a hinge, bend it closed and fasten."
+            : "Make two parallel cuts across the joint, roll the middle piece over and fasten it back on.");
+        set("dgStartLabel", notch ? "First wedge point from the end (optional)" : "First cut from the end (optional)");
+        set("dgStartHelp", notch
+            ? "The point of the first wedge, on the hinge edge, from the end of the joint. Leave blank to center the offset in the joint."
+            : "On the centerline, from the end of the joint. Leave blank to center the offset in the joint.");
+        set("dgFigCap", notch
+            ? "Cheek face of the joint, marks from the left end. Cut out the shaded wedges; the uncut side at each wedge point is the hinge."
+            : "Cheek face of the joint, marks from the left end. Both cuts lean the same way; the shaded middle piece gets rolled over.");
         const byRun = DC.val("dgMode") === "run";
         DC.show("dgAngleGroup", !byRun);
         DC.show("dgRunGroup", byRun);
@@ -229,6 +241,10 @@
             }
         }
 
+        if (DC.val("dgMethod") !== "roll") {
+            return doglegNotch(out, { W, O, J, alpha, byRun });
+        }
+
         const a = DC.rad(alpha);
         const beta = alpha / 2;
         const M = O / Math.sin(a);
@@ -307,6 +323,195 @@
     const ease = v => v * v * (3 - 2 * v);
 
     function dogScene(g, u) {
+        return g.method === "notch" ? notchScene(g, u) : rollScene(g, u);
+    }
+
+    /*
+     * Wedge (notch) dogleg: a V is cut out of both cheeks at each bend, the
+     * opposite side is left whole as a hinge, and the bend is closed.
+     *   w  = W · tan(α/2)    the V opens w each side of its point
+     *   Mc = O / sin α       middle piece on the centerline (finished shape
+     *                        is a mitered offset)
+     *   wedge points are m = Mc + w apart along the joint, on opposite edges
+     *   bend 1: point x1 on the bottom edge, opens at the top (x1 ± w),
+     *           hinge on the bottom side; closing swings the duct up
+     *   bend 2: point x2 on the top edge, opens at the bottom (x2 ± w),
+     *           hinge on the top side; closing swings it back level
+     *   joint gets shorter by Mc(1 − cos α) + 2w
+     */
+    function doglegNotch(out, { W, O, J, alpha, byRun }) {
+        const a = DC.rad(alpha);
+        const Mc = O / Math.sin(a);
+        const L = Mc * Math.cos(a);
+        const w = W * Math.tan(a / 2);
+        const m = Mc + w;
+        const startText = String(DC.val("dgStart") || "").trim();
+        const x1 = startText ? DC.meas("dgStart") : (J - m) / 2;
+        const x2 = x1 + m;
+        const shorter = Mc * (1 - Math.cos(a)) + 2 * w;
+        const f = DC.fmt;
+
+        if (startText && !(x1 >= 0)) {
+            return DC.renderProblem(out, "Check the first wedge", "Enter where the first wedge's point goes, from the end of the joint, or leave it blank to center the offset.");
+        }
+        if (J < m + 2 * w + 0.001) {
+            const need = DC.quarterUp(m + 2 * w);
+            return DC.renderProblem(out, "The joint is too short", "Both wedges don't fit on this joint.", [
+                `Use a joint at least ${f(need)} long (${DC.fmtFt(need)}).`,
+                byRun ? "Or use a shorter run (a steeper offset)." : "Or try a different elbow angle."
+            ]);
+        }
+        if (x1 - w < -0.001 || x2 + w > J + 0.001) {
+            return DC.renderProblem(out, "A wedge runs off the joint", "At this position a wedge runs past the end of the joint.", [
+                `Put the first wedge point between ${f(DC.quarterUp(w))} and ${f(Math.floor((J - m - w) * 4) / 4)} from the end.`,
+                "Or leave it blank to center the offset."
+            ]);
+        }
+
+        const b = v => `<b>${v}</b>`;
+        const step = (n, html) => ({ text: `<span class="dg-step"><b class="dg-n">${n}</b><span>${html}</span></span>` });
+        DC.renderRows(out, [
+            { label: "Wedge angle", note: "each wedge, point to point across the cheek", value: DC.deg(alpha), main: true },
+            { label: "Wedge opening", note: "at the open edge", value: f(2 * w) },
+            { head: "Steps" },
+            step(1, `Hook your tape on one end of the joint. ${b("First wedge")}: on one cheek, mark its point on the ${b("bottom edge")} at ${b(f(x1))}, and its opening on the ${b("top edge")} at ${b(f(x1 - w))} and ${b(f(x1 + w))}.`),
+            step(2, `${b("Second wedge")}: point on the ${b("top edge")} at ${b(f(x2))}, opening on the ${b("bottom edge")} at ${b(f(x2 - w))} and ${b(f(x2 + w))}.`),
+            step(3, `Draw each V on the cheek: from the point to its two opening marks. Each side is ${DC.deg(alpha / 2)} off square.`),
+            step(4, `Do the same on the other cheek, from the same end. Square across the ${b("top")} side between the first wedge's opening marks, and across the ${b("bottom")} side between the second wedge's.`),
+            step(5, `Cut out both wedges (both cheeks and the strip across the open side). ${b("Don't cut")} the bottom side at the first wedge or the top side at the second: those are the hinges.`),
+            step(6, `Bend the first wedge closed (the duct swings up ${DC.deg(alpha)}), then the second (it swings back level). Fasten the seams.`),
+            { head: "Check" },
+            { label: "Offset made", value: f(O) },
+            { label: "Elbow angle (each)", value: DC.deg(alpha) },
+            { label: "Middle, on the centerline", value: DC.len(Mc) },
+            { label: "Run between the elbows", note: "centerline", value: DC.len(L) },
+            { label: "Joint gets shorter by", note: "the wedges take material out", value: DC.len(shorter) },
+            { label: "Finished length", note: "end to end, along the duct", value: DC.len(J - shorter) },
+            { text: "Marks are exact, with no tabs. If you fasten with tabs, leave them on the wedge cuts. Tap Finished on the 3D view to watch it bend." }
+        ]);
+
+        drawNotchLayout({ W, J, x1, x2, w });
+
+        const H = DC.meas("dgH") > 0 ? DC.meas("dgH") : W * 0.5;
+        dgGeom = { method: "notch", W, H, J, O, L, Mc, w, x1, x2, alpha, shorter };
+        return dogScene(dgGeom, dgU);
+    }
+
+    function notchScene(g, u) {
+        const { W, H, J, O, L, Mc, w, x1, x2, alpha, shorter } = g;
+        const a = DC.rad(alpha);
+        const hw = W / 2, hh = H / 2;
+        const corners = [[1, 1], [-1, 1], [-1, -1], [1, -1]];
+        // a face given x at the top edge (xt) and at the bottom edge (xb)
+        const face = (xt, xb) => corners.map(([cy, cw]) => [cy > 0 ? xt : xb, cy * hw, cw * hh]);
+        const lerpRing = (r0, r1, k) => r0.map((p, i) => p.map((v, j) => v + (r1[i][j] - v) * k));
+        const piece = (f0, f1, len) => {
+            const n = Math.max(1, Math.ceil(len / Math.max(W * 0.6, 4)));
+            const out = [];
+            for (let k = 0; k <= n; k += 1) out.push(lerpRing(f0, f1, k / n));
+            return out;
+        };
+        const v1L = face(x1 - w, x1), v1R = face(x1 + w, x1);
+        const v2L = face(x2, x2 - w), v2R = face(x2, x2 + w);
+        const A = piece(face(0, 0), v1L, x1);
+        const B = piece(v1R, v2L, x2 - x1);
+        const C = piece(v2R, face(J, J), J - x2);
+        const W1 = piece(v1L, v1R, 2 * w);
+        const W2 = piece(v2L, v2R, 2 * w);
+
+        const s1 = ease(clamp01(u / 0.3));
+        const s2 = ease(clamp01((u - 0.3) / 0.35));
+        const s3 = ease(clamp01((u - 0.65) / 0.35));
+        const R = (p, c, ang) => {
+            const ca = Math.cos(ang), sa = Math.sin(ang), dx = p[0] - c[0], dy = p[1] - c[1];
+            return [c[0] + dx * ca - dy * sa, c[1] + dx * sa + dy * ca, p[2]];
+        };
+        const H1 = [x1, -hw];
+        const th1 = a * s2;
+        const H2b = R([x2, hw, 0], H1, th1);
+        const th2 = -a * s3;
+        const moveB = p => R(p, H1, th1);
+        const moveC = p => R(R(p, H1, th1), H2b, th2);
+        const lift = W * 0.9 * s1;
+        const moveW1 = p => [p[0], p[1] + lift, p[2]];
+        const moveW2 = p => [p[0], p[1] - lift, p[2]];
+        const ringsOf = (rs, fn, flags) => rs.map((pts, k) => ({ pts: pts.map(fn), ...(flags(k, rs.length) || {}) }));
+        const id = p => p;
+        const ends = (k, n) => (k === 0 || k === n - 1 ? { joint: true } : null);
+        const base = { kind: "rect", w: W, h: H };
+
+        let parts;
+        let marks = [];
+        if (u <= 0) {
+            parts = [{ ...base, rings: ringsOf(piece(face(0, 0), face(J, J), J), id, ends) }];
+            // V's on both cheeks, cut lines across the open sides, hinge lines
+            for (const cw of [1, -1]) {
+                const n = [0, 0, cw];
+                marks.push({ a: [x1, -hw, cw * hh], b: [x1 - w, hw, cw * hh], n }, { a: [x1, -hw, cw * hh], b: [x1 + w, hw, cw * hh], n });
+                marks.push({ a: [x2, hw, cw * hh], b: [x2 - w, -hw, cw * hh], n }, { a: [x2, hw, cw * hh], b: [x2 + w, -hw, cw * hh], n });
+            }
+            for (const x of [x1 - w, x1 + w]) marks.push({ a: [x, hw, -hh], b: [x, hw, hh], n: [0, 1, 0] });
+            for (const x of [x2 - w, x2 + w]) marks.push({ a: [x, -hw, -hh], b: [x, -hw, hh], n: [0, -1, 0] });
+            marks.push({ a: [x1, -hw, -hh], b: [x1, -hw, hh], n: [0, -1, 0], cls: "fv-bend" });
+            marks.push({ a: [x2, hw, -hh], b: [x2, hw, hh], n: [0, 1, 0], cls: "fv-bend" });
+        } else if (u >= 1) {
+            const rings = [
+                ...ringsOf(A, id, k => (k === 0 ? { joint: true } : null)),
+                ...ringsOf(B.slice(1), moveB, () => null),
+                ...ringsOf(C.slice(1), moveC, (k, n) => (k === n - 1 ? { joint: true } : null))
+            ];
+            rings[A.length - 1].joint = true;
+            rings[A.length - 1 + B.length - 1].joint = true;
+            parts = [{ ...base, rings }];
+        } else {
+            parts = [
+                { ...base, rings: ringsOf(A, id, ends) },
+                { ...base, rings: ringsOf(B, moveB, ends) },
+                { ...base, rings: ringsOf(C, moveC, ends) }
+            ];
+            if (s1 < 1) {
+                parts.push({ ...base, rings: ringsOf(W1, moveW1, ends), tone: "main" });
+                parts.push({ ...base, rings: ringsOf(W2, moveW2, ends), tone: "main" });
+            }
+        }
+
+        let dims = [];
+        let caption;
+        if (u <= 0) {
+            const T = x => [x, hw], Bt = x => [x, -hw];
+            const run = (p, side, label) => ({ a: [0, side * hw], b: p, dir: [0, side], base: W * 0.25, ea: [0, side * hw], eb: p, label });
+            dims = [
+                { a: [0, -hw], b: [0, hw], dir: [-1, 0], base: W * 0.3, label: `${f(W)} cheek` },
+                run(T(x1 - w), 1, f(x1 - w)), run(T(x1 + w), 1, f(x1 + w)), run(T(x2), 1, f(x2)),
+                run(Bt(x1), -1, f(x1)), run(Bt(x2 - w), -1, f(x2 - w)), run(Bt(x2 + w), -1, f(x2 + w))
+            ];
+            caption = `Straight joint ${f(J)} · cut out the two wedges on the yellow lines, bend on the dotted hinge lines · marks from the left end`;
+        } else if (u >= 1) {
+            const t = w / 2;
+            const d1 = x1 - t;
+            const C0 = J - (x2 + t);
+            const BL = [x1, -hw];
+            const TL = [x1 - w, hw];
+            const TR = [d1 + L - t, O + hw];
+            const endBottom = [d1 + L + C0, O - hw];
+            const nrm = [-Math.sin(a), Math.cos(a)];
+            dims = [
+                { a: [0, -hw], b: [0, hw], dir: [-1, 0], base: W * 0.3, label: `${f(W)} cheek` },
+                { a: [0, -hw], b: [endBottom[0], -hw], dir: [0, -1], base: W * 0.4, ea: [0, -hw], eb: endBottom, label: `Finished ${f(J - shorter)}` },
+                { a: [endBottom[0], -hw], b: endBottom, dir: [1, 0], base: W * 0.35, ea: BL, eb: endBottom, label: `Offset ${f(O)}` },
+                { a: TL, b: TR, dir: nrm, base: W * 0.3, ea: TL, eb: TR, label: `Middle ${f(Mc)}` }
+            ];
+            caption = `${DC.deg(alpha)} elbows · wedges cut out and bent closed · depth ${f(H)}`;
+        } else {
+            caption = u < 0.3 ? "Cut out the wedges…" : u < 0.65 ? "Bend the first wedge closed…" : "Bend the second wedge closed…";
+        }
+
+        return { roll: 0, dimW: H / 2, parts, dims, marks, caption };
+    }
+
+    const f = v => DC.fmt(v);
+
+    function rollScene(g, u) {
         const { W, H, J, O, L, M, t, d1, d2, alpha, beta, shorter } = g;
         const a = DC.rad(alpha);
         const corners = [[1, 1], [-1, 1], [-1, -1], [1, -1]];
@@ -490,6 +695,34 @@
             ${run(d1 + t, bottom + 16, 1)}${run(d2 + t, bottom + 36, 1)}
             <text class="fig-t" x="${left + len}" y="${top - 8}" text-anchor="end">top edge</text>
             <text class="fig-t" x="${left + len}" y="${bottom + 16}" text-anchor="end">bottom edge</text>`;
+    }
+
+    // Flat layout of the joint with both wedges (shaded) and hinge lines.
+    function drawNotchLayout({ W, J, x1, x2, w }) {
+        const svg = DC.get("dgLayout");
+        if (!svg) return;
+        const VW = 340, VH = 262;
+        const s = Math.min((VW - 76) / J, 92 / W);
+        const len = J * s, h = W * s;
+        const left = (VW - len) / 2 - 12, top = 84, bottom = top + h;
+        const X = d => left + d * s;
+        const run = (d, y, up) => {
+            const x = X(d), xa = X(0);
+            return `<path class="dm" d="M${xa} ${y}H${x}M${x} ${up ? y - 4 : y + 4}V${up ? top : bottom}" stroke-width="1.2"/>
+                <path class="dm" d="M${x - 5} ${y - 3}L${x} ${y}L${x - 5} ${y + 3}" stroke-width="1.2"/>
+                <text class="fig-t fig-y" x="${x - 4}" y="${up ? y - 6 : y + 15}" text-anchor="end">${DC.fmt(d)}</text>`;
+        };
+        const wedge = (px, py, ox, oy) => `<polygon points="${X(px)},${py} ${X(ox - w)},${oy} ${X(ox + w)},${oy}" fill="rgba(255,210,58,.16)" stroke="var(--yellow)" stroke-width="2"/>`;
+        svg.setAttribute("viewBox", `0 0 ${VW} ${VH}`);
+        svg.innerHTML = `
+            <rect class="ln" x="${left}" y="${top}" width="${len}" height="${h}"/>
+            <path class="hd" d="M${left} ${(top + bottom) / 2}H${left + len}"/>
+            ${wedge(x1, bottom, x1, top)}${wedge(x2, top, x2, bottom)}
+            <path class="dm" d="M${X(0)} ${top - 60}V${bottom + 60}" stroke-width="1.2"/>
+            ${run(x1 - w, top - 14, true)}${run(x1 + w, top - 32, true)}${run(x2, top - 50, true)}
+            ${run(x1, bottom + 14, false)}${run(x2 - w, bottom + 32, false)}${run(x2 + w, bottom + 50, false)}
+            <text class="fig-t" x="${left + len + 5}" y="${top + 4}" text-anchor="start">top</text>
+            <text class="fig-t" x="${left + len + 5}" y="${bottom + 4}" text-anchor="start">bottom</text>`;
     }
 
     function compute() {
