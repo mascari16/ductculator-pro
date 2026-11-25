@@ -42,7 +42,12 @@
         const tToe = (main / 2 + Math.cos(a) * size / 2) / Math.sin(a);
         const endHeel = r.straight - sign * lean;
         const endToe = r.straight + sign * lean;
-        return { tHeel, tToe, endHeel, endToe, heel: endHeel - tHeel, toe: endToe - tToe };
+        // Where the heel edge meets the main, measured along the main from the
+        // centerline crossing (negative = before it), and the branch's final
+        // centerline (where the elbow ends) on the same scale.
+        const xHeel = tHeel * Math.cos(a) - Math.sin(a) * size / 2;
+        const xEnd = r.orient === "parallel" ? r.advanceToElbowEnd : r.travel * Math.cos(a);
+        return { tHeel, tToe, endHeel, endToe, heel: endHeel - tHeel, toe: endToe - tToe, xHeel, xEnd, tapToEnd: xEnd - xHeel };
     }
 
     DC.lateralSides = lateralSides;
@@ -53,7 +58,12 @@
         const rows = [
             { label: "Straight, long side", note: "heel edge, from the main to the elbow", value: sd.heel > 0 ? DC.len(sd.heel) : "—" },
             { label: "Straight, short side", note: "toe edge, from the main to the elbow", value: sd.toe > 0 ? DC.len(sd.toe) : "—" },
-            { label: "Straight on the centerline", note: smooth ? "from the main centerline" : "from the main centerline to the miter point", value: DC.len(r.straight) }
+            { label: "Straight on the centerline", note: smooth ? "from the main centerline" : "from the main centerline to the miter point", value: DC.len(r.straight) },
+            {
+                label: r.orient === "parallel" ? "Along the main, tap to elbow end" : "Along the main, tap to branch centerline",
+                note: "from the heel of the tap",
+                value: DC.len(sd.tapToEnd)
+            }
         ];
         if (sd.toe <= 0) {
             rows.push({ text: "The elbow starts before the short side clears the main. Increase the offset (or distance along the main), or use a smaller elbow." });
@@ -115,11 +125,13 @@
         // (The short side is listed in the results: on the drawing it sits
         // against the main, where its dimension can't be read.)
 
+        // Along the main: from the heel of the tap (where the long side starts).
+        const sidesX = lateralSides({ main, size, angle, r, smooth });
         if (parallel) {
             dims.push({ a: [end.x, 0], b: [end.x, end.y], dir: [1, 0], base: unit * 0.45, ea: [0, 0], eb: [elbowEnd.x, end.y], cl: true, label: `${roll ? "True offset" : "Offset"} ${DC.fmt(r.trueOffset)}` });
-            dims.push({ a: [0, -main / 2], b: [elbowEnd.x, -main / 2], dir: [0, -1], base: main * 0.45, ea: [0, 0], eb: [elbowEnd.x, elbowEnd.y], cl: true, label: `Along main ${DC.fmt(elbowEnd.x)}` });
+            dims.push({ a: [sidesX.xHeel, -main / 2], b: [elbowEnd.x, -main / 2], dir: [0, -1], base: main * 0.45, ea: [sidesX.xHeel, main / 2], eb: [elbowEnd.x, elbowEnd.y], cl: true, label: `Tap to elbow end ${DC.fmt(elbowEnd.x - sidesX.xHeel)}` });
         } else {
-            dims.push({ a: [0, -main / 2], b: [elbowEnd.x, -main / 2], dir: [0, -1], base: main * 0.45, ea: [0, 0], eb: [elbowEnd.x, end.y], cl: true, label: `Along main ${DC.fmt(elbowEnd.x)}` });
+            dims.push({ a: [sidesX.xHeel, -main / 2], b: [elbowEnd.x, -main / 2], dir: [0, -1], base: main * 0.45, ea: [sidesX.xHeel, main / 2], eb: [elbowEnd.x, end.y], cl: true, label: `Tap to centerline ${DC.fmt(elbowEnd.x - sidesX.xHeel)}` });
         }
 
         return {
