@@ -1677,3 +1677,6 @@ h1,h2,h3,h4{
     .dg-toggle{order:3;width:100%;margin-left:0}
     .dg-toggle button{flex:1}
 }
+
+/* Dogleg cut layout: bigger, sized by the page width */
+#dgLayout{max-height:none;max-width:580px;margin:0 auto}

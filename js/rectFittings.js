@@ -665,23 +665,45 @@
         b.addEventListener("click", () => setDogView(Number(b.dataset.dgv)));
     });
 
+    // Running-mark label: inside the span (before the arrow) when it fits,
+    // otherwise just past the arrow so it never crosses the end line.
+    // Narrow screens draw the layout with bigger text so it stays readable.
+    function figSize(svg) {
+        const wPx = svg.clientWidth || window.innerWidth;
+        const small = wPx < 480;
+        return { small, fs: small ? 18 : 14, gap: small ? 26 : 22 };
+    }
+    let figFs = 14;
+
+    function tag(d, x, x0, y) {
+        const text = DC.fmt(d);
+        const wText = text.length * figFs * 0.52;
+        const st = `style="font-size:${figFs}px"`;
+        return x - x0 - 8 >= wText
+            ? `<text class="fig-t fig-y" ${st} x="${x - 4}" y="${y}" text-anchor="end">${text}</text>`
+            : `<text class="fig-t fig-y" ${st} x="${x + 4}" y="${y}" text-anchor="start">${text}</text>`;
+    }
+
     // Flat layout of the straight joint (cheek face) with both cuts marked.
     // Marks are running dimensions from the left end, like a tape hooked on it.
     function drawDogLayout({ W, J, d1, d2, t }) {
         const svg = DC.get("dgLayout");
         if (!svg) return;
-        const VW = 340, VH = 210;
-        const s = Math.min((VW - 40) / J, 92 / W);
+        const VW = 340;
+        const { fs, gap } = figSize(svg);
+        figFs = fs;
+        const s = Math.min((VW - 76) / J, 150 / W);
         const len = J * s, h = W * s;
-        const left = (VW - len) / 2, top = 64, bottom = top + h;
+        const left = (VW - len) / 2 - 12, top = 2 * gap + 18, bottom = top + h;
+        const VH = bottom + 2 * gap + 14;
         const X = d => left + d * s;
         const f = v => DC.fmt(v);
         const run = (d, y, side) => {
             const x = X(d), xa = X(0), up = side < 0;
-            const ty = up ? y - 6 : y + 15;
+            const ty = up ? y - 6 : y + figFs + 1;
             return `<path class="dm" d="M${xa} ${y}H${x}M${x} ${up ? y - 4 : y + 4}V${up ? top : bottom}" stroke-width="1.2"/>
                 <path class="dm" d="M${x - 5} ${y - 3}L${x} ${y}L${x - 5} ${y + 3}" stroke-width="1.2"/>
-                <text class="fig-t fig-y" x="${x - 4}" y="${ty}" text-anchor="end">${f(d)}</text>`;
+                ${tag(d, x, xa, ty)}`;
         };
         const cut = d => `<path class="dm" d="M${X(d + t)} ${bottom}L${X(d - t)} ${top}" stroke-width="2.2"/>`;
         svg.setAttribute("viewBox", `0 0 ${VW} ${VH}`);
@@ -689,28 +711,31 @@
             <polygon points="${X(d1 - t)},${top} ${X(d2 - t)},${top} ${X(d2 + t)},${bottom} ${X(d1 + t)},${bottom}" fill="rgba(110,190,230,.18)" stroke="none"/>
             <rect class="ln" x="${left}" y="${top}" width="${len}" height="${h}"/>
             <path class="hd" d="M${left} ${(top + bottom) / 2}H${left + len}"/>
-            <path class="dm" d="M${X(0)} ${top - 40}V${bottom + 40}" stroke-width="1.2"/>
+            <path class="dm" d="M${X(0)} ${top - 2 * gap + 4}V${bottom + 2 * gap - 4}" stroke-width="1.2"/>
             ${cut(d1)}${cut(d2)}
-            ${run(d1 - t, top - 16, -1)}${run(d2 - t, top - 36, -1)}
-            ${run(d1 + t, bottom + 16, 1)}${run(d2 + t, bottom + 36, 1)}
-            <text class="fig-t" x="${left + len}" y="${top - 8}" text-anchor="end">top edge</text>
-            <text class="fig-t" x="${left + len}" y="${bottom + 16}" text-anchor="end">bottom edge</text>`;
+            ${run(d1 - t, top - gap + 8, -1)}${run(d2 - t, top - 2 * gap + 8, -1)}
+            ${run(d1 + t, bottom + gap - 8, 1)}${run(d2 + t, bottom + 2 * gap - 8, 1)}
+            <text class="fig-t" style="font-size:${fs - 2}px" x="${left + len + 5}" y="${top + 4}" text-anchor="start">top</text>
+            <text class="fig-t" style="font-size:${fs - 2}px" x="${left + len + 5}" y="${bottom + 4}" text-anchor="start">bottom</text>`;
     }
 
     // Flat layout of the joint with both wedges (shaded) and hinge lines.
     function drawNotchLayout({ W, J, x1, x2, w }) {
         const svg = DC.get("dgLayout");
         if (!svg) return;
-        const VW = 340, VH = 262;
-        const s = Math.min((VW - 76) / J, 92 / W);
+        const VW = 340;
+        const { fs, gap } = figSize(svg);
+        figFs = fs;
+        const s = Math.min((VW - 76) / J, 150 / W);
         const len = J * s, h = W * s;
-        const left = (VW - len) / 2 - 12, top = 84, bottom = top + h;
+        const left = (VW - len) / 2 - 12, top = 3 * gap + 18, bottom = top + h;
+        const VH = bottom + 3 * gap + 14;
         const X = d => left + d * s;
         const run = (d, y, up) => {
             const x = X(d), xa = X(0);
             return `<path class="dm" d="M${xa} ${y}H${x}M${x} ${up ? y - 4 : y + 4}V${up ? top : bottom}" stroke-width="1.2"/>
                 <path class="dm" d="M${x - 5} ${y - 3}L${x} ${y}L${x - 5} ${y + 3}" stroke-width="1.2"/>
-                <text class="fig-t fig-y" x="${x - 4}" y="${up ? y - 6 : y + 15}" text-anchor="end">${DC.fmt(d)}</text>`;
+                ${tag(d, x, xa, up ? y - 6 : y + figFs + 1)}`;
         };
         const wedge = (px, py, ox, oy) => `<polygon points="${X(px)},${py} ${X(ox - w)},${oy} ${X(ox + w)},${oy}" fill="rgba(255,210,58,.16)" stroke="var(--yellow)" stroke-width="2"/>`;
         svg.setAttribute("viewBox", `0 0 ${VW} ${VH}`);
@@ -718,11 +743,11 @@
             <rect class="ln" x="${left}" y="${top}" width="${len}" height="${h}"/>
             <path class="hd" d="M${left} ${(top + bottom) / 2}H${left + len}"/>
             ${wedge(x1, bottom, x1, top)}${wedge(x2, top, x2, bottom)}
-            <path class="dm" d="M${X(0)} ${top - 60}V${bottom + 60}" stroke-width="1.2"/>
-            ${run(x1 - w, top - 14, true)}${run(x1 + w, top - 32, true)}${run(x2, top - 50, true)}
-            ${run(x1, bottom + 14, false)}${run(x2 - w, bottom + 32, false)}${run(x2 + w, bottom + 50, false)}
-            <text class="fig-t" x="${left + len + 5}" y="${top + 4}" text-anchor="start">top</text>
-            <text class="fig-t" x="${left + len + 5}" y="${bottom + 4}" text-anchor="start">bottom</text>`;
+            <path class="dm" d="M${X(0)} ${top - 3 * gap + 4}V${bottom + 3 * gap - 4}" stroke-width="1.2"/>
+            ${run(x1 - w, top - gap + 8, true)}${run(x1 + w, top - 2 * gap + 8, true)}${run(x2, top - 3 * gap + 8, true)}
+            ${run(x1, bottom + gap - 8, false)}${run(x2 - w, bottom + 2 * gap - 8, false)}${run(x2 + w, bottom + 3 * gap - 8, false)}
+            <text class="fig-t" style="font-size:${fs - 2}px" x="${left + len + 5}" y="${top + 4}" text-anchor="start">top</text>
+            <text class="fig-t" style="font-size:${fs - 2}px" x="${left + len + 5}" y="${bottom + 4}" text-anchor="start">bottom</text>`;
     }
 
     function compute() {
