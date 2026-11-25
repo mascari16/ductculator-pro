@@ -1747,3 +1747,4 @@ h1,h2,h3,h4{
 .wheel-round em{font-style:normal;color:var(--gray)}
 .wheel-opts{display:flex;flex-wrap:wrap;gap:6px 22px;margin:4px 0 0}
 .wh-hair-row[hidden]{display:none !important}
+#calculateOffsetBtn[hidden]{display:none !important}
