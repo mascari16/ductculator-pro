@@ -140,3 +140,23 @@ function getFlatOvalOptions(requiredArea, targetVelocity, cfm) {
     return options.slice(0, 5);
 
 }
+// ------------------------------------
+// Flat oval sizes at or above a target (same rule as rectangles)
+// ------------------------------------
+function flatOvalAreaSqIn(width, height) {
+    return (width - height) * height + Math.PI * (height / 2) ** 2;
+}
+
+function flatOvalEquivalentRound(width, height) {
+    const area = flatOvalAreaSqIn(width, height);
+    const perimeter = Math.PI * height + 2 * (width - height);
+    return 1.55 * Math.pow(area, 0.625) / Math.pow(perimeter, 0.25);
+}
+
+function ovalsForRound(round, options) {
+    return sizesAtOrAbove((w, h) => w > h && flatOvalEquivalentRound(w, h) >= round - 1e-9, { minShort: 3, strictlyLonger: true, ...options });
+}
+
+function ovalsForArea(areaSqFt, options) {
+    return sizesAtOrAbove((w, h) => w > h && flatOvalAreaSqIn(w, h) / 144 >= areaSqFt - 1e-12, { minShort: 3, strictlyLonger: true, ...options });
+}

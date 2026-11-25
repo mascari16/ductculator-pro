@@ -97,17 +97,9 @@ function calculateConstantVelocity(cfm, targetVelocity) {
 }
 
 function buildResults(data) {
-    const rectangles = getRectangleOptions(
-        data.requiredArea,
-        data.targetVelocity,
-        data.cfm
-    );
+    const rectangles = rectangleAreaOptions(data.requiredArea, data.cfm);
 
-    const ovals = getFlatOvalOptions(
-        data.requiredArea,
-        data.targetVelocity,
-        data.cfm
-    );
+    const ovals = ovalAreaOptions(data.requiredArea, data.cfm);
 
     const velocityDifference =
         data.actualVelocity - data.targetVelocity;
@@ -158,6 +150,10 @@ function buildResults(data) {
                 ${buildAreaOptionsTable("Rectangle", "▭", rectangles)}
                 ${buildAreaOptionsTable("Flat Oval", "⬭", ovals)}
             </div>
+            <p class="options-legend">
+                Each size is the smallest with at least the required area, so velocity
+                stays at or below the target, squarest first, in ${rectSizeStep()}" steps.
+            </p>
 
             <details class="engineering-breakdown">
                 <summary>Engineering Breakdown</summary>
@@ -189,7 +185,61 @@ function buildResults(data) {
     `;
 }
 
+/*
+ * Rectangular and flat oval options, the same rule as the manual wheel:
+ * for each short side, the smallest long side (1" or 2" steps, the screen
+ * setting) that meets the target. Equal friction: equivalent round at least
+ * the exact round, so friction is at or below the design rate. Constant
+ * velocity / static regain: area at least the required area, so velocity is
+ * at or below the target. Squarest first, 4:1 at most.
+ */
+function frictionOption(size, cfm, targetRate, equivalentFn, areaSqIn) {
+    const equivalentDiameter = equivalentFn(size.width, size.height);
+    const frictionRate = roundFrictionRate(cfm, equivalentDiameter);
+    const area = areaSqIn / 144;
+    return {
+        width: size.width,
+        height: size.height,
+        area,
+        velocity: cfm / area,
+        equivalentDiameter,
+        frictionRate,
+        frictionDifference: ((frictionRate - targetRate) / targetRate) * 100,
+        aspectRatio: size.aspectRatio
+    };
+}
+
+function areaOption(size, cfm, requiredAreaSqFt, areaSqIn) {
+    const area = areaSqIn / 144;
+    return {
+        width: size.width,
+        height: size.height,
+        area,
+        velocity: cfm / area,
+        areaDifference: ((area - requiredAreaSqFt) / requiredAreaSqFt) * 100,
+        aspectRatio: size.aspectRatio
+    };
+}
+
+function rectangleAreaOptions(requiredAreaSqFt, cfm) {
+    return rectanglesForArea(requiredAreaSqFt).map(o => areaOption(o, cfm, requiredAreaSqFt, o.width * o.height));
+}
+
+function ovalAreaOptions(requiredAreaSqFt, cfm) {
+    return ovalsForArea(requiredAreaSqFt).map(o => areaOption(o, cfm, requiredAreaSqFt, flatOvalAreaSqIn(o.width, o.height)));
+}
+
 function getEqualFrictionRectangleOptions(cfm, targetRate, targetDiameter) {
+    return rectanglesForRound(targetDiameter).map(o =>
+        frictionOption(o, cfm, targetRate, rectEquivalentRound, o.width * o.height));
+}
+
+function getEqualFrictionOvalOptions(cfm, targetRate, targetDiameter) {
+    return ovalsForRound(targetDiameter).map(o =>
+        frictionOption(o, cfm, targetRate, flatOvalEquivalentRound, flatOvalAreaSqIn(o.width, o.height)));
+}
+
+function oldEqualFrictionRectangleOptions(cfm, targetRate, targetDiameter) {
     const options = [];
     const seen = new Set();
 
@@ -232,7 +282,7 @@ function getEqualFrictionRectangleOptions(cfm, targetRate, targetDiameter) {
     return options.sort((a, b) => a.score - b.score).slice(0, 5);
 }
 
-function getEqualFrictionOvalOptions(cfm, targetRate, targetDiameter) {
+function oldEqualFrictionOvalOptions(cfm, targetRate, targetDiameter) {
     const options = [];
 
     for (const oval of FLAT_OVAL_SIZES) {
@@ -370,9 +420,9 @@ function buildEqualFrictionResults(data) {
                 ${buildFrictionOptionsTable("Flat Oval", "⬭", ovals)}
             </div>
             <p class="options-legend">
-                Friction Δ compares each size with the target friction rate:
-                <strong>+</strong> is higher friction, <strong>−</strong> is lower.
-                Green is within 2%.
+                Each size is the smallest that keeps friction at or below the target
+                (equal friction with the exact round), squarest first, in ${rectSizeStep()}" steps.
+                Friction Δ shows how far below the target it runs.
             </p>
 
             <details class="engineering-breakdown">
@@ -524,13 +574,13 @@ function buildStaticOptionsTable(title, icon, options) {
 
 function buildStaticRegainResults(data) {
     const rectangles = addStaticRegainToOptions(
-        getRectangleOptions(data.requiredArea, data.targetVelocity, data.cfm),
+        rectangleAreaOptions(data.requiredArea, data.cfm),
         data.enteringVelocityPressure,
         data.regainEfficiency,
         data.desiredStaticRegain
     );
     const ovals = addStaticRegainToOptions(
-        getFlatOvalOptions(data.requiredArea, data.targetVelocity, data.cfm),
+        ovalAreaOptions(data.requiredArea, data.cfm),
         data.enteringVelocityPressure,
         data.regainEfficiency,
         data.desiredStaticRegain

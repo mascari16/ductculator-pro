@@ -238,11 +238,16 @@
         greenRow.appendChild(band(g0, g1, GA[0] - 4, GA[1] + 4, "wh-green wh-green-in"));
         const sides = [4, 5, 6, 7, 8, 9, 10, 12, 14, 16, 18, 20, 24, 28, 30, 36, 40, 48, 54, 60, 72, 80, 90, 100];
         const taken = [];
+        const step = typeof rectSizeStep === "function" ? rectSizeStep() : 1;
         for (const a of sides) {
-            const b = rectB(a, D);
-            if (!b || b < 3 || b > 120 || Math.max(a, b) / Math.min(a, b) > 6) continue;
+            if (a % step) continue;
+            const exact = rectB(a, D);
+            if (!exact) continue;
+            // the matching side, rounded up to the step so friction stays at or below
+            const b = Math.max(step, Math.ceil(exact / step - 1e-9) * step);
+            if (b < 3 || b > 120 || Math.max(a, b) / Math.min(a, b) > 4.01) continue;
             const ang = gA(a);
-            const text = String(Math.ceil(b - 0.05));
+            const text = String(b);
             const half = ((text.length * 7 + 6) / 2 / (g1 - 20)) * 180 / Math.PI;
             if (taken.some(([x, h]) => Math.abs(ang - x) < half + h)) continue;
             taken.push([ang, half]);
@@ -273,14 +278,10 @@
         }
         return null;
     }
+    // same rule as the calculator's list (rectangle.js)
     function rectList(D) {
-        const out = [];
-        for (const b of [4, 6, 8, 10, 12, 14, 16, 18, 20, 24, 30, 36]) {
-            const a = rectB(b, D);
-            if (!a || a < b || a / b > 4.01) continue;
-            out.push(`${Math.ceil(a - 0.05)} × ${b}`);
-        }
-        return out.slice(-3).reverse().join(", ");
+        if (typeof rectanglesForRound !== "function") return "";
+        return rectanglesForRound(D, { count: 4 }).map(o => `${o.width} × ${o.height}`).join(", ");
     }
     const f2 = v => (v == null ? "—" : v >= 100 ? Math.round(v).toLocaleString() : v >= 10 ? v.toFixed(1) : v.toFixed(v < 1 ? 3 : 2));
 
@@ -410,6 +411,12 @@
     roundField?.addEventListener("change", fromField);
     roundField?.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); fromField(); roundField.blur(); } });
     document.getElementById("whHair")?.addEventListener("change", update);
+    // 1" / 2" steps: redraw the wheel's pairs and recalculate the calculator
+    document.getElementById("rectStep")?.addEventListener("change", () => {
+        lastD = null;
+        update();
+        if (typeof updateCalculator === "function") updateCalculator();
+    });
 
     // Line the wheel up with the calculator's airflow and friction.
     document.getElementById("whFromInputs")?.addEventListener("click", () => {

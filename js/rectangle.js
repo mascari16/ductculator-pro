@@ -143,3 +143,68 @@ for (const option of options) {
 return unique.slice(0, 5);
 
 }
+// ------------------------------------
+// Sizes at or above a target (shared by the calculator and the wheel)
+// ------------------------------------
+//
+// For each short side (in the chosen step), the smallest long side (same
+// step) that meets the target: equal friction means the equivalent round
+// (Huebscher) is at least the target round, so friction never exceeds the
+// design rate; equal area means the area is at least the required area, so
+// velocity never exceeds the target. Shapes past 4:1 are left out, and the
+// list runs squarest first.
+
+const RECT_MAX_ASPECT = 4;
+
+// 1" steps unless the screen's setting says 2"
+function rectSizeStep() {
+    const select = document.getElementById("rectStep");
+    return select && select.value === "2" ? 2 : 1;
+}
+
+function rectEquivalentRound(width, height) {
+    return 1.30 * Math.pow(width * height, 0.625) / Math.pow(width + height, 0.25);
+}
+
+// smallest long side (>= minLong, in step) with meets(long, short) true
+function smallestLongSide(shortSide, step, meets, maxLong, minLong) {
+    const start = Math.max(minLong, shortSide);
+    if (meets(start, shortSide)) return start;
+    let lo = start, hi = start;
+    while (!meets(hi, shortSide)) {
+        hi *= 2;
+        if (hi > maxLong * 2) return null;
+    }
+    for (let i = 0; i < 60; i += 1) {
+        const mid = (lo + hi) / 2;
+        if (meets(mid, shortSide)) hi = mid; else lo = mid;
+    }
+    let w = Math.max(start, Math.ceil(hi / step - 1e-9) * step);
+    if (!meets(w, shortSide)) w += step;   // guard against rounding
+    return w;
+}
+
+function sizesAtOrAbove(meets, { step = rectSizeStep(), minShort = 4, maxShort = 120, maxLong = 300, maxAspect = RECT_MAX_ASPECT, count = 5, strictlyLonger = false } = {}) {
+    const out = [];
+    const start = Math.ceil(minShort / step) * step;
+    for (let h = start; h <= maxShort; h += step) {
+        const minLong = strictlyLonger ? h + step : h;
+        const w = smallestLongSide(h, step, meets, maxLong, minLong);
+        if (w === null || w > maxLong) continue;
+        if (w / h <= maxAspect + 1e-9) out.push({ width: w, height: h, aspectRatio: w / h });
+        if (w === minLong) break;   // the squarest size: larger short sides only get bigger
+    }
+    // drop sizes another size beats on both sides (e.g. 14 × 14 when 14 × 13 already works)
+    const lean = out.filter(o => !out.some(p => p !== o && p.width <= o.width && p.height <= o.height));
+    return lean.sort((a, b) => a.aspectRatio - b.aspectRatio).slice(0, count);
+}
+
+// equal friction with a round of diameter `round` (friction at or below its rate)
+function rectanglesForRound(round, options) {
+    return sizesAtOrAbove((w, h) => rectEquivalentRound(w, h) >= round - 1e-9, options);
+}
+
+// equal area: at least `areaSqFt` (velocity at or below target)
+function rectanglesForArea(areaSqFt, options) {
+    return sizesAtOrAbove((w, h) => (w * h) / 144 >= areaSqFt - 1e-12, options);
+}

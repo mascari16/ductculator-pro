@@ -1768,3 +1768,7 @@ h1,h2,h3,h4{
 .options-table tbody tr:nth-child(even){
     background:rgba(255,255,255,.045);
 }
+.af-top{display:flex;flex-wrap:wrap;align-items:center;gap:12px 22px;margin:0 0 18px}
+.af-top .af-mode{margin:0}
+.af-step{display:flex;align-items:center;gap:10px;margin:0;color:var(--gray);font-size:15px}
+.af-step select{width:auto;margin:0;min-height:40px}

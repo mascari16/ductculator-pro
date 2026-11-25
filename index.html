@@ -360,7 +360,11 @@
 
         </header>
 
+        <div class="af-top">
         <div class="seg af-mode" role="tablist" aria-label="How to size"><button type="button" role="tab" data-afmode="calc" class="is-on" aria-selected="true">Calculator</button><button type="button" role="tab" data-afmode="wheel" aria-selected="false">Manual wheel</button></div>
+        <label class="af-step" for="rectStep"><span>Rectangular sizes in</span>
+            <select id="rectStep"><option value="1" selected>1" steps</option><option value="2">2" steps</option></select></label>
+        </div>
 
         <div id="afWheel" class="wheel-wrap" hidden>
             <div class="panel wheel-panel">
@@ -1961,7 +1965,7 @@
 <script src="js/rectFittings.js?v=20261124-3"></script>
 <script src="js/layoutMath.js?v=20261124-2"></script>
 <script src="js/takeoff.js?v=20261124-2"></script>
-<script src="js/wheel.js?v=20261125-5"></script>
+<script src="js/wheel.js?v=20261125-6"></script>
 <script src="js/navigation.js?v=20261124-2"></script>
 
 </body>
