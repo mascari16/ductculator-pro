@@ -147,13 +147,13 @@
             { label: "Elbow angle", value: DC.deg(r.elbow), main: true },
             type === "straight" && { label: "Miter cut", note: "off square", value: DC.deg(r.elbow / 2) },
             type === "straight" && { label: "End lean across the cheek", value: DC.fmt(W * Math.tan(DC.rad(r.elbow / 2))) },
-            { label: "Branch straight to elbow", note: type === "straight" ? "to the miter point" : "from the main centerline", value: DC.len(r.straight) },
+            ...DC.lateralSideRows(DC.meas("xlMainW") > 0 ? DC.meas("xlMainW") : W * 1.5, W, angle, r, type === "radius"),
             r.orient === "parallel"
                 ? { label: "Along the main to elbow end", value: DC.len(r.advanceToElbowEnd) }
                 : { label: "Elbow end above main centerline", value: DC.len(r.elbowEndHeight) },
             type === "radius" && { label: "Elbow centerline radius", value: DC.fmt(R) },
             type === "radius" && { label: "Throat / heel radius", value: `${DC.fmt(R - W / 2)} / ${DC.fmt(R + W / 2)}` },
-            { text: "Straight is measured from where the branch centerline crosses the main centerline. Subtract your lateral fitting's own length." }
+            { text: "Long and short side run along the branch from where it meets the main to the start of the elbow. Subtract your lateral fitting's own length." }
         ]);
 
         // ---------- 3D scene ----------

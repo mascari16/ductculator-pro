@@ -27,6 +27,42 @@
      * main centerline at the lateral angle, one elbow, then a tail.
      * Shared with Rect Fittings through DC.lateralScene.
      */
+    /*
+     * Straight on each edge of the branch, measured from where that edge
+     * meets the main surface (the tap) to where the elbow starts. The long
+     * side is the heel (obtuse) side, the short side the toe. For a mitered
+     * elbow each edge runs to its own miter point.
+     */
+    function lateralSides({ main, size, angle, r, smooth }) {
+        const a = DC.rad(angle);
+        const turn = r.orient === "parallel" ? -r.elbow : r.elbow;
+        const lean = smooth ? 0 : (size / 2) * Math.tan(DC.rad(Math.abs(turn)) / 2);
+        const sign = turn > 0 ? 1 : -1; // inside of the turn: +1 = heel side
+        const tHeel = (main / 2 - Math.cos(a) * size / 2) / Math.sin(a);
+        const tToe = (main / 2 + Math.cos(a) * size / 2) / Math.sin(a);
+        const endHeel = r.straight - sign * lean;
+        const endToe = r.straight + sign * lean;
+        return { tHeel, tToe, endHeel, endToe, heel: endHeel - tHeel, toe: endToe - tToe };
+    }
+
+    DC.lateralSides = lateralSides;
+
+    // Result rows for the straight: both edges from the tap, plus the centerline.
+    function sideRows(main, size, angle, r, smooth) {
+        const sd = lateralSides({ main, size, angle, r, smooth });
+        const rows = [
+            { label: "Straight, long side", note: "heel edge, from the main to the elbow", value: sd.heel > 0 ? DC.len(sd.heel) : "—" },
+            { label: "Straight, short side", note: "toe edge, from the main to the elbow", value: sd.toe > 0 ? DC.len(sd.toe) : "—" },
+            { label: "Straight on the centerline", note: smooth ? "from the main centerline" : "from the main centerline to the miter point", value: DC.len(r.straight) }
+        ];
+        if (sd.toe <= 0) {
+            rows.push({ text: "The elbow starts before the short side clears the main. Increase the offset (or distance along the main), or use a smaller elbow." });
+        }
+        return rows;
+    }
+
+    DC.lateralSideRows = sideRows;
+
     function lateralScene({ kind, main, size, depth, angle, r, R, smooth, roll, label }) {
         const a = DC.rad(angle);
         const tail = size * 1.6;
@@ -66,12 +102,18 @@
                 slideMax: Math.max(0, Math.hypot(elbowStart[0] + Math.sin(a) * size / 2 - tapVertex[0], elbowStart[1] - Math.cos(a) * size / 2 - tapVertex[1]) - size * 0.9),
                 label: DC.deg(angle)
             },
-            r.straight > 0.05 && {
-                a: [0, 0], b: elbowStart, dir: nrm, base: size / 2 + unit * 0.35,
-                ea: [0, 0], eb: [elbowStart[0] + nrm[0] * size / 2, elbowStart[1] + nrm[1] * size / 2], cl: "a",
-                label: `Straight ${DC.fmt(r.straight)}`
-            }
         ];
+
+        // Straight on the long side, from the tap on the main to the elbow.
+        const sides = lateralSides({ main, size, angle, r, smooth });
+        const edge = (t, o) => [t * Math.cos(a) + nrm[0] * o, t * Math.sin(a) + nrm[1] * o];
+        if (sides.heel > 0.05) {
+            const pa = edge(sides.tHeel, size / 2);
+            const pb = edge(sides.endHeel, size / 2);
+            dims.push({ a: pa, b: pb, dir: nrm, base: unit * 0.3, ea: pa, eb: pb, label: `Long side ${DC.fmt(sides.heel)}` });
+        }
+        // (The short side is listed in the results: on the drawing it sits
+        // against the main, where its dimension can't be read.)
 
         if (parallel) {
             dims.push({ a: [end.x, 0], b: [end.x, end.y], dir: [1, 0], base: unit * 0.45, ea: [0, 0], eb: [elbowEnd.x, end.y], cl: true, label: `${roll ? "True offset" : "Offset"} ${DC.fmt(r.trueOffset)}` });
@@ -302,13 +344,13 @@
             { label: "Elbow angle", value: DC.deg(r.elbow), main: true },
             r.rollAngle != null && { label: "True offset", note: "√(offset² + roll²)", value: DC.fmt(r.trueOffset) },
             r.rollAngle != null && { label: "Roll angle", note: "turn the lateral this far from vertical", value: DC.deg(r.rollAngle, 1) },
-            { label: "Branch straight to elbow", note: "from the main centerline", value: DC.len(r.straight) },
+            ...sideRows(DC.meas("rlMainD") > 0 ? DC.meas("rlMainD") : D * 1.5, D, angle, r, true),
             { label: "Branch travel to elbow center", value: DC.len(r.travel) },
             r.orient === "parallel"
                 ? { label: "Along the main to elbow end", value: DC.len(r.advanceToElbowEnd) }
                 : { label: "Elbow end above main centerline", value: DC.len(r.elbowEndHeight) },
             { label: "Elbow centerline radius", value: DC.fmt(R) },
-            { text: "Straight is measured from where the branch centerline crosses the main centerline. Subtract your lateral fitting's own length." }
+            { text: "Long and short side run along the branch from where it meets the main to the start of the elbow. Subtract your lateral fitting's own length." }
         ];
 
         DC.renderRows(out, rows);

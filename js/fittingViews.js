@@ -424,8 +424,14 @@
             gy0 = Math.min(gy0, p[1]); gy1 = Math.max(gy1, p[1]);
         }
 
-        // Phones: size the view to the drawing's shape.
-        if (cw < 700) {
+        const lock = state.lock || null;
+        const gcx = (gx0 + gx1) / 2;
+        const gcy = (gy0 + gy1) / 2;
+
+        // Phones: size the view to the drawing's shape (not while dragging).
+        if (lock) {
+            ch = lock.ch;
+        } else if (cw < 700) {
             const aspect = (gy1 - gy0 + 1) / (gx1 - gx0 + 1);
             const want = Math.round(Math.max(230, Math.min(400, cw * aspect * 1.1 + 170)));
             if (Math.abs(want - ch) > 2) {
@@ -662,7 +668,14 @@
         let placed = null;
         let F = null;
 
-        for (let k = 0; k < shares.length; k += 1) {
+        if (lock) {
+            // Turning the view: keep the scale, height and framing from the
+            // start of the drag so the fitting turns smoothly in place.
+            placed = place(lock.u);
+            F = { u: lock.u, w: lock.w, h: lock.h, cx: gcx + lock.dx, cy: gcy + lock.dy };
+        }
+
+        for (let k = 0; !lock && k < shares.length; k += 1) {
             const share = shares[k];
             const uu = cw < 700 ? geomW / (cw * share) : Math.max(geomW / (cw * share), geomH / (ch * Math.min(0.78, share * 1.25)));
             const result = place(uu);
@@ -695,6 +708,7 @@
         }
 
         const u = F.u;
+        state.frame = { u: F.u, w: F.w, h: F.h, dx: F.cx - gcx, dy: F.cy - gcy, ch };
         svg.setAttribute("viewBox", `${F.cx - F.w / 2} ${F.cy - F.h / 2} ${F.w} ${F.h}`);
 
         // Centerline extensions drawn in depth order (hidden behind the duct).
@@ -837,6 +851,7 @@
 
         svg.addEventListener("pointerdown", event => {
             drag = { x: event.clientX, y: event.clientY, yaw: state.yaw, pitch: state.pitch };
+            state.lock = state.frame || null;
             svg.setPointerCapture(event.pointerId);
             root.classList.add("is-dragging");
         });
@@ -849,8 +864,12 @@
         });
 
         const end = () => {
+            if (!drag) return;
             drag = null;
+            state.lock = null;
             root.classList.remove("is-dragging");
+            // Refit the drawing and dimensions for the new angle.
+            if (state.scene) render(viewId, state.scene);
         };
         svg.addEventListener("pointerup", end);
         svg.addEventListener("pointercancel", end);
