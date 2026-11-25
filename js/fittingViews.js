@@ -724,7 +724,14 @@
                     const probe = labelBox(d.label, 0, 0);
                     const push0 = Math.abs(sx) * probe.w / 2 + Math.abs(sy) * probe.h / 2 + 3 * u;
                     let lb = labelBox(d.label, mx + sx * push0, my + sy * push0);
-                    search: for (let t = 0; d.fixed && t < 30 && !rectFree(lb); t += 1) {
+                    if (d.radius) {
+                        // radius callout: the label sits right at the tail of its leader
+                        const lx = pb[0] - pa[0], ly = pb[1] - pa[1], ll = Math.hypot(lx, ly) || 1;
+                        const ux = lx / ll, uy = ly / ll;
+                        const along = Math.abs(ux) * probe.w / 2 + Math.abs(uy) * probe.h / 2;
+                        lb = labelBox(d.label, pa[0] - ux * along, pa[1] - uy * along);
+                    }
+                    search: for (let t = 0; d.fixed && !d.radius && t < 30 && !rectFree(lb); t += 1) {
                         for (const sign of [1, -1]) {
                             const push = sign * (push0 + t * step);
                             const cand = labelBox(d.label, mx + sx * push, my + sy * push);
