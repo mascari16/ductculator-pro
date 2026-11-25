@@ -70,8 +70,16 @@
 
         const slope = DC.rad(alpha);
         const nrm = [-Math.sin(slope), Math.cos(slope)];
-        const vertex = [(W / 2) * Math.tan(half), -W / 2];
+        const lean = (W / 2) * Math.tan(half);
         const Lc = Math.hypot(O, L);
+        // Corners of the sloped piece (both miters are parallel, so the
+        // piece is a parallelogram): its cheek edges are Lc long, and its
+        // bottom corners are exactly L apart along the run.
+        const BL = [lean, -W / 2];
+        const BR = [L + lean, O - W / 2];
+        const TL = [-lean, W / 2];
+        const TR = [L - lean, O + W / 2];
+        const outEnd = [L + lead, O - W / 2]; // bottom corner of the outlet's end
 
         return {
             roll: 0,
@@ -79,10 +87,14 @@
             parts: [{ kind: "rect", w: W, h: H, path: path.points }],
             dims: [
                 { a: [-lead, -W / 2], b: [-lead, W / 2], dir: [-1, 0], base: W * 0.3, label: `${DC.fmt(W)} cheek` },
-                { a: [0, -W / 2], b: [L, -W / 2], dir: [0, -1], base: W * 0.45, ea: [0, 0], eb: [L, O], cl: true, label: `Length ${DC.fmt(L)}` },
-                { a: [L + lead, 0], b: [L + lead, O], dir: [1, 0], base: W * 0.45, ea: [0, 0], eb: [L, O], cl: true, label: `Offset ${DC.fmt(O)}` },
-                { a: [nrm[0] * W / 2, nrm[1] * W / 2], b: [L + nrm[0] * W / 2, O + nrm[1] * W / 2], dir: nrm, base: W * 0.45, label: `Sloped ${DC.fmt(Lc)}` },
-                { type: "angle", c: vertex, a0: 0, a1: alpha, r: W * 0.6, slide: [Math.cos(slope), Math.sin(slope)], slideMax: Math.max(0, Lc - W), label: DC.deg(alpha) }
+                // Run between the miters, from the sloped piece's bottom corners.
+                { a: BL, b: [BR[0], -W / 2], dir: [0, -1], base: W * 0.4, ea: BL, eb: BR, label: `Length ${DC.fmt(L)}` },
+                // Offset between the bottom edges of the inlet and outlet.
+                { a: [outEnd[0], -W / 2], b: outEnd, dir: [1, 0], base: W * 0.35, ea: BL, eb: outEnd, label: `Offset ${DC.fmt(O)}` },
+                // Cheek edge of the sloped piece, corner to corner.
+                { a: TL, b: TR, dir: nrm, base: W * 0.3, ea: TL, eb: TR, label: `Sloped ${DC.fmt(Lc)}` },
+                // Angle at the bottom corner, off the inlet's bottom edge.
+                { type: "angle", c: BL, a0: 0, a1: alpha, r: W * 0.55, label: DC.deg(alpha) }
             ],
             caption: `Both miters cut ${DC.deg(alpha / 2)} off square · depth ${DC.fmt(H)}`
         };
