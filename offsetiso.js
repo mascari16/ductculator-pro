@@ -2001,7 +2001,13 @@
         }
         // centerline radius of the first elbow, from its center to the centerline
         const midArc = [R * Math.sin(a / 2), R - R * Math.cos(a / 2)];
-        dims.push({ a: [0, R], b: midArc, fixed: true, radius: true, label: `CLR ${fmt(R)}` });
+        // A fixed-length leader pointing at the centerline, so the callout stays put
+        // whatever the CLR (it no longer runs all the way back to the center).
+        const toC = [0 - midArc[0], R - midArc[1]];
+        const toCl = Math.hypot(toC[0], toC[1]) || 1;
+        const lead = Math.min(R, W * 0.55);
+        const tail = [midArc[0] + toC[0] / toCl * lead, midArc[1] + toC[1] / toCl * lead];
+        dims.push({ a: tail, b: midArc, fixed: true, radius: true, label: `CLR ${fmt(R)}` });
 
         return {
             roll: 0,
