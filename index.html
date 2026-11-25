@@ -1292,102 +1292,87 @@
             <p>Break one long rectangular taper into 2, 3, or 4 CAMduct fittings.</p>
         </header>
 
-        <div class="transition-splitter-layout">
-            <div class="transition-visual-column">
-                <div class="transition-view-grid">
-                    <section class="transition-view-card">
-                        <div class="transition-view-heading">
-                            <div><span class="transition-view-kicker">Top view</span><h3>From above</h3></div>
-                            <span class="transition-view-help">Width change + left/right offset</span>
-                        </div>
-                        <div id="transitionTopView" class="transition-view-canvas"></div>
-                    </section>
-
-                    <section class="transition-view-card">
-                        <div class="transition-view-heading">
-                            <div><span class="transition-view-kicker">Right view</span><h3>From the right</h3></div>
-                            <span class="transition-view-help">Depth change + top/bottom offset</span>
-                        </div>
-                        <div id="transitionSideView" class="transition-view-canvas"></div>
-                    </section>
+        <div class="calculator tool-calc transition-calc">
+            <div class="panel tool-inputs">
+                <h3>Inputs</h3>
+                <p class="input-help">Enter the transition exactly as it was sent over.</p>
+                <label for="transitionWidthIn">A) Width In</label>
+                <input id="transitionWidthIn" type="text" inputmode="decimal" value="30">
+                <label for="transitionDepthIn">B) Depth In</label>
+                <input id="transitionDepthIn" type="text" inputmode="decimal" value="30">
+                <label for="transitionWidthOut">C) Width Out</label>
+                <input id="transitionWidthOut" type="text" inputmode="decimal" value="12">
+                <label for="transitionDepthOut">D) Depth Out</label>
+                <input id="transitionDepthOut" type="text" inputmode="decimal" value="8">
+                <label for="transitionLength">E) Length</label>
+                <input id="transitionLength" type="text" inputmode="decimal" value="91">
+                <label for="transitionOffsetWidth">H) Offset Width</label>
+                <div class="transition-offset-row">
+                    <input id="transitionOffsetWidth" type="text" inputmode="decimal" value="0">
+                    <select id="transitionOffsetWidthMode" aria-label="Offset Width Direction">
+                        <option value="leftIn" selected>Left In</option>
+                        <option value="leftOut">Left Out</option>
+                        <option value="rightIn">Right In</option>
+                        <option value="rightOut">Right Out</option>
+                    </select>
                 </div>
-
-                <div id="transitionSplitSummary" class="transition-summary-grid"></div>
-
-                <p id="transitionTaperNote" class="transition-taper-note" hidden></p>
-
-                <section class="transition-output-section">
-                    <div class="transition-output-heading">
-                        <div><span>Shop entry</span><h2>What to type into CAMduct</h2></div>
-                        <p>Each card is one separate taper. The outlet of one fitting becomes the inlet of the next.</p>
-                    </div>
-                    <div id="transitionFittingList" class="transition-fitting-list"></div>
-                </section>
-            </div>
-
-            <aside class="transition-input-panel">
-                <div class="transition-input-title">
-                    <span>Original fitting</span>
-                    <h2>Transition inputs</h2>
-                    <p>Enter the transition exactly as it was sent over.</p>
+                <label for="transitionOffsetDepth">I) Offset Depth</label>
+                <div class="transition-offset-row">
+                    <input id="transitionOffsetDepth" type="text" inputmode="decimal" value="0">
+                    <select id="transitionOffsetDepthMode" aria-label="Offset Depth Direction">
+                        <option value="topUp" selected>Top Up</option>
+                        <option value="topDown">Top Down</option>
+                        <option value="bottomUp">Bottom Up</option>
+                        <option value="bottomDown">Bottom Down</option>
+                    </select>
                 </div>
-
-                <div class="transition-input-grid">
-                    <label for="transitionWidthIn">A) Width In</label><input id="transitionWidthIn" type="text" inputmode="decimal" value="30">
-                    <label for="transitionDepthIn">B) Depth In</label><input id="transitionDepthIn" type="text" inputmode="decimal" value="30">
-                    <label for="transitionWidthOut">C) Width Out</label><input id="transitionWidthOut" type="text" inputmode="decimal" value="12">
-                    <label for="transitionDepthOut">D) Depth Out</label><input id="transitionDepthOut" type="text" inputmode="decimal" value="8">
-                    <label for="transitionLength">E) Length</label><input id="transitionLength" type="text" inputmode="decimal" value="91">
-                </div>
-
-                <div class="transition-offset-section">
-                    <h3>Offset Width</h3>
-                    <div class="transition-offset-row">
-                        <input id="transitionOffsetWidth" type="text" inputmode="decimal" value="0" aria-label="Offset Width">
-                        <select id="transitionOffsetWidthMode" aria-label="Offset Width Direction">
-                            <option value="leftIn" selected>Left In</option>
-                            <option value="leftOut">Left Out</option>
-                            <option value="rightIn">Right In</option>
-                            <option value="rightOut">Right Out</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="transition-offset-section">
-                    <h3>Offset Depth</h3>
-                    <div class="transition-offset-row">
-                        <input id="transitionOffsetDepth" type="text" inputmode="decimal" value="0" aria-label="Offset Depth">
-                        <select id="transitionOffsetDepthMode" aria-label="Offset Depth Direction">
-                            <option value="topUp" selected>Top Up</option>
-                            <option value="topDown">Top Down</option>
-                            <option value="bottomUp">Bottom Up</option>
-                            <option value="bottomDown">Bottom Down</option>
-                        </select>
-                    </div>
-                </div>
-
-                <label class="transition-split-label" for="transitionSplitCount">Change To</label>
+                <label for="transitionSplitCount">Split into</label>
                 <select id="transitionSplitCount">
                     <option value="2" selected>2 Fittings</option>
                     <option value="3">3 Fittings</option>
                     <option value="4">4 Fittings</option>
                     <option value="auto">By max piece length</option>
                 </select>
-
-                <div id="transitionMaxPieceGroup" class="transition-extra-field" hidden>
+                <div id="transitionMaxPieceGroup" hidden>
                     <label for="transitionMaxPiece">Max piece length</label>
                     <input id="transitionMaxPiece" type="text" inputmode="decimal" value="48">
                 </div>
+                <label for="transitionTaperLimit">Max taper angle (optional)</label>
+                <input id="transitionTaperLimit" type="number" inputmode="decimal" min="1" max="89" step="0.5" placeholder="Your shop limit, e.g. 15">
+                <p class="input-help">The inlet, outlet, total length and offsets stay the same. Breaks are at equal stations along the taper.</p>
+            </div>
 
-                <div class="transition-extra-field">
-                    <label for="transitionTaperLimit">Max taper angle (optional)</label>
-                    <input id="transitionTaperLimit" type="number" inputmode="decimal" min="1" max="89" step="0.5" placeholder="Your shop limit, e.g. 15">
+            <div class="panel tool-output">
+                <h3>Results</h3>
+                <div class="live-view" id="transitionView">
+                    <div class="live-view-head">
+                        <h4>Live 3D view</h4>
+                        <button type="button" class="live-view-reset" data-view-reset>Reset view</button>
+                    </div>
+                    <svg class="fv-svg" tabindex="0" role="img" aria-label="3D view of the split transition. Drag or use the arrow keys to turn it."></svg>
+                    <p class="live-view-msg" hidden></p>
+                    <p class="live-view-caption" hidden></p>
+                    <p class="live-view-hint">Drag or use the arrow keys to turn the view.</p>
                 </div>
-
-                <button id="calculateTransitionSplit" class="transition-calculate-btn" type="button">Split Transition</button>
-
-                <div class="transition-input-note">The tool keeps the original inlet size, outlet size, total length, and offset path. Intermediate sizes are calculated at equal stations along the taper.</div>
-            </aside>
+                <div id="transitionSplitSummary" class="kv-list" aria-live="polite"></div>
+                <p id="transitionTaperNote" class="transition-taper-note" hidden></p>
+                <h4 class="kv-head">What to type into CAMduct</h4>
+                <p class="input-help">Each card is one taper. The outlet of one fitting is the inlet of the next.</p>
+                <div id="transitionFittingList" class="transition-fitting-list"></div>
+                <details class="transition-flat">
+                    <summary>Top and right views</summary>
+                    <div class="transition-view-grid">
+                        <section class="transition-view-card">
+                            <div class="transition-view-heading"><h3>From above</h3><span class="transition-view-help">Width change and left/right offset</span></div>
+                            <div id="transitionTopView" class="transition-view-canvas"></div>
+                        </section>
+                        <section class="transition-view-card">
+                            <div class="transition-view-heading"><h3>From the right</h3><span class="transition-view-help">Depth change and top/bottom offset</span></div>
+                            <div id="transitionSideView" class="transition-view-canvas"></div>
+                        </section>
+                    </div>
+                </details>
+            </div>
         </div>
     </section>
 </div>
@@ -1957,13 +1942,13 @@
 <script src="app.js?v=20260812-6"></script>
 <script src="offsetiso.js?v=20261125-5"></script>
 <script src="js/equivalentUI.js?v=20260812-6"></script>
-<script src="js/transitionSplitter.js?v=20260812-6"></script>
 <script src="js/proCalc.js?v=20261124-1"></script>
 <script src="js/shared.js?v=20261124-2"></script>
 <script src="js/sizingTools.js?v=20261124-2"></script>
-<script src="js/fittingViews.js?v=20261124-3"></script>
+<script src="js/fittingViews.js?v=20261125-1"></script>
 <script src="js/roundFittings.js?v=20261124-3"></script>
 <script src="js/rectFittings.js?v=20261124-3"></script>
+<script src="js/transitionSplitter.js?v=20261125-2"></script>
 <script src="js/layoutMath.js?v=20261124-2"></script>
 <script src="js/takeoff.js?v=20261124-2"></script>
 <script src="js/wheel.js?v=20261125-9"></script>

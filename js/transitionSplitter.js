@@ -877,26 +877,85 @@
             return;
         }
 
-        const eachLength = result.length / result.splitCount;
+        const n = result.splitCount;
+        const each = result.length / n;
+        const breaks = [];
+        for (let k = 1; k < n; k += 1) breaks.push(formatMeasurement(each * k));
 
-        summary.innerHTML = `
-            <div class="transition-summary-card">
-                <span>Original length</span>
-                <strong>${formatMeasurement(result.length)}</strong>
-            </div>
-            <div class="transition-summary-card transition-summary-primary">
-                <span>Split into</span>
-                <strong>${result.splitCount} fittings</strong>
-            </div>
-            <div class="transition-summary-card">
-                <span>Each length</span>
-                <strong>${formatMeasurement(eachLength)}</strong>
-            </div>
-            <div class="transition-summary-card">
-                <span>Intermediate breaks</span>
-                <strong>${result.splitCount - 1}</strong>
-            </div>
-        `;
+        const row = (label, value, note, main) => `
+            <div class="kv-row${main ? " kv-main" : ""}">
+                <span>${label}${note ? `<em>${note}</em>` : ""}</span>
+                <strong>${value}</strong>
+            </div>`;
+
+        summary.innerHTML =
+            row("Each piece", formatMeasurement(each), `${n} fittings, equal lengths`, true) +
+            row("Original length", formatMeasurement(result.length)) +
+            row(n > 2 ? "Breaks at" : "Break at", breaks.join(", "), "measured from the inlet") +
+            row("Sizes at the breaks",
+                result.stations.slice(1, -1).map(st => `${formatMeasurement(cleanNumber(st.width))} × ${formatMeasurement(cleanNumber(st.depth))}`).join(", "));
+    }
+
+    /*
+     * Live 3D view (same renderer as the other fitting screens). x runs
+     * along the length, y across the width, w through the depth. Each break
+     * is a seam ring.
+     */
+    function transitionScene(result) {
+        const L = result.length;
+        const Wi = result.widthIn;
+        const Di = result.depthIn;
+        const corners = st => {
+            const yl = Wi / 2 - st.left;
+            const yr = yl - st.width;
+            const wb = -Di / 2 + st.bottom;
+            const wt = wb + st.depth;
+            return { yl, yr, wb, wt };
+        };
+        const rings = result.stations.map(st => {
+            const x = st.lengthPosition;
+            const c = corners(st);
+            return { pts: [[x, c.yl, c.wt], [x, c.yr, c.wt], [x, c.yr, c.wb], [x, c.yl, c.wb]], joint: true };
+        });
+        const first = corners(result.stations[0]);
+        const last = corners(result.stations[result.stations.length - 1]);
+        const yMin = Math.min(first.yr, last.yr);
+        const size = Math.max(Wi, result.widthOut, 6);
+        const n = result.splitCount;
+        const each = L / n;
+        const mids = result.stations.slice(1, -1).map(st => [st.lengthPosition, yMin, st.lengthPosition, corners(st).yr]);
+        const fmt = formatMeasurement;
+
+        return {
+            roll: 0,
+            dimW: Di / 2,
+            parts: [{ kind: "rect", w: Wi, h: Di, rings }],
+            dims: [
+                { a: [0, first.yr], b: [0, first.yl], dir: [-1, 0], base: size * 0.3, label: `${fmt(Wi)} in` },
+                { a: [L, last.yr], b: [L, last.yl], dir: [1, 0], base: size * 0.3, label: `${fmt(result.widthOut)} out` },
+                { a: [0, yMin], b: [L, yMin], dir: [0, -1], base: size * 0.35, ea: [0, first.yr], eb: [L, last.yr], mid: mids,
+                  label: n > 1 ? `Length ${fmt(L)} (${fmt(each)} each)` : `Length ${fmt(L)}` }
+            ],
+            caption: [
+                `${n} fittings`,
+                `${fmt(Wi)} × ${fmt(Di)} to ${fmt(result.widthOut)} × ${fmt(result.depthOut)}`,
+                `depth ${fmt(Di)} to ${fmt(result.depthOut)}`
+            ].join(" · ")
+        };
+    }
+
+    let viewBound = false;
+    function render3D(result) {
+        if (!window.DC || !DC.Fit3D) return;
+        if (!viewBound) {
+            DC.Fit3D.bindView("transitionView");
+            viewBound = true;
+        }
+        if (!result) {
+            DC.Fit3D.clear("transitionView", "Fix the inputs to see the transition.");
+            return;
+        }
+        DC.Fit3D.render("transitionView", transitionScene(result));
     }
 
     function entry(label, value, className = "", measurement = false) {
@@ -936,10 +995,7 @@
             return `
                 <article class="transition-fitting-card">
                     <div class="transition-fitting-heading">
-                        <div>
-                            <span>CAMduct entry</span>
-                            <h3>Fitting ${fitting.number}</h3>
-                        </div>
+                        <h3>Fitting ${fitting.number}</h3>
                         <div class="transition-fitting-size">
                             ${formatMeasurement(fitting.widthIn)} × ${formatMeasurement(fitting.depthIn)}
                             <b>→</b>
@@ -970,9 +1026,9 @@
 
         if (summary) {
             summary.innerHTML = `
-                <div class="transition-error">
-                    <strong>Check Transition Inputs</strong>
-                    <span>${message}</span>
+                <div class="kv-problem" role="alert">
+                    <strong>Check the transition inputs</strong>
+                    <p>${message}</p>
                 </div>
             `;
         }
@@ -1074,6 +1130,7 @@
         if (error) {
             showError(error);
             renderTaperNote(null);
+            render3D(null);
             return;
         }
 
@@ -1122,6 +1179,7 @@
             reverseHorizontal: true
         });
 
+        render3D(result);
         renderSummary(result);
         renderFittings(result);
         renderTaperNote(result);

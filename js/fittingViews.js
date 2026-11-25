@@ -911,7 +911,8 @@
             // intermediate points of a chain: extension line and arrows both ways
             for (const q of p.d.mid || []) {
                 const q2 = [q[0] + p.dir[0] * p.dist, q[1] + p.dir[1] * p.dist];
-                const s0 = Q(q[0], q[1]), s1 = Q(q2[0], q2[1]);
+                // [x, y] on the chain's base line, or [x, y, ex, ey]: extension starts at (ex, ey) on the part
+                const s0 = q.length >= 4 ? Q(q[2], q[3]) : Q(q[0], q[1]), s1 = Q(q2[0], q2[1]);
                 const dx = s1[0] - s0[0], dy = s1[1] - s0[1], l = Math.hypot(dx, dy) || 1;
                 line([s0[0] + (dx / l) * 3 * u, s0[1] + (dy / l) * 3 * u], [s1[0] + (dx / l) * 4 * u, s1[1] + (dy / l) * 4 * u], "fv-ext", 0.9);
                 arrow(s1, p.pa);
