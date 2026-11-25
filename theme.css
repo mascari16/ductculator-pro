@@ -1701,6 +1701,7 @@ h1,h2,h3,h4{
 .wh-tk-major{stroke-width:1.5}
 .wh-num{fill:#111;font:600 13px "Barlow Condensed", "Arial Narrow", sans-serif}
 .wh-num-sm{font-size:11px;font-weight:500}
+.wh-num-r{font-size:11.5px}
 .wh-unit{fill:#111;font:700 13px "Barlow Condensed", sans-serif}
 .wh-tab{fill:none;stroke:#111;stroke-width:22;stroke-linecap:round}
 .wh-tab-sm{stroke-width:18}

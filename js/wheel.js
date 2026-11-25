@@ -47,8 +47,41 @@
     const eQ = q => E0 + AL * Math.log10(q);
     const G0 = E0 - AL * LOG_V - K + c * LOG_K;
     const vV = v => G0 + AL * Math.log10(v);
-    const GA = [186, 262];                           // green arc (card angles)
-    const gA = a => GA[0] + ((Math.log10(a) - Math.log10(3)) / (Math.log10(100) - Math.log10(3))) * (GA[1] - GA[0]);
+    // green: two printed scales, long side on the card, short side on the disc.
+    // Equal friction (Huebscher) isn't exactly separable, so the two scales are
+    // fitted (least squares over sides 3-120", 1:1 to 4:1) so that wherever the
+    // disc sits, each long side lines up with its short side to about 1%.
+    const DE = (x, y) => (1.30 * (x * y) ** 0.625) / (x + y) ** 0.25;
+    const GREEN = (function fitGreen() {
+        const n = 81, grid = [];
+        for (let i = 0; i < n; i += 1) grid.push(3 * 40 ** (i / (n - 1)));
+        const pairs = [];
+        for (let i = 0; i < n; i += 1) for (let j = 0; j <= i; j += 1) {
+            if (grid[i] / grid[j] <= 4.0001) pairs.push([i, j, phiOf(DE(grid[i], grid[j]))]);
+        }
+        const X = new Float64Array(n), Y = new Float64Array(n);
+        for (let it = 0; it < 300; it += 1) {
+            const sx = new Float64Array(n), nx = new Float64Array(n);
+            for (const [i, j, t] of pairs) { sx[i] += t + Y[j]; nx[i] += 1; }
+            for (let i = 0; i < n; i += 1) if (nx[i]) X[i] = sx[i] / nx[i];
+            const sy = new Float64Array(n), ny = new Float64Array(n);
+            for (const [i, j, t] of pairs) { sy[j] += X[i] - t; ny[j] += 1; }
+            for (let j = 0; j < n; j += 1) if (ny[j]) Y[j] = sy[j] / ny[j];
+        }
+        const lg = grid.map(Math.log);
+        const at = (tab, v) => {
+            const u = Math.log(v);
+            let k = 0;
+            while (k < n - 2 && lg[k + 1] < u) k += 1;
+            const f = (u - lg[k]) / (lg[k + 1] - lg[k]);
+            return tab[k] + f * (tab[k + 1] - tab[k]);
+        };
+        const shift = 187 - at(X, 4);
+        return { long: a => at(X, a) + shift, short: b => at(Y, b) + shift };
+    })();
+    const gA = GREEN.long;                           // card angle of a long side
+    const gB = GREEN.short;                          // disc angle of a short side
+    const GREEN_MAX = 72;
 
     const R = { disc: 290, rim: 252, out: [294, 352], win: [196, 240], winA: 20, green: [254, 290] };
 
@@ -128,8 +161,9 @@
     const base = el("g", {});
     const disc = el("g", { class: "wh-discg" });
     const over = el("g", {});
-    const greenRow = el("g", {});
-    svg.replaceChildren(base, disc, greenRow, over);
+    const greenOuter = el("g", {});
+    const greenInner = el("g", {});
+    svg.replaceChildren(base, disc, over);
 
     // ---------- the card ----------
     function drawCard() {
@@ -146,11 +180,10 @@
         scale(base, { values: ticks(200, 40000, FINE), labels: ticks(200, 40000, LBL), angle: eQ, rLine: o0, dir: 1, rText: o0 + 27, isMajor: v => rank(v) <= 2, fmt: num });
         tab(base, "AIR VOLUME – CFM", o1 + 16, eQ(3000), 34);
 
-        // green: rectangular side A (outer row)
-        base.appendChild(band(o0, o1, GA[0] - 4, GA[1] + 4, "wh-green"));
-        const sides = [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 36, 40, 42, 48, 54, 60, 66, 72, 80, 90, 100];
-        scale(base, { values: ticks(3, 100, [[1, 2, 0.1], [2, 5, 0.5], [5, 10, 1]]), labels: sides, angle: gA, rLine: o0, dir: 1, rText: o0 + 27, isMajor: v => v === Math.round(v), fmt: String });
-        tab(base, "RECTANGULAR DUCT DIMENSIONS – INCHES", o1 + 16, (GA[0] + GA[1]) / 2, 62);
+        // green: rectangular long side (printed on the card)
+        base.appendChild(band(o0, o1, gA(4) - 4, gA(GREEN_MAX) + 4, "wh-green"));
+        base.appendChild(greenOuter);
+        tab(base, "RECTANGULAR DUCT – LONG SIDE, INCHES", o1 + 16, (gA(4) + gA(GREEN_MAX)) / 2, 62);
 
         // round duct size, printed on the card under the disc's window
         base.appendChild(band(R.win[0] - 4, R.win[1] + 4, dD(3) - 3, dD(100) + 3, "wh-fplate"));
@@ -194,7 +227,8 @@
 
         // round duct window, frame, label and arrow
         disc.appendChild(el("path", { d: arcPath(w1, P - wa, P + wa) + arcPath(w0, P - wa, P + wa), class: "wh-winframe" }));
-        tab(disc, "ROUND DUCT DIAMETER – INCHES", w1 + 22, P - 3, 54, true);
+        tab(disc, "ROUND DUCT DIAMETER – INCHES", w1 + 22, P - 4, 50, true);
+        disc.appendChild(greenInner);
         const [hx, hy] = pt(w0 - 3, P);
         disc.appendChild(el("path", { d: `M${hx} ${hy}l-18 -11v6h-16v10h16v6z`, class: "wh-index-head", transform: `rotate(${P - 90} ${hx} ${hy})` }));
 
@@ -210,8 +244,8 @@
             ["wh-step", "    friction rate on the blue scales.", 14],
             ["wh-step", "2. Read the round duct size at the arrow in the window.", 14],
             ["wh-step", "3. Read the velocity on the orange scale opposite the airflow.", 14],
-            ["wh-step", "4. Read rectangular sizes on the green: each outer size pairs", 13],
-            ["wh-step", "    with the inner size beside it (same friction as the round).", 0]
+            ["wh-step", "4. Rectangular: find the long side on the outer green; the", 13],
+            ["wh-step", "    short side is beside it on the disc (same friction as the round).", 0]
         ]);
         textBlock(disc, x - 12, CY + 92, [
             ["wh-step-h", "Notes", 14],
@@ -223,41 +257,58 @@
         disc.appendChild(el("circle", { cx: CX + 8, cy: CY + 44, r: 5, class: "wh-pivot" }));
     }
 
-    // inner green row: the side that pairs with each outer size for the round size in the window
+    // matching side for a long side a at round size D (exact, for checks)
     function rectB(a, D) {
-        const de = (x, y) => (1.30 * (x * y) ** 0.625) / (x + y) ** 0.25;
-        if (de(a, 400) < D) return null;
+        if (DE(a, 400) < D) return null;
         let lo = 0.5, hi = 400;
-        if (de(a, lo) > D) return null;
-        for (let i = 0; i < 50; i += 1) { const m = (lo + hi) / 2; if (de(a, m) < D) lo = m; else hi = m; }
+        if (DE(a, lo) > D) return null;
+        for (let i = 0; i < 50; i += 1) { const m = (lo + hi) / 2; if (DE(a, m) < D) lo = m; else hi = m; }
         return hi;
     }
-    function drawGreenRow(D) {
-        greenRow.replaceChildren();
-        const [g0, g1] = R.green;
-        greenRow.appendChild(band(g0, g1, GA[0] - 4, GA[1] + 4, "wh-green wh-green-in"));
-        const sides = [4, 5, 6, 7, 8, 9, 10, 12, 14, 16, 18, 20, 24, 28, 30, 36, 40, 48, 54, 60, 72, 80, 90, 100];
-        const taken = [];
-        const step = typeof rectSizeStep === "function" ? rectSizeStep() : 1;
-        for (const a of sides) {
-            if (a % step) continue;
-            const exact = rectB(a, D);
-            if (!exact) continue;
-            // the matching side, rounded up to the step so friction stays at or below
-            const b = Math.max(step, Math.ceil(exact / step - 1e-9) * step);
-            if (b < 3 || b > 120 || Math.max(a, b) / Math.min(a, b) > 4.01) continue;
-            const ang = gA(a);
-            const text = String(b);
-            const half = ((text.length * 7 + 6) / 2 / (g1 - 20)) * 180 / Math.PI;
-            if (taken.some(([x, h]) => Math.abs(ang - x) < half + h)) continue;
-            taken.push([ang, half]);
-            const [x0, y0] = pt(g1, ang), [x1, y1] = pt(g1 - 10, ang);
-            greenRow.appendChild(el("line", { x1: x0, y1: y0, x2: x1, y2: y1, class: "wh-tk wh-tk-major" }));
-            const [tx, ty] = pt(g1 - 22, ang);
-            const up = Math.cos(rad(ang)) >= -0.25;
-            greenRow.appendChild(el("text", { x: tx, y: ty, class: "wh-num", transform: `rotate(${up ? norm(ang) : norm(ang) + 180} ${tx} ${ty})`, "text-anchor": "middle", "dominant-baseline": "central" }, text));
+
+    // printed sides. Ticks every inch to 36", then every 2"; labels read along
+    // the radius (like a printed wheel's dense scales) so they all fit.
+    function sideTicks(step) {
+        const out = [];
+        for (let v = 4; v <= GREEN_MAX; v += 1) {
+            if (v % step) continue;
+            if (v > 36 && v % 2) continue;
+            out.push(v);
+        }
+        return out;
+    }
+    function sideLabels(step) {
+        const out = step === 1 ? [4, 5, 6, 7, 8, 9, 10, 11, 12] : [4, 6, 8, 10, 12];
+        out.push(14, 16, 18, 20, 22, 24, 28, 32, 36, 40, 44, 48, 54, 60, 66, 72);
+        return out;
+    }
+    function greenScale(g, { angle, rLine, dir, len, lenMajor, rText, step }) {
+        const labels = sideLabels(step);
+        for (const v of sideTicks(step)) {
+            const a = angle(v), major = labels.includes(v);
+            const [x0, y0] = pt(rLine, a), [x1, y1] = pt(rLine + dir * (major ? lenMajor : len), a);
+            g.appendChild(el("line", { x1: x0, y1: y0, x2: x1, y2: y1, class: major ? "wh-tk wh-tk-major" : "wh-tk" }));
+        }
+        let last = null;
+        for (const v of labels) {
+            const a = angle(v);
+            if (last !== null && Math.abs(a - last) * rText * Math.PI / 180 < 9.5) continue;
+            last = a;
+            const [tx, ty] = pt(rText, a);
+            let r = a - 90;
+            if (Math.cos(rad(r)) < 0) r += 180;
+            g.appendChild(el("text", { x: tx, y: ty, class: "wh-num wh-num-r", transform: `rotate(${norm(r)} ${tx} ${ty})`, "text-anchor": "middle", "dominant-baseline": "central" }, String(v)));
         }
     }
+    function drawGreenScales() {
+        const step = typeof rectSizeStep === "function" ? rectSizeStep() : 2;
+        greenOuter.replaceChildren();
+        greenScale(greenOuter, { angle: gA, rLine: R.out[0], dir: 1, len: 8, lenMajor: 13, rText: R.out[0] + 28, step });
+        greenInner.replaceChildren();
+        greenInner.appendChild(band(R.rim, R.disc, gB(GREEN_MAX) - 4, gB(4) + 2, "wh-green wh-green-in"));
+        greenScale(greenInner, { angle: gB, rLine: R.disc, dir: -1, len: 7, lenMajor: 12, rText: R.disc - 24, step });
+    }
+    window.__wheelGreen = { gA, gB, phiOf, roundOf };
 
     // ---------- reading hairline ----------
     const hairLine = el("line", { class: "wh-hair" });
@@ -313,11 +364,10 @@
 
     const hairOn = () => !!document.getElementById("whHair")?.checked;
 
-    let lastD = null;
+
     function update() {
         disc.setAttribute("transform", `rotate(${phi} ${CX} ${CY})`);
         const D = roundOf(phi);
-        if (lastD === null || Math.abs(D - lastD) > 0.01) { drawGreenRow(D); lastD = D; }
         const n = notch(D);
         if (drag && drag.kind === "disc" && lastNotch !== null && n !== lastNotch) click();
         lastNotch = n;
@@ -414,7 +464,7 @@
     document.getElementById("whHair")?.addEventListener("change", update);
     // 1" / 2" steps: redraw the wheel's pairs and recalculate the calculator
     document.getElementById("rectStepSize")?.addEventListener("change", () => {
-        lastD = null;
+        drawGreenScales();
         update();
         if (typeof updateCalculator === "function") updateCalculator();
     });
@@ -447,6 +497,7 @@
 
     drawCard();
     drawDisc();
+    drawGreenScales();
     update();
 
     window.DuctWheel = {
