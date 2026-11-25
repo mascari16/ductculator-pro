@@ -1585,3 +1585,27 @@ h1,h2,h3,h4{
         display:none !important;
     }
 }
+
+/* Drawing conventions for the 3D view dimensions */
+.fv-arrow{
+    fill:var(--yellow);
+    stroke:none;
+}
+
+.fv-cl{
+    stroke:#9fb4c2;
+    stroke-opacity:.55;
+    stroke-linecap:round;
+}
+
+.fv-ext{
+    stroke-dasharray:none;
+    stroke-opacity:.7;
+    vector-effect:none;
+}
+
+.live-view-caption{
+    padding:8px 14px 0;
+    color:#cfd6db;
+    font-size:13.5px;
+}

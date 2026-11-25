@@ -68,17 +68,23 @@
             .corner(-alpha)
             .line(lead, true);
 
+        const slope = DC.rad(alpha);
+        const nrm = [-Math.sin(slope), Math.cos(slope)];
+        const vertex = [(W / 2) * Math.tan(half), -W / 2];
+        const Lc = Math.hypot(O, L);
+
         return {
             roll: 0,
+            dimW: H / 2,
             parts: [{ kind: "rect", w: W, h: H, path: path.points }],
             dims: [
-                { a: [-lead, -W / 2], b: [-lead, W / 2], off: [-gap, 0], label: `${DC.fmt(W)} cheek` },
-                { a: [0, 0], b: [L, 0], off: [0, -(W / 2 + gap)], eb: [L, O], label: `Length ${DC.fmt(L)}` },
-                { a: [L + lead + gap, 0], b: [L + lead + gap, O], ea: null, eb: [L + lead, O], label: `Offset ${DC.fmt(O)}` }
+                { a: [-lead, -W / 2], b: [-lead, W / 2], dir: [-1, 0], base: W * 0.3, label: `${DC.fmt(W)} cheek` },
+                { a: [0, -W / 2], b: [L, -W / 2], dir: [0, -1], base: W * 0.45, ea: [0, 0], eb: [L, O], cl: true, label: `Length ${DC.fmt(L)}` },
+                { a: [L + lead, 0], b: [L + lead, O], dir: [1, 0], base: W * 0.45, ea: [0, 0], eb: [L, O], cl: true, label: `Offset ${DC.fmt(O)}` },
+                { a: [nrm[0] * W / 2, nrm[1] * W / 2], b: [L + nrm[0] * W / 2, O + nrm[1] * W / 2], dir: nrm, base: W * 0.45, label: `Sloped ${DC.fmt(Lc)}` },
+                { type: "angle", c: vertex, a0: 0, a1: alpha, r: W * 0.6, slide: [Math.cos(slope), Math.sin(slope)], slideMax: Math.max(0, Lc - W), label: DC.deg(alpha) }
             ],
-            notes: [
-                { at: [L / 2, O + W / 2 + gap * 0.9], text: `Both miters ${DC.deg(alpha / 2)}` }
-            ]
+            caption: `Both miters cut ${DC.deg(alpha / 2)} off square · depth ${DC.fmt(H)}`
         };
     }
 

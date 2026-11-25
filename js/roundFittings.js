@@ -29,10 +29,8 @@
      */
     function lateralScene({ kind, main, size, depth, angle, r, R, smooth, roll, label }) {
         const a = DC.rad(angle);
-        const gap = Math.max(main, size) * 0.8 + 3;
         const tail = size * 1.6;
-        // The branch starts on the main's surface (centerline point) and
-        // its first ring is cut to the main: flat for rect, saddle for round.
+        // Branch starts on the main surface; its first ring is cut to the main.
         const start = Math.min((main / 2) / Math.sin(a), Math.max(0, r.straight));
         const turn = r.orient === "parallel" ? -r.elbow : r.elbow;
         const path = DC.Fit3D.Path(start * Math.cos(a), start * Math.sin(a), angle).line(r.straight - start, true);
@@ -47,43 +45,53 @@
 
         const end = path.points[path.points.length - 1];
         const elbowEnd = path.points[path.points.length - 2];
-        const mainLeft = -main * 1.6 - (size / 2) / Math.tan(a);
-        const mainRight = Math.max(end.x, elbowEnd.x + size) + (r.orient === "parallel" ? 0 : main * 1.4);
+        const parallel = r.orient === "parallel";
+        const mainLeft = -main * 1.4 - (size / 2) / Math.tan(a);
+        const mainRight = parallel ? end.x : elbowEnd.x + size / 2 + main * 1.4;
         const mainPath = DC.Fit3D.Path(mainLeft, 0, 0).line(mainRight - mainLeft, true);
         const section = kind === "round" ? { d: main } : { w: main, h: depth };
         const branch = kind === "round" ? { d: size } : { w: size, h: depth };
-        const mid = r.straight / 2;
+        const nrm = [-Math.sin(a), Math.cos(a)];
+        const elbowStart = [r.straight * Math.cos(a), r.straight * Math.sin(a)];
+        // Vertex where the branch's lower edge meets the main surface.
+        const tapVertex = [(main / 2) / Math.tan(a) + (size / 2) / Math.sin(a), main / 2];
+        const unit = Math.max(main, size);
+
         const dims = [
-            { a: [mainLeft, -main / 2], b: [mainLeft, main / 2], off: [-gap, 0], label: label(main) }
-        ];
-        const notes = [
-            { at: [Math.cos(a / 2) * (main * 0.5 + gap * 1.1), Math.sin(a / 2) * (main * 0.5 + gap * 1.1) + main / 2], text: DC.deg(angle) },
-            r.straight > 0.01 && {
-                at: [mid * Math.cos(a) - Math.sin(a) * (size / 2 + gap * 0.8), mid * Math.sin(a) + Math.cos(a) * (size / 2 + gap * 0.8)],
-                text: `Straight ${DC.fmt(r.straight)}`
+            { a: [mainLeft, -main / 2], b: [mainLeft, main / 2], dir: [-1, 0], base: main * 0.3, label: label(main) },
+            {
+                type: "angle", c: tapVertex, a0: 0, a1: angle, r: size * 0.7,
+                // slide up the branch's lower edge, but not past the elbow
+                slide: [Math.cos(a), Math.sin(a)],
+                slideMax: Math.max(0, Math.hypot(elbowStart[0] + Math.sin(a) * size / 2 - tapVertex[0], elbowStart[1] - Math.cos(a) * size / 2 - tapVertex[1]) - size * 0.9),
+                label: DC.deg(angle)
+            },
+            r.straight > 0.05 && {
+                a: [0, 0], b: elbowStart, dir: nrm, base: size / 2 + unit * 0.35,
+                ea: [0, 0], eb: [elbowStart[0] + nrm[0] * size / 2, elbowStart[1] + nrm[1] * size / 2], cl: "a",
+                label: `Straight ${DC.fmt(r.straight)}`
             }
         ];
 
-        if (r.orient === "parallel") {
-            const T = r.trueOffset;
-            dims.push({ a: [end.x + gap, 0], b: [end.x + gap, T], ea: [mainRight, 0], eb: [end.x, end.y], label: `${roll ? "True offset" : "Offset"} ${DC.fmt(T)}` });
+        if (parallel) {
+            dims.push({ a: [end.x, 0], b: [end.x, end.y], dir: [1, 0], base: unit * 0.45, ea: [0, 0], eb: [elbowEnd.x, end.y], cl: true, label: `${roll ? "True offset" : "Offset"} ${DC.fmt(r.trueOffset)}` });
+            dims.push({ a: [0, -main / 2], b: [elbowEnd.x, -main / 2], dir: [0, -1], base: main * 0.45, ea: [0, 0], eb: [elbowEnd.x, elbowEnd.y], cl: true, label: `Along main ${DC.fmt(elbowEnd.x)}` });
         } else {
-            const A = elbowEnd.x;
-            dims.push({ a: [0, 0], b: [A, 0], off: [0, -(main / 2 + gap)], eb: [end.x, end.y], label: `Along main ${DC.fmt(A)}` });
-        }
-
-        if (roll) {
-            notes.push({ at: [end.x, end.y + size / 2 + gap], text: `Rolled ${roll.toFixed(1)}° from vertical` });
+            dims.push({ a: [0, -main / 2], b: [elbowEnd.x, -main / 2], dir: [0, -1], base: main * 0.45, ea: [0, 0], eb: [elbowEnd.x, end.y], cl: true, label: `Along main ${DC.fmt(elbowEnd.x)}` });
         }
 
         return {
             roll: roll || 0,
+            dimW: kind === "rect" ? depth / 2 : 0,
             parts: [
                 { kind, ...section, path: mainPath.points, tone: "main" },
                 { kind, ...branch, path: path.points, tap: { kind, half: main / 2, angle } }
             ],
-            dims,
-            notes: notes.filter(Boolean)
+            dims: dims.filter(Boolean),
+            caption: [
+                `${DC.deg(r.elbow)} ${smooth ? "radius" : "straight"} elbow${smooth ? `, CLR ${DC.fmt(R)}` : ""}`,
+                roll ? `rolled ${roll.toFixed(1)}° from vertical` : ""
+            ].filter(Boolean).join(" · ")
         };
     }
 
@@ -201,35 +209,36 @@
 
         // ---------- 3D scene ----------
         const lead = Math.max(D * 1.2, 6);
-        const gap = D * 0.9 + 3;
         const path = DC.Fit3D.Path(-lead, 0, 0)
             .line(lead, true)
             .gored(R, angle, gores)
             .line(Math.max(0, straight), true)
             .gored(R, -angle, gores)
             .line(lead, true);
-        const half = DC.rad(angle / 2);
-        const elbowMid = [R * Math.sin(half), R - R * Math.cos(half)];
-        const out1 = [Math.sin(half), -Math.cos(half)];
+        const nrm = [-Math.sin(a), Math.cos(a)];
+        const e1 = [R * Math.sin(a), R * (1 - Math.cos(a))];
+        const e2 = [e1[0] + Math.max(0, straight) * Math.cos(a), e1[1] + Math.max(0, straight) * Math.sin(a)];
         const rollDeg = roll > 0 ? (rise > 0 ? DC.degOf(Math.atan(roll / rise)) : 90) : 0;
-        const slopeMid = [
-            (R * Math.sin(DC.rad(angle)) + length - R * Math.sin(DC.rad(angle))) / 2,
-            T / 2
-        ];
+        const heelVertex = [(R + D / 2) * Math.tan(a / 2), -D / 2];
 
         return {
             roll: rollDeg,
             parts: [{ kind: "round", d: D, path: path.points }],
             dims: [
-                { a: [-lead, -D / 2], b: [-lead, D / 2], off: [-gap, 0], label: `Ø ${DC.fmt(D)}` },
-                { a: [0, 0], b: [length, 0], off: [0, -(D / 2 + gap)], eb: [length, T], label: `Length ${DC.fmt(length)}` },
-                { a: [length + lead + gap, 0], b: [length + lead + gap, T], ea: null, eb: [length + lead, T], label: `${roll > 0 ? "True offset" : "Offset"} ${DC.fmt(T)}` }
-            ],
-            notes: [
-                { at: [elbowMid[0] + out1[0] * (D / 2 + gap * 0.45), elbowMid[1] + out1[1] * (D / 2 + gap * 0.45)], text: DC.deg(angle) },
-                straight > 0.01 && { at: [slopeMid[0] - Math.sin(DC.rad(angle)) * (D / 2 + gap * 0.7), slopeMid[1] + Math.cos(DC.rad(angle)) * (D / 2 + gap * 0.7)], text: `Straight ${DC.fmt(straight)}` },
-                roll > 0 && { at: [length + lead, T + D / 2 + gap], text: `Rolled ${rollDeg.toFixed(1)}° from vertical` }
-            ].filter(Boolean)
+                { a: [-lead, -D / 2], b: [-lead, D / 2], dir: [-1, 0], base: D * 0.3, label: `Ø ${DC.fmt(D)}` },
+                { a: [0, -D / 2], b: [length, -D / 2], dir: [0, -1], base: D * 0.45, ea: [0, -D / 2], eb: [length, T - D / 2], label: `Length ${DC.fmt(length)}` },
+                { a: [length + lead, 0], b: [length + lead, T], dir: [1, 0], base: D * 0.45, ea: [0, 0], eb: [length, T], cl: true, label: `${roll > 0 ? "True offset" : "Offset"} ${DC.fmt(T)}` },
+                straight > 0.05 && {
+                    a: [e1[0] + nrm[0] * D / 2, e1[1] + nrm[1] * D / 2],
+                    b: [e2[0] + nrm[0] * D / 2, e2[1] + nrm[1] * D / 2],
+                    dir: nrm, base: D * 0.45, label: `Straight ${DC.fmt(straight)}`
+                },
+                { type: "angle", c: heelVertex, a0: 0, a1: angle, r: heelVertex[0] + D * 0.6, label: DC.deg(angle) }
+            ].filter(Boolean),
+            caption: [
+                `${gores}-gore elbows, CLR ${DC.fmt(R)}`,
+                roll > 0 ? `rolled ${rollDeg.toFixed(1)}° from vertical` : ""
+            ].filter(Boolean).join(" · ")
         };
     }
 
@@ -366,7 +375,6 @@
 
         // ---------- 3D scene ----------
         const lead = D * 0.9;
-        const gap = D * 0.9 + 3;
         const path = DC.Fit3D.Path(-lead, 0, 0).line(lead, true).gored(R, angle, gores).line(lead, true);
         const half = DC.rad(angle / 2);
         const mid = [R * Math.sin(half), R - R * Math.cos(half)];
@@ -375,13 +383,11 @@
             roll: 0,
             parts: [{ kind: "round", d: D, path: path.points }],
             dims: [
-                { a: [-lead, -D / 2], b: [-lead, D / 2], off: [-gap, 0], label: `Ø ${DC.fmt(D)}` },
-                { a: [0, R], b: mid, ea: null, eb: null, label: `CLR ${DC.fmt(R)}` }
+                { a: [-lead, -D / 2], b: [-lead, D / 2], dir: [-1, 0], base: D * 0.3, label: `Ø ${DC.fmt(D)}` },
+                { a: [0, R], b: mid, fixed: true, radius: true, label: `CLR ${DC.fmt(R)}` },
+                { type: "angle", c: [0, R], a0: -90, a1: -90 + angle, r: Math.max(R - D / 2, R * 0.3) * 0.45, fixed: true, noRays: true, keepOnSmall: true, label: DC.deg(angle) }
             ],
-            notes: [
-                { at: [mid[0] + Math.sin(half) * (D / 2 + gap * 0.45), mid[1] - Math.cos(half) * (D / 2 + gap * 0.45)], text: `${DC.deg(angle)} · ${gores} gores` },
-                { at: [-lead, D / 2 + gap * 0.9], text: `Miter ${DC.deg(g.miter)}` }
-            ]
+            caption: `${gores} gores · miter ${DC.deg(g.miter)} · full gore ${DC.deg(g.goreAngle)}`
         };
     }
 

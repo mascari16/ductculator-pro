@@ -308,6 +308,7 @@
         const cam = camera(state);
         const items = [];
         const pts2 = [];
+        const occ = []; // screen outlines of everything drawn (for dimension placement)
         const P = v => {
             const q = cam(v);
             return [q[0], -q[2], q[1]];
@@ -343,6 +344,7 @@
 
                     const sp = quad.map(P);
                     sp.forEach(p => pts2.push(p));
+                    occ.push(sp);
                     const fill = shade(tone, nv);
                     items.push({
                         z: sp.reduce((s, p) => s + p[2], 0) / 4,
@@ -394,6 +396,7 @@
                 if (nv[1] >= 0) continue;
                 const sp = S[i].ring.map(P);
                 sp.forEach(p => pts2.push(p));
+                occ.push(sp);
                 const fill = shade(TONES.main, nv);
                 items.push({
                     z: sp.reduce((s, p) => s + p[2], 0) / sp.length,
@@ -408,55 +411,23 @@
             }
         }
 
-        items.sort((a, b) => b.z - a.z);
-
-        svg.replaceChildren();
-        const defs = el("defs");
-        svg.appendChild(defs);
-
-        const g = el("g", { class: "fv-solid" });
-        items.forEach(item => g.appendChild(item.node));
-        svg.appendChild(g);
-
-        // ---------- dimensions: gather geometry first ----------
-        const dimGeo = [];
-
-        for (const d of scene.dims || []) {
-            // ea / eb: where the extension lines start (default: a / b; null = none)
-            const off = d.off || [0, 0];
-            const pa = P(to3(plane, d.a[0] + off[0], d.a[1] + off[1]));
-            const pb = P(to3(plane, d.b[0] + off[0], d.b[1] + off[1]));
-            const fromA = d.ea === null ? null : d.ea || d.a;
-            const fromB = d.eb === null ? null : d.eb || d.b;
-            const ea = fromA ? P(to3(plane, fromA[0], fromA[1])) : null;
-            const eb = fromB ? P(to3(plane, fromB[0], fromB[1])) : null;
-            pts2.push(pa, pb);
-            dimGeo.push({ ea, eb, pa, pb, label: d.label });
-        }
-
-        const noteGeo = (scene.notes || []).map(n => {
-            const p = P(to3(plane, n.at[0], n.at[1], n.w || 0));
-            pts2.push(p);
-            return { p, text: n.text };
-        });
-
-        // ---------- fit the view ----------
-        let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-        for (const p of pts2) {
-            minX = Math.min(minX, p[0]); maxX = Math.max(maxX, p[0]);
-            minY = Math.min(minY, p[1]); maxY = Math.max(maxY, p[1]);
-        }
-        // Size from the view's real on-screen box so labels stay ~14px,
-        // then grow the fit to include the label text and fit again.
+        // =================================================
+        // Dimensions: placed clear of the duct and of each other.
+        // =================================================
         const box = svg.getBoundingClientRect();
         const cw = box.width || 600;
         let ch = box.height || 380;
 
-        // Phones: size the view to the drawing so wide fittings aren't
-        // shrunk into a tall, mostly empty box.
-        if (cw && cw < 700) {
-            const aspect = (maxY - minY + 1) / (maxX - minX + 1);
-            const want = Math.round(Math.max(210, Math.min(380, cw * aspect * 1.25 + 120)));
+        let gx0 = Infinity, gy0 = Infinity, gx1 = -Infinity, gy1 = -Infinity;
+        for (const p of pts2) {
+            gx0 = Math.min(gx0, p[0]); gx1 = Math.max(gx1, p[0]);
+            gy0 = Math.min(gy0, p[1]); gy1 = Math.max(gy1, p[1]);
+        }
+
+        // Phones: size the view to the drawing's shape.
+        if (cw < 700) {
+            const aspect = (gy1 - gy0 + 1) / (gx1 - gx0 + 1);
+            const want = Math.round(Math.max(230, Math.min(400, cw * aspect * 1.1 + 170)));
             if (Math.abs(want - ch) > 2) {
                 svg.style.height = `${want}px`;
                 ch = want;
@@ -465,131 +436,380 @@
             svg.style.height = "";
             ch = svg.getBoundingClientRect().height || ch;
         }
-        const padX = Math.min(70, cw * 0.12);
-        const padY = Math.min(60, ch * 0.12);
 
-        function fit(bx0, by0, bx1, by1) {
-            const wv = Math.max(bx1 - bx0, 1);
-            const hv = Math.max(by1 - by0, 1);
-            const uu = Math.max(wv / Math.max(cw - padX, 80), hv / Math.max(ch - padY, 60));
+        const small = cw < 520;
+        const labelPx = small ? 12.5 : 14;
+
+        function fitBox(x0, y0, x1, y1, padX, padY) {
+            const wv = Math.max(x1 - x0, 1);
+            const hv = Math.max(y1 - y0, 1);
+            const uu = Math.max(wv / Math.max(cw - padX, 60), hv / Math.max(ch - padY, 50));
             let w = wv + padX * uu;
             let h = hv + padY * uu;
             if (w / h < cw / ch) w = h * cw / ch; else h = w * ch / cw;
-            return { u: w / cw, w, h, cx: (bx0 + bx1) / 2, cy: (by0 + by1) / 2 };
+            return { u: w / cw, w, h, cx: (x0 + x1) / 2, cy: (y0 + y1) / 2 };
         }
 
-        function labelAnchors(uu) {
-            const boxes = [];
-            for (const d of dimGeo) {
-                const dx = d.pb[0] - d.pa[0];
-                const dy = d.pb[1] - d.pa[1];
-                const len = Math.hypot(dx, dy) || 1;
-                const nx = -dy / len;
-                const ny = dx / len;
-                const side = ny > 0 ? -1 : 1;
-                d.lx = (d.pa[0] + d.pb[0]) / 2 + nx * 14 * uu * side;
-                d.ly = (d.pa[1] + d.pb[1]) / 2 + ny * 14 * uu * side;
-                boxes.push([d.lx, d.ly, String(d.label).length * 7.4 * uu, 16 * uu]);
+        function pointInPoly(x, y, poly) {
+            let inside = false;
+            for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+                const xi = poly[i][0], yi = poly[i][1], xj = poly[j][0], yj = poly[j][1];
+                if ((yi > y) !== (yj > y) && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) inside = !inside;
             }
-            for (const n of noteGeo) {
-                boxes.push([n.p[0], n.p[1], String(n.text).length * 6.8 * uu, 15 * uu]);
-            }
-            return boxes;
+            return inside;
         }
 
-        let F = fit(minX, minY, maxX, maxY);
+        // Dimensions go on the face plane toward the viewer (rect parts),
+        // so they measure visible edges and clear the part quickly.
+        const dw = (scene.dimW || 0) * (cam(plane.Wn)[1] < 0 ? 1 : -1);
+        const Q = (x, y) => P(to3(plane, x, y, dw));
 
-        for (let pass = 0; pass < 2; pass += 1) {
-            let x0 = minX, y0 = minY, x1 = maxX, y1 = maxY;
-            for (const [x, y, w, h] of labelAnchors(F.u)) {
-                x0 = Math.min(x0, x - w / 2); x1 = Math.max(x1, x + w / 2);
-                y0 = Math.min(y0, y - h / 2); y1 = Math.max(y1, y + h / 2);
+        function place(u) {
+            // Occupancy grid of the drawn duct, in screen units.
+            const cell = 3 * u;
+            const margin = 320 * u;
+            const ox = gx0 - margin;
+            const oy = gy0 - margin;
+            const nx = Math.ceil((gx1 - gx0 + 2 * margin) / cell) + 1;
+            const ny = Math.ceil((gy1 - gy0 + 2 * margin) / cell) + 1;
+            const grid = new Uint8Array(nx * ny);
+            const idx = (x, y) => {
+                const i = Math.floor((x - ox) / cell);
+                const j = Math.floor((y - oy) / cell);
+                return i < 0 || j < 0 || i >= nx || j >= ny ? -1 : j * nx + i;
+            };
+
+            for (const poly of occ) {
+                let a0 = Infinity, b0 = Infinity, a1 = -Infinity, b1 = -Infinity;
+                for (const p of poly) {
+                    a0 = Math.min(a0, p[0]); a1 = Math.max(a1, p[0]);
+                    b0 = Math.min(b0, p[1]); b1 = Math.max(b1, p[1]);
+                }
+                const i0 = Math.floor((a0 - ox) / cell), i1 = Math.floor((a1 - ox) / cell);
+                const j0 = Math.floor((b0 - oy) / cell), j1 = Math.floor((b1 - oy) / cell);
+                for (let j = j0; j <= j1; j += 1) {
+                    for (let i = i0; i <= i1; i += 1) {
+                        if (i < 0 || j < 0 || i >= nx || j >= ny) continue;
+                        const x = ox + (i + 0.5) * cell;
+                        const y = oy + (j + 0.5) * cell;
+                        if (pointInPoly(x, y, poly)) grid[j * nx + i] = 1;
+                    }
+                }
+                for (const p of poly) {
+                    const k = idx(p[0], p[1]);
+                    if (k >= 0) grid[k] = 1;
+                }
             }
-            F = fit(x0, y0, x1, y1);
+
+            // Clearance: grow the duct by two cells.
+            for (let pass = 0; pass < 2; pass += 1) {
+                const copy = grid.slice();
+                for (let j = 1; j < ny - 1; j += 1) {
+                    for (let i = 1; i < nx - 1; i += 1) {
+                        const k = j * nx + i;
+                        if (!copy[k] && (copy[k - 1] || copy[k + 1] || copy[k - nx] || copy[k + nx])) grid[k] = 1;
+                    }
+                }
+            }
+
+            const ductGrid = grid.slice();
+            const isDuct = (x, y) => {
+                const k = idx(x, y);
+                return k >= 0 && ductGrid[k] === 1;
+            };
+            const isFree = (x, y) => {
+                const k = idx(x, y);
+                return k < 0 || !grid[k];
+            };
+            const mark = (x, y) => {
+                const k = idx(x, y);
+                if (k >= 0) grid[k] = 2;
+            };
+            const segFree = (a, b) => {
+                const n = Math.max(2, Math.ceil(Math.hypot(b[0] - a[0], b[1] - a[1]) / cell));
+                for (let i = 0; i <= n; i += 1) {
+                    if (!isFree(a[0] + ((b[0] - a[0]) * i) / n, a[1] + ((b[1] - a[1]) * i) / n)) return false;
+                }
+                return true;
+            };
+            const segMark = (a, b) => {
+                const n = Math.max(2, Math.ceil(Math.hypot(b[0] - a[0], b[1] - a[1]) / cell));
+                for (let i = 0; i <= n; i += 1) mark(a[0] + ((b[0] - a[0]) * i) / n, a[1] + ((b[1] - a[1]) * i) / n);
+            };
+            const rectFree = r => {
+                for (let y = r.y; y <= r.y + r.h; y += cell) for (let x = r.x; x <= r.x + r.w; x += cell) if (!isFree(x, y)) return false;
+                return isFree(r.x + r.w, r.y + r.h);
+            };
+            const rectMark = r => {
+                for (let y = r.y - cell; y <= r.y + r.h + cell; y += cell) for (let x = r.x - cell; x <= r.x + r.w + cell; x += cell) mark(x, y);
+            };
+
+            const size = labelPx * u;
+            const labelBox = (text, x, y) => {
+                const w = String(text).length * size * 0.56 + 12 * u;
+                const h = size * 1.45;
+                return { x: x - w / 2, y: y - h / 2, w, h, cx: x, cy: y };
+            };
+
+            const placed = [];
+            const step = 4 * u;
+            const gc = [(gx0 + gx1) / 2, (gy0 + gy1) / 2];
+            const away = (mx, my, sx, sy) => {
+                let l = Math.hypot(sx, sy);
+                if (l < 1e-9) {
+                    sx = mx - gc[0]; sy = my - gc[1]; l = Math.hypot(sx, sy) || 1;
+                }
+                return [sx / l, sy / l];
+            };
+
+            // Fixed dimensions first (they can't move), then angles, then the rest.
+            // On phones the angle arcs are left out: the angle is the headline result.
+            const rank = d => (d.fixed ? 0 : d.type === "angle" ? 1 : 2);
+            const order = (scene.dims || [])
+                .filter(d => !(small && d.type === "angle" && !d.keepOnSmall))
+                .sort((p, q) => rank(p) - rank(q));
+
+            for (const d of order) {
+                if (d.type === "angle") {
+                    let best = null;
+                    const slide = d.slide ? norm([d.slide[0], d.slide[1], 0]) : null;
+                    for (let k = 0; k < 90; k += 1) {
+                        // Slide the vertex along the measured edge first (same angle,
+                        // parallel reference line), then grow the radius.
+                        const sk = slide ? Math.min(k, 60) : 0;
+                        const along = Math.min(sk * step * 1.5, d.slideMax ?? Infinity);
+                        const c3 = slide ? [d.c[0] + slide[0] * along, d.c[1] + slide[1] * along] : d.c;
+                        const r = d.r + (d.fixed ? 0 : (slide ? Math.max(0, k - 60) : k) * step);
+                        const pts = [];
+                        const n = 28;
+                        for (let i = 0; i <= n; i += 1) {
+                            const a = rad(d.a0 + ((d.a1 - d.a0) * i) / n);
+                            pts.push(Q(c3[0] + r * Math.cos(a), c3[1] + r * Math.sin(a)));
+                        }
+                        const am = rad((d.a0 + d.a1) / 2);
+                        const lm = Q(c3[0] + r * Math.cos(am), c3[1] + r * Math.sin(am));
+                        const cs = Q(c3[0], c3[1]);
+                        const [rx, ry] = away(lm[0], lm[1], lm[0] - cs[0], lm[1] - cs[1]);
+                        const probe = labelBox(d.label, 0, 0);
+                        const push0 = Math.abs(rx) * probe.w / 2 + Math.abs(ry) * probe.h / 2 + 4 * u;
+                        let lb = labelBox(d.label, lm[0] + rx * push0, lm[1] + ry * push0);
+                        // Fixed arcs: try outward and inward until the label is clear.
+                        search: for (let t = 0; d.fixed && t < 30 && !rectFree(lb); t += 1) {
+                            for (const sign of [1, -1]) {
+                                const push = sign * (push0 + t * step);
+                                const cand = labelBox(d.label, lm[0] + rx * push, lm[1] + ry * push);
+                                if (rectFree(cand)) { lb = cand; break search; }
+                            }
+                        }
+                        let ok = rectFree(lb);
+                        // arc ends touch the measured edges by design: test the inside only
+                        for (let i = 3; ok && i < n - 3; i += 1) ok = segFree(pts[i], pts[i + 1]);
+                        best = { d, pts, lb, c: c3 };
+                        if (ok || d.fixed) break;
+                    }
+                    for (let i = 0; i < best.pts.length - 1; i += 1) segMark(best.pts[i], best.pts[i + 1]);
+                    rectMark(best.lb);
+                    placed.push(best);
+                    continue;
+                }
+
+                // linear
+                const dir = d.dir || (d.off ? norm([d.off[0], d.off[1], 0]) : [0, 1, 0]);
+                const base = d.base ?? (d.off ? Math.hypot(d.off[0], d.off[1]) : 0);
+                let best = null;
+                for (let k = 0; k < 90; k += 1) {
+                    const dist = base + (d.fixed ? 0 : k * step);
+                    const a2 = [d.a[0] + dir[0] * dist, d.a[1] + dir[1] * dist];
+                    const b2 = [d.b[0] + dir[0] * dist, d.b[1] + dir[1] * dist];
+                    const pa = Q(a2[0], a2[1]);
+                    const pb = Q(b2[0], b2[1]);
+                    // Text sits just outside the dimension line, away from the part.
+                    const mx = (pa[0] + pb[0]) / 2, my = (pa[1] + pb[1]) / 2;
+                    const base0 = Q(d.a[0], d.a[1]);
+                    let [sx, sy] = away(mx, my, pa[0] - base0[0], pa[1] - base0[1]);
+                    if (d.fixed) {
+                        const lx = pb[0] - pa[0], ly = pb[1] - pa[1], ll = Math.hypot(lx, ly) || 1;
+                        [sx, sy] = [-ly / ll, lx / ll];
+                    }
+                    const probe = labelBox(d.label, 0, 0);
+                    const push0 = Math.abs(sx) * probe.w / 2 + Math.abs(sy) * probe.h / 2 + 3 * u;
+                    let lb = labelBox(d.label, mx + sx * push0, my + sy * push0);
+                    search: for (let t = 0; d.fixed && t < 30 && !rectFree(lb); t += 1) {
+                        for (const sign of [1, -1]) {
+                            const push = sign * (push0 + t * step);
+                            const cand = labelBox(d.label, mx + sx * push, my + sy * push);
+                            if (rectFree(cand)) { lb = cand; break search; }
+                        }
+                    }
+                    const ok = segFree(pa, pb) && rectFree(lb);
+                    best = { d, pa, pb, lb, dist, dir, a2, b2 };
+                    if (ok || d.fixed) break;
+                }
+                segMark(best.pa, best.pb);
+                rectMark(best.lb);
+                placed.push(best);
+            }
+
+            placed.isDuct = isDuct;
+            return placed;
         }
 
-        labelAnchors(F.u);
+        // Lock the drawing scale first, then place dimensions at exactly that
+        // scale. If they don't fit the view, step the drawing down and retry.
+        const geomW = Math.max(gx1 - gx0, 1);
+        const geomH = Math.max(gy1 - gy0, 1);
+        const shares = small ? [0.72, 0.62, 0.53, 0.45, 0.38, 0.32, 0.26] : [0.64, 0.55, 0.47, 0.4, 0.34, 0.28];
+        let placed = null;
+        let F = null;
+
+        for (let k = 0; k < shares.length; k += 1) {
+            const share = shares[k];
+            const uu = cw < 700 ? geomW / (cw * share) : Math.max(geomW / (cw * share), geomH / (ch * Math.min(0.78, share * 1.25)));
+            const result = place(uu);
+            let x0 = gx0, y0 = gy0, x1 = gx1, y1 = gy1;
+            for (const p of result) {
+                for (const q of p.pts || [p.pa, p.pb]) {
+                    x0 = Math.min(x0, q[0]); x1 = Math.max(x1, q[0]);
+                    y0 = Math.min(y0, q[1]); y1 = Math.max(y1, q[1]);
+                }
+                x0 = Math.min(x0, p.lb.x); x1 = Math.max(x1, p.lb.x + p.lb.w);
+                y0 = Math.min(y0, p.lb.y); y1 = Math.max(y1, p.lb.y + p.lb.h);
+            }
+            const pad = (small ? 8 : 16) * uu;
+            // Phones: the view grows to the content's height, so only width must fit.
+            const flexible = cw < 700;
+            const fits = x1 - x0 + 2 * pad <= cw * uu && (flexible || y1 - y0 + 2 * pad <= ch * uu);
+            placed = result;
+            if (flexible) {
+                const hPx = Math.round(Math.max(190, Math.min(560, (y1 - y0) / uu + 2 * (pad / uu) + 8)));
+                svg.style.height = `${hPx}px`;
+                ch = hPx;
+            }
+            F = { u: uu, w: cw * uu, h: ch * uu, cx: (x0 + x1) / 2, cy: (y0 + y1) / 2 };
+            if (fits) break;
+            if (k === shares.length - 1) {
+                // Last resort: fit everything (labels may be a touch smaller).
+                const fb = fitBox(x0, y0, x1, y1, 16, 16);
+                F = fb;
+            }
+        }
+
         const u = F.u;
         svg.setAttribute("viewBox", `${F.cx - F.w / 2} ${F.cy - F.h / 2} ${F.w} ${F.h}`);
 
-        // scale-stable strokes
+        // Centerline extensions drawn in depth order (hidden behind the duct).
+        for (const p of placed) {
+            if (!p.d.cl) continue;
+            for (const [from, end] of [[p.d.ea, p.a2], [p.d.eb, p.b2]]) {
+                if (!from || from === null || !end) continue;
+                if (!(p.d.cl === true || p.d.cl === (from === p.d.ea ? "a" : "b"))) continue;
+                const steps = 40;
+                for (let i = 0; i < steps; i += 1) {
+                    const t0 = i / steps, t1 = (i + 1) / steps;
+                    const q0 = [from[0] + (end[0] - from[0]) * t0, from[1] + (end[1] - from[1]) * t0];
+                    const q1 = [from[0] + (end[0] - from[0]) * t1, from[1] + (end[1] - from[1]) * t1];
+                    const s0 = Q(q0[0], q0[1]);
+                    const s1 = Q(q1[0], q1[1]);
+                    if (placed.isDuct((s0[0] + s1[0]) / 2, (s0[1] + s1[1]) / 2)) continue;
+                    items.push({ z: (s0[2] + s1[2]) / 2 - 0.3, node: el("line", { x1: s0[0], y1: s0[1], x2: s1[0], y2: s1[1], class: "fv-cl", "stroke-width": 0.9 * u }) });
+                }
+            }
+        }
+
+        items.sort((a, b) => b.z - a.z);
+
+        svg.replaceChildren();
+        const g = el("g", { class: "fv-solid" });
+        items.forEach(item => g.appendChild(item.node));
+        svg.appendChild(g);
+
+        // scale-stable strokes for the solid
         svg.querySelectorAll(".fv-edge, .fv-cap").forEach(n => n.setAttribute("stroke-width", 1.3 * u));
         svg.querySelectorAll(".fv-seam").forEach(n => n.setAttribute("stroke-width", 1.1 * u));
         g.querySelectorAll("polygon:not(.fv-cap)").forEach(n => n.setAttribute("stroke-width", 0.7 * u));
 
-        // ---------- dimensions (always on top) ----------
+        // ---------- draw dimensions ----------
         const dims = el("g", { class: "fv-dims" });
-        const seg = (a, b, cls, w) =>
-            dims.appendChild(el("line", { x1: a[0], y1: a[1], x2: b[0], y2: b[1], class: cls, "stroke-width": w * u }));
+        const line = (a, b, cls, w) => dims.appendChild(el("line", { x1: a[0], y1: a[1], x2: b[0], y2: b[1], class: cls, "stroke-width": w * u }));
+        const arrow = (tip, from) => {
+            const dx = tip[0] - from[0], dy = tip[1] - from[1];
+            const l = Math.hypot(dx, dy) || 1;
+            const ux = dx / l, uy = dy / l;
+            const L = 8 * u, W = 2.8 * u;
+            const bx = tip[0] - ux * L, by = tip[1] - uy * L;
+            dims.appendChild(el("path", { d: `M${tip[0]} ${tip[1]}L${bx - uy * W} ${by + ux * W}L${bx + uy * W} ${by - ux * W}Z`, class: "fv-arrow" }));
+        };
+        const tag = (lb, text) => {
+            dims.appendChild(el("rect", { x: lb.x, y: lb.y, width: lb.w, height: lb.h, rx: 4 * u, class: "fv-tag" }));
+            dims.appendChild(el("text", { x: lb.cx, y: lb.cy + labelPx * u * 0.36, "text-anchor": "middle", class: "fv-label", "font-size": labelPx * u }, text));
+        };
 
-        for (const d of dimGeo) {
-            for (const [from, to] of [[d.ea, d.pa], [d.eb, d.pb]]) {
-                if (from && Math.hypot(from[0] - to[0], from[1] - to[1]) > 2 * u) {
-                    seg(from, to, "fv-ext", 0.9);
+        for (const p of placed) {
+            if (p.pts) {
+                // angular dimension: extension rays from the vertex, arc, arrows
+                if (!p.d.noRays) {
+                    const c = Q(p.c[0], p.c[1]);
+                    for (const end of [p.pts[0], p.pts[p.pts.length - 1]]) {
+                        const dx = end[0] - c[0], dy = end[1] - c[1];
+                        const l = Math.hypot(dx, dy) || 1;
+                        const B = [end[0] + (dx / l) * 4 * u, end[1] + (dy / l) * 4 * u];
+                        const pieces = Math.max(4, Math.ceil(l / (2 * u)));
+                        let run = null;
+                        for (let i = 0; i <= pieces; i += 1) {
+                            const q = [c[0] + ((B[0] - c[0]) * i) / pieces, c[1] + ((B[1] - c[1]) * i) / pieces];
+                            const free = !placed.isDuct(q[0], q[1]);
+                            if (free && !run) run = q;
+                            if ((!free || i === pieces) && run) {
+                                if (Math.hypot(q[0] - run[0], q[1] - run[1]) > 2 * u) line(run, q, "fv-ext", 0.9);
+                                run = null;
+                            }
+                        }
+                    }
+                }
+                for (let i = 0; i < p.pts.length - 1; i += 1) line(p.pts[i], p.pts[i + 1], "fv-dim", 1.3);
+                arrow(p.pts[0], p.pts[2]);
+                arrow(p.pts[p.pts.length - 1], p.pts[p.pts.length - 3]);
+                tag(p.lb, p.d.label);
+                continue;
+            }
+
+            // extension lines: small gap off the part, slight overshoot
+            for (const [from, end, which] of [[p.d.ea === null ? null : p.d.ea || p.d.a, p.pa, "a"], [p.d.eb === null ? null : p.d.eb || p.d.b, p.pb, "b"]]) {
+                if (!from || p.d.radius) continue;
+                if (p.d.cl === true || p.d.cl === which) continue; // drawn as a centerline in depth order
+                const s = Q(from[0], from[1]);
+                const dx = end[0] - s[0], dy = end[1] - s[1];
+                const l = Math.hypot(dx, dy);
+                if (l < 3 * u) continue;
+                const ux = dx / l, uy = dy / l;
+                const A = [s[0] + ux * 3 * u, s[1] + uy * 3 * u];
+                const B = [end[0] + ux * 4 * u, end[1] + uy * 4 * u];
+                const pieces = Math.max(4, Math.ceil(Math.hypot(B[0] - A[0], B[1] - A[1]) / (2 * u)));
+                let run = null;
+                for (let i = 0; i <= pieces; i += 1) {
+                    const q = [A[0] + ((B[0] - A[0]) * i) / pieces, A[1] + ((B[1] - A[1]) * i) / pieces];
+                    const free = !placed.isDuct(q[0], q[1]);
+                    if (free && !run) run = q;
+                    if ((!free || i === pieces) && run) {
+                        if (Math.hypot(q[0] - run[0], q[1] - run[1]) > 2 * u) line(run, q, "fv-ext", 0.9);
+                        run = null;
+                    }
                 }
             }
 
-            seg(d.pa, d.pb, "fv-dim", 1.4);
-
-            const dx = d.pb[0] - d.pa[0];
-            const dy = d.pb[1] - d.pa[1];
-            const len = Math.hypot(dx, dy) || 1;
-            const nx = -dy / len;
-            const ny = dx / len;
-
-            for (const p of [d.pa, d.pb]) {
-                seg([p[0] - nx * 5 * u, p[1] - ny * 5 * u], [p[0] + nx * 5 * u, p[1] + ny * 5 * u], "fv-dim", 1.4);
-            }
-
-            // label on the outside of the line, kept upright
-            const size = (cw < 520 ? 15 : 14) * u;
-            dims.appendChild(el("text", {
-                x: d.lx,
-                y: d.ly + size * 0.35,
-                "text-anchor": "middle",
-                class: "fv-label",
-                "font-size": size
-            }, d.label));
-        }
-
-        for (const n of noteGeo) {
-            const size = (cw < 520 ? 14 : 12.5) * u;
-            dims.appendChild(el("text", {
-                x: n.p[0],
-                y: n.p[1] + size * 0.35,
-                "text-anchor": "middle",
-                class: "fv-note",
-                "font-size": size
-            }, n.text));
+            line(p.pa, p.pb, "fv-dim", 1.3);
+            if (!p.d.radius) arrow(p.pa, p.pb);
+            arrow(p.pb, p.pa);
+            tag(p.lb, p.d.label);
         }
 
         svg.appendChild(dims);
 
-        // Put every label on a solid dark tag (no text outlines: phone
-        // dark modes recolor outlines and made labels unreadable).
-        for (const t of [...dims.querySelectorAll("text")]) {
-            let b;
-            try {
-                b = t.getBBox();
-            } catch (error) {
-                b = null;
-            }
-            const size = Number(t.getAttribute("font-size"));
-            if (!b || !b.width) {
-                const w = String(t.textContent).length * size * 0.56;
-                b = { x: Number(t.getAttribute("x")) - w / 2, y: Number(t.getAttribute("y")) - size * 0.85, width: w, height: size * 1.1 };
-            }
-            const padX = 5 * u;
-            const padY = 2.5 * u;
-            const tag = el("rect", {
-                x: b.x - padX,
-                y: b.y - padY,
-                width: b.width + 2 * padX,
-                height: b.height + 2 * padY,
-                rx: 4 * u,
-                class: t.classList.contains("fv-note") ? "fv-tag fv-tag-note" : "fv-tag"
-            });
-            dims.insertBefore(tag, t);
+        // Caption under the view (notes that don't belong in the drawing).
+        const cap = root.querySelector(".live-view-caption");
+        if (cap) {
+            cap.textContent = scene.caption || "";
+            cap.hidden = !scene.caption;
         }
     }
 
