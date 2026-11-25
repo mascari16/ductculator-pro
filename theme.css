@@ -1772,3 +1772,7 @@ h1,h2,h3,h4{
 .af-top .af-mode{margin:0}
 .af-step{display:flex;align-items:center;gap:10px;margin:0;color:var(--gray);font-size:15px}
 .af-step select{width:auto;margin:0;min-height:40px}
+/* wheel: rectangular sizes stack under the label, each size kept whole */
+.kv-row.kv-sizes{flex-direction:column;align-items:stretch;gap:8px}
+.kv-row.kv-sizes strong{display:flex;flex-wrap:wrap;gap:6px 8px;text-align:left}
+.kv-row.kv-sizes strong span{white-space:nowrap;color:var(--white);padding:3px 10px;border:1px solid var(--border);border-radius:6px;background:rgba(255,255,255,.03)}

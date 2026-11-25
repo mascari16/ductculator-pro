@@ -281,7 +281,7 @@
     // same rule as the calculator's list (rectangle.js)
     function rectList(D) {
         if (typeof rectanglesForRound !== "function") return "";
-        return rectanglesForRound(D, { count: 4 }).map(o => `${o.width} × ${o.height}`).join(", ");
+        return rectanglesForRound(D, { count: 4 }).map(o => `<span>${o.width} × ${o.height}</span>`).join("");
     }
     const f2 = v => (v == null ? "—" : v >= 100 ? Math.round(v).toLocaleString() : v >= 10 ? v.toFixed(1) : v.toFixed(v < 1 ? 3 : 2));
 
@@ -342,7 +342,8 @@
         set("whFr", fr ? `${f2(fr)}"` : "—");
         set("whQOr", qO ? `${f2(qO)} CFM` : "—");
         set("whVel", vel ? `${f2(vel)} FPM` : "—");
-        set("whRect", rectList(D) || "—");
+        const rectEl = document.getElementById("whRect");
+        if (rectEl) rectEl.innerHTML = rectList(D) || "—";
     }
 
     // ---------- interaction ----------
